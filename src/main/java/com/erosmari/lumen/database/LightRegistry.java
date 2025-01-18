@@ -10,7 +10,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,9 +84,9 @@ public class LightRegistry {
         }
     }
 
-    public static List<Location> getSoftDeletedBlocksByOperationId(String operationId) {
-        String query = "SELECT * FROM illuminated_blocks WHERE operation_id = ? AND is_deleted = 1;";
-        List<Location> blocks = new ArrayList<>();
+    public static Map<Location, Integer> getSoftDeletedBlocksWithLightLevelByOperationId(String operationId) {
+        String query = "SELECT world, x, y, z, light_level FROM illuminated_blocks WHERE operation_id = ? AND is_deleted = 1;";
+        Map<Location, Integer> blocksWithLightLevel = new HashMap<>();
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -95,17 +97,16 @@ public class LightRegistry {
                 while (resultSet.next()) {
                     Location location = createLocationFromResultSet(resultSet);
                     if (location != null) {
-                        blocks.add(location);
-                    } else {
-                        logger.warning("No se pudo crear la ubicación para operation_id: " + operationId);
+                        int lightLevel = resultSet.getInt("light_level");
+                        blocksWithLightLevel.put(location, lightLevel);
                     }
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener los bloques eliminados para operation_id: " + operationId, e);
+            logger.log(Level.SEVERE, "Error al obtener bloques eliminados con niveles de luz para operation_id: " + operationId, e);
         }
 
-        return blocks;
+        return blocksWithLightLevel;
     }
 
     public static String getLastSoftDeletedOperationId() {

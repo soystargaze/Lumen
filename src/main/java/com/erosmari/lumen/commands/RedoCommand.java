@@ -47,31 +47,26 @@ public class RedoCommand {
             return;
         }
 
-        // Obtener el ID de la operación
-        final String operationId = context.getOrDefault("operation_id", "last");
-        final String resolvedOperationId = operationId.equals("last")
+        final String operationId = context.getOrDefault("operation_id", "last").equals("last")
                 ? LightRegistry.getLastSoftDeletedOperationId()
-                : operationId;
+                : context.get("operation_id");
 
-        if (resolvedOperationId == null) {
+        if (operationId == null) {
             player.sendMessage("§eNo hay operaciones previas para rehacer.");
             return;
         }
 
-        // Recuperar los bloques asociados a la operación
-        List<Location> blocks = LightRegistry.getSoftDeletedBlocksByOperationId(resolvedOperationId);
+        // Recuperar bloques y niveles de luz desde la base de datos
+        Map<Location, Integer> blocksWithLightLevels = LightRegistry.getSoftDeletedBlocksWithLightLevelByOperationId(operationId);
 
-        if (blocks.isEmpty()) {
-            player.sendMessage("§eNo se encontraron bloques para la operación: §b" + resolvedOperationId);
+        if (blocksWithLightLevels.isEmpty()) {
+            player.sendMessage("§eNo se encontraron bloques para la operación: §b" + operationId);
             return;
         }
 
-        logger.info("Restaurando bloques de luz para operation_id: " + resolvedOperationId + ". Total bloques: " + blocks.size());
+        logger.info("Restaurando bloques de luz para operation_id: " + operationId + ". Total bloques: " + blocksWithLightLevels.size());
 
-        // Usar una cola para manejar los bloques pendientes
-        Queue<Location> blockQueue = new LinkedList<>(blocks);
-
-        // Obtener el máximo de bloques por tick desde la configuración
+        Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
         int maxBlocksPerTick = ConfigHandler.getInt("settings.light_per_tick_with_command", 1000);
 
         Bukkit.getScheduler().runTaskTimer(
@@ -80,23 +75,23 @@ public class RedoCommand {
                     int processedCount = 0;
 
                     while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
-                        Location blockLocation = blockQueue.poll();
-                        if (blockLocation != null && blockLocation.getWorld() != null) {
-                            processBlock(blockLocation, resolvedOperationId);
+                        Map.Entry<Location, Integer> entry = blockQueue.poll();
+                        if (entry != null) {
+                            processBlock(entry.getKey(), entry.getValue(), operationId);
                             processedCount++;
                         }
                     }
 
                     if (blockQueue.isEmpty()) {
-                        logger.info("Restauración completada para operation_id: " + resolvedOperationId);
-                        LightRegistry.restoreSoftDeletedBlocksByOperationId(resolvedOperationId);
+                        logger.info("Restauración completada para operation_id: " + operationId);
+                        LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
                         Bukkit.getScheduler().cancelTasks(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Lumen")));
                     }
                 },
-                0L, 1L // Ejecutar cada tick
+                0L, 1L
         );
 
-        player.sendMessage("§aRestauración iniciada para " + blocks.size() + " bloques. Procesando en lotes de hasta " + maxBlocksPerTick + " bloques por tick...");
+        player.sendMessage("§aRestauración iniciada para " + blocksWithLightLevels.size() + " bloques. Procesando en lotes de hasta " + maxBlocksPerTick + " bloques por tick...");
     }
 
     /**
@@ -105,27 +100,17 @@ public class RedoCommand {
      * @param blockLocation Ubicación del bloque.
      * @param operationId   ID de la operación.
      */
-    private static void processBlock(Location blockLocation, String operationId) {
+    private static void processBlock(Location blockLocation, int lightLevel, String operationId) {
         Block block = blockLocation.getBlock();
-
-        // Establecer el bloque como Material.LIGHT
         block.setType(Material.LIGHT, false);
 
         if (block.getType() == Material.LIGHT) {
             try {
-                // Configurar el nivel de luz del bloque
                 Levelled lightData = (Levelled) block.getBlockData();
-                int lightLevel = LightRegistry.getLightLevel(blockLocation);
+                lightData.setLevel(lightLevel);
+                block.setBlockData(lightData, false);
 
-                if (lightLevel > 0 && lightLevel <= 15) {
-                    lightData.setLevel(lightLevel);
-                    block.setBlockData(lightData, false);
-
-                    // Registrar el bloque restaurado en la base de datos
-                    LightRegistry.addBlock(blockLocation, lightLevel, operationId);
-                } else {
-                    logger.warning("El nivel de luz recuperado (" + lightLevel + ") no es válido para " + blockLocation);
-                }
+                LightRegistry.addBlock(blockLocation, lightLevel, operationId);
             } catch (ClassCastException e) {
                 logger.warning("Error al configurar el nivel de luz para el bloque en " + blockLocation + ": " + e.getMessage());
             }
