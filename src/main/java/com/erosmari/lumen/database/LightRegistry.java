@@ -77,6 +77,8 @@ public class LightRegistry {
                     Location location = createLocationFromResultSet(resultSet);
                     if (location != null) {
                         blocks.add(location);
+                    } else {
+                        logger.warning("No se pudo crear la ubicación para operation_id: " + operationId);
                     }
                 }
             }

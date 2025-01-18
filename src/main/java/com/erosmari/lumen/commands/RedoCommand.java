@@ -35,23 +35,21 @@ public class RedoCommand {
     private static void handleRedoCommand(CommandContext<CommandSender> context) {
         CommandSender sender = context.getSender();
 
-        // Validar que sea un jugador
         if (!(sender instanceof Player player)) {
             sender.sendMessage("§cSolo los jugadores pueden usar este comando.");
             return;
         }
 
-        // Obtener el ID de la operación
         String operationId = context.getOrDefault("operation_id", "last");
         if (operationId.equals("last")) {
-            operationId = LightRegistry.getLastSoftDeletedOperationId(); // Nuevo método para obtener el último `soft delete`
+            operationId = LightRegistry.getLastSoftDeletedOperationId();
             if (operationId == null) {
                 player.sendMessage("§eNo hay operaciones previas para rehacer.");
                 return;
             }
         }
 
-        // Recuperar los bloques asociados a la operación marcados como eliminados
+        // Obtener los bloques marcados como eliminados
         List<Location> blocks = LightRegistry.getSoftDeletedBlocksByOperationId(operationId);
 
         if (blocks.isEmpty()) {
@@ -62,19 +60,22 @@ public class RedoCommand {
         int restoredCount = 0;
         for (Location blockLocation : blocks) {
             if (blockLocation.getWorld() != null) {
+                // Coloca el bloque de luz
                 blockLocation.getBlock().setType(Material.LIGHT);
 
-                // Ajustar el nivel de luz
+                // Ajusta el nivel de luz
                 org.bukkit.block.data.Levelled lightData = (org.bukkit.block.data.Levelled) blockLocation.getBlock().getBlockData();
                 int lightLevel = LightRegistry.getLightLevel(blockLocation);
                 lightData.setLevel(lightLevel);
                 blockLocation.getBlock().setBlockData(lightData, true);
 
                 restoredCount++;
+            } else {
+                player.sendMessage("§eEl mundo para el bloque en " + blockLocation + " no está cargado.");
             }
         }
 
-        // Cambiar el estado de los bloques a no eliminados
+        // Restaurar el estado de los bloques en la base de datos
         LightRegistry.restoreBlocksByOperationId(operationId);
 
         player.sendMessage("§aSe han restaurado " + restoredCount + " bloques de luz para la operación: §b" + operationId);
