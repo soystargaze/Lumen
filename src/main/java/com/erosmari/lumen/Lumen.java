@@ -36,6 +36,7 @@ public class Lumen extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        DatabaseHandler.close(); // Cierra el pool de conexiones de la base de datos
         getLogger().info(TranslationHandler.get("plugin.disabled"));
     }
 
