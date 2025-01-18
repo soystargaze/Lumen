@@ -24,7 +24,7 @@ public class LightHandler {
                 for (int z = -areaBlocks; z <= areaBlocks; z++) {
                     Location blockLocation = center.clone().add(x, y, z);
 
-                    if (shouldPlaceLight(blockLocation)) {
+                    if (shouldPlaceLight(blockLocation, includeSkylight)) {
                         placeLightBlock(world, blockLocation, lightLevel); // Pasa el parámetro 'world'
                     }
                 }
@@ -40,8 +40,14 @@ public class LightHandler {
      * @param location La ubicación del bloque.
      * @return Verdadero si se puede colocar luz.
      */
-    private boolean shouldPlaceLight(Location location) {
-        return location.getBlock().getType().isAir(); // Sólo se coloca luz en bloques de aire
+    private boolean shouldPlaceLight(Location location, boolean includeSkylight) {
+        if (!location.getBlock().getType().isAir()) {
+            return false; // Solo se permite colocar luz en bloques de aire
+        }
+
+        // Si no se permite skylight, verifica si el bloque está expuesto al cielo
+        return includeSkylight || location.getWorld().getHighestBlockYAt(location) > location.getBlockY(); // Bloque iluminado naturalmente por el cielo
+        // Bloque elegible para colocación de luz
     }
 
     /**
