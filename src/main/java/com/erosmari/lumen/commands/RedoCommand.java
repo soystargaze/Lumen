@@ -23,7 +23,7 @@ public class RedoCommand {
     public static void register(CommandManager<CommandSender> commandManager, Command.Builder<CommandSender> parentBuilder) {
         commandManager.command(
                 parentBuilder.literal("redo")
-                        .argument(StringArgument.of("operation_id")) // ID de la operación
+                        .argument(StringArgument.optional("operation_id")) // ID de la operación (opcional)
                         .permission("lumen.redo")
                         .handler(RedoCommand::handleRedoCommand)
         );
@@ -42,7 +42,14 @@ public class RedoCommand {
         }
 
         // Obtener el ID de la operación
-        String operationId = context.get("operation_id");
+        String operationId = context.getOrDefault("operation_id", "last");
+        if (operationId.equals("last")) {
+            operationId = LightRegistry.getLastOperationId();
+            if (operationId == null) {
+                player.sendMessage("§eNo hay operaciones previas para rehacer.");
+                return;
+            }
+        }
 
         // Recuperar los bloques asociados a la operación
         List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
@@ -59,7 +66,7 @@ public class RedoCommand {
 
                 // Ajustar el nivel de luz
                 org.bukkit.block.data.Levelled lightData = (org.bukkit.block.data.Levelled) blockLocation.getBlock().getBlockData();
-                int lightLevel = LightRegistry.getLightLevel(blockLocation); // Implementa este metodo para recuperar el nivel de luz
+                int lightLevel = LightRegistry.getLightLevel(blockLocation);
                 lightData.setLevel(lightLevel);
                 blockLocation.getBlock().setBlockData(lightData, true);
 
