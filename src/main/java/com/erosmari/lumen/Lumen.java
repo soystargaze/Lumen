@@ -22,6 +22,7 @@ public class Lumen extends JavaPlugin {
 
         try {
             loadConfigurations();
+            initializeDatabase();
             initializeSystems();
             registerComponents();
 
