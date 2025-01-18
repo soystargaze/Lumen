@@ -68,10 +68,16 @@ public class LumenCommandManager {
         LightCommand.register(commandManager, parentBuilder);
 
         // Subcomando: /lumen undo
-        //UndoCommand.register(commandManager, parentBuilder, plugin);
+        UndoCommand.register(commandManager, parentBuilder);
 
         // Subcomando: /lumen redo
-        //RedoCommand.register(commandManager, parentBuilder, plugin);
+        RedoCommand.register(commandManager, parentBuilder);
+
+        // Subcomando: /lumen clear
+        ClearCommand.register(commandManager, parentBuilder);
+
+        // Subcomando: /lumen remove
+        RemoveCommand.register(commandManager, parentBuilder);
 
         // Subcomando: /lumen reload
         ReloadCommand.register(commandManager, parentBuilder, plugin);

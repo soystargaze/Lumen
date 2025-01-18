@@ -13,9 +13,9 @@ public class LightHandler {
      * @param player          El jugador que ejecutó el comando.
      * @param areaBlocks      Tamaño del área en bloques.
      * @param lightLevel      Nivel de luz.
-     * @param includeSkylight Si incluye skylight (actualmente no se usa).
+     * @param includeSkylight Si incluye skylight.
      */
-    public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight) {
+    public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight, String operationId) {
         Location center = player.getLocation();
         World world = center.getWorld(); // Obtiene el mundo del jugador
 
@@ -25,7 +25,7 @@ public class LightHandler {
                     Location blockLocation = center.clone().add(x, y, z);
 
                     if (shouldPlaceLight(blockLocation, includeSkylight)) {
-                        placeLightBlock(world, blockLocation, lightLevel); // Pasa el parámetro 'world'
+                        placeLightBlock(world, blockLocation, lightLevel, operationId); // Pasa el parámetro 'operationId'
                     }
                 }
             }
@@ -56,7 +56,7 @@ public class LightHandler {
      * @param location   Ubicación del bloque.
      * @param lightLevel Nivel de luz.
      */
-    private void placeLightBlock(World world, Location location, int lightLevel) {
+    private void placeLightBlock(World world, Location location, int lightLevel, String operationId) {
         // Verifica que el bloque esté en el mundo correcto
         if (!location.getWorld().equals(world)) {
             return; // Salir si no es el mundo esperado
@@ -73,6 +73,6 @@ public class LightHandler {
         location.getBlock().setBlockData(lightData, true);
 
         // Registra el bloque en la base de datos
-        LightRegistry.addBlock(location, lightLevel);
+        LightRegistry.addBlock(location, lightLevel, operationId);
     }
 }

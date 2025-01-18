@@ -64,7 +64,8 @@ public class DatabaseHandler {
                     "x INTEGER NOT NULL," +
                     "y INTEGER NOT NULL," +
                     "z INTEGER NOT NULL," +
-                    "light_level INTEGER NOT NULL" +
+                    "light_level INTEGER NOT NULL," +
+                    "operation_id TEXT NOT NULL" +
                     ");";
             stmt.executeUpdate(createIlluminatedBlocksTable);
 
