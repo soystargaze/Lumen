@@ -1,6 +1,5 @@
 package com.erosmari.lumen.database;
 
-import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
