@@ -26,6 +26,11 @@ public class LightRegistry {
      * @param operationId Identificador de la operación.
      */
     public static void addBlock(Location location, int lightLevel, String operationId) {
+        if (lightLevel <= 0 || lightLevel > 15) {
+            logger.warning("Intento de registrar un nivel de luz inválido (" + lightLevel + ") para " + location);
+            return;
+        }
+
         String query = "INSERT INTO illuminated_blocks (world, x, y, z, light_level, operation_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0);";
 
         try (Connection connection = DatabaseHandler.getConnection();
@@ -255,14 +260,20 @@ public class LightRegistry {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                    return resultSet.getInt("light_level");
+                    int lightLevel = resultSet.getInt("light_level");
+                    if (lightLevel > 0 && lightLevel <= 15) {
+                        return lightLevel;
+                    }
+                    logger.warning("Nivel de luz inválido recuperado: " + lightLevel + " para " + location);
+                } else {
+                    logger.warning("No se encontró nivel de luz para la ubicación: " + location);
                 }
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Error al obtener el nivel de luz para la ubicación: " + location, e);
         }
 
-        return 0;
+        return 0; // Valor por defecto si no se encuentra o es inválido
     }
 
     /**
