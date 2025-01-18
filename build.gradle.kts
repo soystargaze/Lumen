@@ -1,6 +1,6 @@
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.9.10" // Soporte para Kotlin
+    id("org.jetbrains.kotlin.jvm") version "2.0.20" // Soporte para Kotlin
     id("com.gradleup.shadow") version "8.3.0" // Sombreamiento del JAR
 }
 
@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     // Kotlin Standard Library
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.10")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.20")
 
     // Dependencias del proyecto
     compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
@@ -35,14 +35,15 @@ java {
     }
 }
 
-tasks.withType<JavaCompile> {
+tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.release.set(21) // Asegura compatibilidad con Java 21
+    options.release.set(21)
 }
 
 tasks.processResources {
+    filteringCharset = "UTF-8"
     filesMatching("plugin.yml") {
-        expand("version" to version)
+        expand(mapOf("version" to version))
     }
 }
 
