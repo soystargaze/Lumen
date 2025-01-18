@@ -63,6 +63,20 @@ public class LightRegistry {
         }
     }
 
+    public static void restoreSoftDeletedBlocksByOperationId(String operationId) {
+        String query = "UPDATE illuminated_blocks SET is_deleted = 0 WHERE operation_id = ?;";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, operationId);
+            statement.executeUpdate();
+            logger.info("Bloques restaurados para operation_id: " + operationId);
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al restaurar los bloques para operation_id: " + operationId, e);
+        }
+    }
+
     public static List<Location> getSoftDeletedBlocksByOperationId(String operationId) {
         String query = "SELECT * FROM illuminated_blocks WHERE operation_id = ? AND is_deleted = 1;";
         List<Location> blocks = new ArrayList<>();
@@ -87,20 +101,6 @@ public class LightRegistry {
         }
 
         return blocks;
-    }
-
-    public static void restoreBlocksByOperationId(String operationId) {
-        String query = "UPDATE illuminated_blocks SET is_deleted = 0 WHERE operation_id = ?;";
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setString(1, operationId);
-            statement.executeUpdate();
-            logger.info("Bloques restaurados para operation_id: " + operationId);
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al restaurar los bloques para operation_id: " + operationId, e);
-        }
     }
 
     public static String getLastSoftDeletedOperationId() {
