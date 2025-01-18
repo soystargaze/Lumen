@@ -1,9 +1,7 @@
 package com.erosmari.lumen;
 
 import com.erosmari.lumen.commands.LumenCommandManager;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.plugin.Plugin;
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -28,19 +26,20 @@ public class Lumen extends JavaPlugin {
 
             getLogger().info("Lumen habilitado correctamente.");
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Error durante la habilitación del plugin.", e);
+            getLogger().log(Level.SEVERE, TranslationHandler.get("plugin.enable_error"), e);
             getServer().getPluginManager().disablePlugin(this);
         }
     }
 
     @Override
     public void onDisable() {
-        getLogger().info("Lumen deshabilitado correctamente.");
+        getLogger().info(TranslationHandler.get("plugin.disabled"));
     }
 
     private void loadConfigurations() {
-        saveDefaultConfig(); // Guarda la configuración por defecto si no existe
+        saveDefaultConfig(); // Guarda la configuración predeterminada si no existe
         setupTranslations();
+        TranslationHandler.loadTranslations(this, getConfig().getString("language", "es_es"));
     }
 
     private void setupTranslations() {
@@ -71,7 +70,7 @@ public class Lumen extends JavaPlugin {
                 commandManager.registerCommands();
             }
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Error al registrar comandos.", e);
+            getLogger().log(Level.SEVERE, TranslationHandler.get("command.register_error"), e);
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -82,11 +81,11 @@ public class Lumen extends JavaPlugin {
 
     private void registerEvents() {
         try {
-            // Aquí se registran los listeners específicos del plugin
-            // Ejemplo:
+            // Registrar eventos relevantes aquí si son necesarios
+            // Por ejemplo:
             // getServer().getPluginManager().registerEvents(new LightEventListener(), this);
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Error al registrar eventos.", e);
+            getLogger().log(Level.SEVERE, TranslationHandler.get("events.register_error"), e);
         }
     }
 }
