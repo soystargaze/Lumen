@@ -47,29 +47,13 @@ public class ConfigHandler {
     }
 
     /**
-     * Obtiene el rango máximo permitido para comandos.
+     * Obtiene un valor entero de la configuración.
      *
-     * @return Rango máximo configurado.
+     * @param path La ruta de la clave en el archivo de configuración.
+     * @param def  El valor predeterminado si no existe la clave.
+     * @return El valor entero obtenido de la configuración.
      */
-    public static int getMaxLightRange() {
-        return config.getInt("settings.max_light_range", 50); // Valor predeterminado: 50
-    }
-
-    /**
-     * Obtiene el nivel de luz predeterminado para bloques invisibles.
-     *
-     * @return Nivel de luz configurado.
-     */
-    public static int getDefaultInvisibleLightLevel() {
-        return config.getInt("settings.default_invisible_light_level", 15); // Valor predeterminado: 15
-    }
-
-    /**
-     * Obtiene si las luces invisibles están habilitadas.
-     *
-     * @return Verdadero si están habilitadas, falso de lo contrario.
-     */
-    public static boolean isInvisibleLightEnabled() {
-        return config.getBoolean("settings.invisible_light_enabled", true); // Valor predeterminado: true
+    public static int getInt(String path, int def) {
+        return config.getInt(path, def);
     }
 }
