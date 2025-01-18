@@ -1,0 +1,6 @@
+language: "es_es" # Idioma del plugin
+
+settings:
+  max_light_range: 50 # Rango máximo para comandos de luz
+  default_invisible_light_level: 15 # Nivel de luz predeterminado para bloques invisibles
+  invisible_light_enabled: true # ¿Permitir luces invisibles?
