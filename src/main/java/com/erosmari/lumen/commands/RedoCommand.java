@@ -44,22 +44,22 @@ public class RedoCommand {
         // Obtener el ID de la operación
         String operationId = context.getOrDefault("operation_id", "last");
         if (operationId.equals("last")) {
-            operationId = LightRegistry.getLastOperationId();
+            operationId = LightRegistry.getLastSoftDeletedOperationId(); // Nuevo método para obtener el último `soft delete`
             if (operationId == null) {
                 player.sendMessage("§eNo hay operaciones previas para rehacer.");
                 return;
             }
         }
 
-        // Recuperar los bloques asociados a la operación (incluyendo eliminados)
-        List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
+        // Recuperar los bloques asociados a la operación marcados como eliminados
+        List<Location> blocks = LightRegistry.getSoftDeletedBlocksByOperationId(operationId);
 
         if (blocks.isEmpty()) {
             player.sendMessage("§eNo se encontraron bloques para la operación: §b" + operationId);
             return;
         }
 
-        int replacedCount = 0;
+        int restoredCount = 0;
         for (Location blockLocation : blocks) {
             if (blockLocation.getWorld() != null) {
                 blockLocation.getBlock().setType(Material.LIGHT);
@@ -70,13 +70,13 @@ public class RedoCommand {
                 lightData.setLevel(lightLevel);
                 blockLocation.getBlock().setBlockData(lightData, true);
 
-                replacedCount++;
+                restoredCount++;
             }
         }
 
-        // Eliminar el estado de "soft delete" para esta operación
-        LightRegistry.softDeleteBlocksByOperationId(operationId); // Marca como no eliminados
+        // Cambiar el estado de los bloques a no eliminados
+        LightRegistry.restoreBlocksByOperationId(operationId);
 
-        player.sendMessage("§aSe han restaurado " + replacedCount + " bloques de luz para la operación: §b" + operationId);
+        player.sendMessage("§aSe han restaurado " + restoredCount + " bloques de luz para la operación: §b" + operationId);
     }
 }

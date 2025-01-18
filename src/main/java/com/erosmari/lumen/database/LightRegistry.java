@@ -63,6 +63,61 @@ public class LightRegistry {
         }
     }
 
+    public static List<Location> getSoftDeletedBlocksByOperationId(String operationId) {
+        String query = "SELECT * FROM illuminated_blocks WHERE operation_id = ? AND is_deleted = 1;";
+        List<Location> blocks = new ArrayList<>();
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, operationId);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Location location = createLocationFromResultSet(resultSet);
+                    if (location != null) {
+                        blocks.add(location);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener los bloques eliminados para operation_id: " + operationId, e);
+        }
+
+        return blocks;
+    }
+
+    public static void restoreBlocksByOperationId(String operationId) {
+        String query = "UPDATE illuminated_blocks SET is_deleted = 0 WHERE operation_id = ?;";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setString(1, operationId);
+            statement.executeUpdate();
+            logger.info("Bloques restaurados para operation_id: " + operationId);
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al restaurar los bloques para operation_id: " + operationId, e);
+        }
+    }
+
+    public static String getLastSoftDeletedOperationId() {
+        String query = "SELECT operation_id FROM illuminated_blocks WHERE is_deleted = 1 ORDER BY id DESC LIMIT 1;";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next()) {
+                return resultSet.getString("operation_id");
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener el último operation_id marcado como eliminado.", e);
+        }
+
+        return null;
+    }
+
     /**
      * Obtiene todos los bloques iluminados almacenados en la base de datos.
      *
