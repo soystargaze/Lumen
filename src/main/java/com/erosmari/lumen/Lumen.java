@@ -11,10 +11,13 @@ import java.util.logging.Level;
 
 public class Lumen extends JavaPlugin {
 
+    private static Lumen instance; // Instancia estática para obtener el plugin fácilmente
     private LumenCommandManager commandManager;
 
     @Override
     public void onEnable() {
+        instance = this; // Inicializa la instancia estática
+
         getLogger().info("--------------------------------------------");
         getLogger().info("Lumen Plugin");
         getLogger().info("v1.0");
@@ -38,6 +41,16 @@ public class Lumen extends JavaPlugin {
     public void onDisable() {
         DatabaseHandler.close(); // Cierra el pool de conexiones de la base de datos
         getLogger().info(TranslationHandler.get("plugin.disabled"));
+        instance = null; // Limpia la instancia estática al desactivar el plugin
+    }
+
+    /**
+     * Devuelve la instancia estática del plugin.
+     *
+     * @return Instancia del plugin.
+     */
+    public static Lumen getInstance() {
+        return instance;
     }
 
     private void loadConfigurations() {
@@ -95,8 +108,6 @@ public class Lumen extends JavaPlugin {
     private void registerEvents() {
         try {
             // Registrar eventos relevantes aquí si son necesarios
-            // Por ejemplo:
-            // getServer().getPluginManager().registerEvents(new LightEventListener(), this);
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("events.register_error"), e);
         }

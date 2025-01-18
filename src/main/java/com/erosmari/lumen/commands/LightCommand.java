@@ -9,8 +9,6 @@ import com.erosmari.lumen.lights.LightHandler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.UUID;
-
 public class LightCommand {
 
     /**
@@ -34,7 +32,7 @@ public class LightCommand {
 
         // Validar que sea un jugador
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cSolo los jugadores pueden usar este comando.");
+            sender.sendMessage("Solo los jugadores pueden usar este comando.");
             return;
         }
 
@@ -50,13 +48,13 @@ public class LightCommand {
         }
 
         // Generar un identificador único para la operación
-        String operationId = UUID.randomUUID().toString();
+        String operationId = java.util.UUID.randomUUID().toString();
 
         // Colocar luces
         LightHandler lightHandler = new LightHandler();
         lightHandler.placeLights(player, areaBlocks, lightLevel, includeSkylight, operationId);
 
-        sender.sendMessage("§aLuces colocadas con nivel de luz " + lightLevel + " en un área de " + areaBlocks + " bloques.");
-        sender.sendMessage("§eID de operación: §b" + operationId);
+        sender.sendMessage("§aLuces colocadas con nivel de luz " + lightLevel + ".");
+        sender.sendMessage("§aID de operación: " + operationId);
     }
 }

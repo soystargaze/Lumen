@@ -1,14 +1,20 @@
 package com.erosmari.lumen.lights;
 
+import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.database.LightRegistry;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class LightHandler {
 
     /**
-     * Coloca bloques de luz invisible en un área.
+     * Coloca bloques de luz invisible en un área de forma asincrónica.
      *
      * @param player          El jugador que ejecutó el comando.
      * @param areaBlocks      Tamaño del área en bloques.
@@ -17,62 +23,59 @@ public class LightHandler {
      */
     public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight, String operationId) {
         Location center = player.getLocation();
-        World world = center.getWorld(); // Obtiene el mundo del jugador
+        World world = center.getWorld();
 
-        for (int x = -areaBlocks; x <= areaBlocks; x++) {
-            for (int y = -areaBlocks; y <= areaBlocks; y++) {
-                for (int z = -areaBlocks; z <= areaBlocks; z++) {
-                    Location blockLocation = center.clone().add(x, y, z);
+        if (world == null) {
+            player.sendMessage("§cError: No se pudo determinar el mundo.");
+            return;
+        }
 
-                    if (shouldPlaceLight(blockLocation, includeSkylight)) {
-                        placeLightBlock(world, blockLocation, lightLevel, operationId); // Pasa el parámetro 'operationId'
+        Bukkit.getScheduler().runTaskAsynchronously(Lumen.getInstance(), () -> {
+            List<Location> blocksToLight = new ArrayList<>();
+
+            for (int x = -areaBlocks; x <= areaBlocks; x++) {
+                for (int y = -areaBlocks; y <= areaBlocks; y++) {
+                    for (int z = -areaBlocks; z <= areaBlocks; z++) {
+                        Location blockLocation = center.clone().add(x, y, z);
+                        if (shouldPlaceLight(blockLocation, includeSkylight)) {
+                            blocksToLight.add(blockLocation);
+                        }
                     }
                 }
-            }
-        }
 
-        player.sendMessage("Se han colocado bloques de luz invisible con nivel " + lightLevel + " en el área.");
+            }
+
+            processBlocks(player, blocksToLight, lightLevel, operationId);
+        });
     }
 
-    /**
-     * Verifica si un bloque puede recibir luz.
-     *
-     * @param location La ubicación del bloque.
-     * @return Verdadero si se puede colocar luz.
-     */
     private boolean shouldPlaceLight(Location location, boolean includeSkylight) {
         if (!location.getBlock().getType().isAir()) {
-            return false; // Solo se permite colocar luz en bloques de aire
+            return false;
         }
 
-        // Si no se permite skylight, verifica si el bloque está expuesto al cielo
-        return includeSkylight || location.getWorld().getHighestBlockYAt(location) > location.getBlockY(); // Bloque iluminado naturalmente por el cielo
-        // Bloque elegible para colocación de luz
+        return includeSkylight || location.getWorld().getHighestBlockYAt(location) > location.getBlockY();
     }
 
-    /**
-     * Coloca un bloque de luz invisible y lo registra.
-     *
-     * @param location   Ubicación del bloque.
-     * @param lightLevel Nivel de luz.
-     */
-    private void placeLightBlock(World world, Location location, int lightLevel, String operationId) {
-        // Verifica que el bloque esté en el mundo correcto
-        if (!location.getWorld().equals(world)) {
-            return; // Salir si no es el mundo esperado
-        }
+    private void processBlocks(Player player, List<Location> blocks, int lightLevel, String operationId) {
+        Bukkit.getScheduler().runTask(Lumen.getInstance(), () -> {
+            int placedCount = 0;
 
-        // Verifica y coloca un bloque de luz en el mundo
-        if (location.getBlock().getType() != org.bukkit.Material.LIGHT) {
-            location.getBlock().setType(org.bukkit.Material.LIGHT);
-        }
+            for (Location location : blocks) {
+                if (location.getBlock().getType() != Material.LIGHT) {
+                    location.getBlock().setType(Material.LIGHT);
+                }
 
-        // Ajusta el nivel de luz
-        org.bukkit.block.data.Levelled lightData = (org.bukkit.block.data.Levelled) location.getBlock().getBlockData();
-        lightData.setLevel(lightLevel);
-        location.getBlock().setBlockData(lightData, true);
+                org.bukkit.block.data.Levelled lightData = (org.bukkit.block.data.Levelled) location.getBlock().getBlockData();
+                lightData.setLevel(lightLevel);
+                location.getBlock().setBlockData(lightData, true);
 
-        // Registra el bloque en la base de datos
-        LightRegistry.addBlock(location, lightLevel, operationId);
+                LightRegistry.addBlock(location, lightLevel, operationId);
+                placedCount++;
+            }
+
+            player.sendMessage("§aSe colocaron " + placedCount + " bloques de luz con nivel " + lightLevel + ".");
+            player.sendMessage("§aID de operación: " + operationId);
+        });
     }
 }
