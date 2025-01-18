@@ -119,21 +119,52 @@ public class LightRegistry {
         return blocks;
     }
 
+    private static void processResultSetToRemoveBlock(ResultSet resultSet) throws SQLException {
+        String worldName = resultSet.getString("world");
+        int x = resultSet.getInt("x");
+        int y = resultSet.getInt("y");
+        int z = resultSet.getInt("z");
+
+        World world = Bukkit.getWorld(worldName);
+        if (world != null) {
+            Location location = new Location(world, x, y, z);
+
+            // Reemplazar el bloque de luz con aire
+            if (location.getBlock().getType() == Material.LIGHT) {
+                location.getBlock().setType(Material.AIR);
+            }
+        } else {
+            logger.warning("El mundo '" + worldName + "' no está cargado o no existe.");
+        }
+    }
+
     /**
-     * Elimina los bloques física y permanentemente de la base de datos.
+     * Marca los bloques como eliminados (soft delete) en la base de datos y los elimina del mundo.
      *
      * @param operationId El identificador de la operación.
      */
     public static void removeBlocksByOperationId(String operationId) {
-        String query = "DELETE FROM illuminated_blocks WHERE operation_id = ?;";
+        String queryUpdate = "UPDATE illuminated_blocks SET is_deleted = 1 WHERE operation_id = ?;";
+        String querySelect = "SELECT world, x, y, z FROM illuminated_blocks WHERE operation_id = ? AND is_deleted = 0;";
 
         try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+             PreparedStatement selectStatement = connection.prepareStatement(querySelect);
+             PreparedStatement updateStatement = connection.prepareStatement(queryUpdate)) {
 
-            statement.setString(1, operationId);
-            statement.executeUpdate();
+            selectStatement.setString(1, operationId);
+
+            try (ResultSet resultSet = selectStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    processResultSetToRemoveBlock(resultSet);
+                }
+            }
+
+            updateStatement.setString(1, operationId);
+            updateStatement.executeUpdate();
+
+            logger.info("Bloques marcados como eliminados y eliminados del mundo para operation_id: " + operationId);
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al eliminar los bloques por operation_id: " + operationId, e);
+            logger.log(Level.SEVERE, "Error al marcar los bloques como eliminados y eliminarlos del mundo para operation_id: " + operationId, e);
         }
     }
 
@@ -221,25 +252,10 @@ public class LightRegistry {
              PreparedStatement updateStatement = connection.prepareStatement(queryUpdate);
              ResultSet resultSet = selectStatement.executeQuery()) {
 
-            // Eliminar bloques del mundo
             while (resultSet.next()) {
-                String worldName = resultSet.getString("world");
-                int x = resultSet.getInt("x");
-                int y = resultSet.getInt("y");
-                int z = resultSet.getInt("z");
-
-                World world = Bukkit.getWorld(worldName);
-                if (world != null) {
-                    Location location = new Location(world, x, y, z);
-
-                    // Reemplazar el bloque de luz con aire
-                    if (location.getBlock().getType() == Material.LIGHT) {
-                        location.getBlock().setType(Material.AIR);
-                    }
-                }
+                processResultSetToRemoveBlock(resultSet);
             }
 
-            // Marcar los bloques como eliminados en la base de datos
             updateStatement.executeUpdate();
             logger.info("Todos los bloques iluminados han sido eliminados del mundo y marcados como eliminados en la base de datos.");
         } catch (SQLException e) {

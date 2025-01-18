@@ -3,6 +3,7 @@ package com.erosmari.lumen.commands;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.standard.IntegerArgument;
+import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.database.LightRegistry;
 import org.bukkit.Location;
@@ -23,16 +24,25 @@ public class RemoveCommand {
     public static void register(CommandManager<CommandSender> commandManager, Command.Builder<CommandSender> parentBuilder) {
         commandManager.command(
                 parentBuilder.literal("remove")
-                        .argument(IntegerArgument.of("range")) // Rango del área
                         .permission("lumen.remove")
-                        .handler(RemoveCommand::handleRemoveCommand)
+                        .literal("area")
+                        .argument(IntegerArgument.of("range")) // Rango del área
+                        .handler(RemoveCommand::handleRemoveAreaCommand)
+        );
+
+        commandManager.command(
+                parentBuilder.literal("remove")
+                        .permission("lumen.remove")
+                        .literal("operation")
+                        .argument(StringArgument.of("operation_id")) // Identificador de operación
+                        .handler(RemoveCommand::handleRemoveOperationCommand)
         );
     }
 
     /**
-     * Maneja el comando `/lumen remove`.
+     * Maneja el comando `/lumen remove area <range>`.
      */
-    private static void handleRemoveCommand(CommandContext<CommandSender> context) {
+    private static void handleRemoveAreaCommand(CommandContext<CommandSender> context) {
         CommandSender sender = context.getSender();
 
         // Validar que sea un jugador
@@ -61,6 +71,48 @@ public class RemoveCommand {
             player.sendMessage("§aSe han eliminado " + removedCount + " bloques de luz en un rango de " + range + " bloques.");
         } else {
             player.sendMessage("§eNo se encontraron bloques de luz en el rango especificado.");
+        }
+    }
+
+    /**
+     * Maneja el comando `/lumen remove operation <operation_id>`.
+     */
+    private static void handleRemoveOperationCommand(CommandContext<CommandSender> context) {
+        CommandSender sender = context.getSender();
+
+        // Validar que sea un jugador
+        if (!(sender instanceof Player player)) {
+            sender.sendMessage("§cSolo los jugadores pueden usar este comando.");
+            return;
+        }
+
+        // Obtener el ID de la operación
+        String operationId = context.get("operation_id");
+
+        // Recuperar los bloques asociados a la operación
+        List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
+
+        if (blocks.isEmpty()) {
+            player.sendMessage("§eNo se encontraron bloques para la operación: §b" + operationId);
+            return;
+        }
+
+        int removedCount = 0;
+        for (Location blockLocation : blocks) {
+            if (blockLocation.getWorld() != null && blockLocation.getBlock().getType() == Material.LIGHT) {
+                blockLocation.getBlock().setType(Material.AIR);
+                removedCount++;
+            }
+        }
+
+        // Eliminar los registros de la base de datos
+        LightRegistry.removeBlocksByOperationId(operationId);
+
+        // Informar al jugador
+        if (removedCount > 0) {
+            player.sendMessage("§aSe han eliminado " + removedCount + " bloques de luz para la operación: §b" + operationId);
+        } else {
+            player.sendMessage("§eNo se encontraron bloques para la operación: §b" + operationId);
         }
     }
 }
