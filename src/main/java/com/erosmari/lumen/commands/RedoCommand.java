@@ -11,8 +11,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public class RedoCommand {
+
+    private static final Logger logger = Logger.getLogger("Lumen-RedoCommand");
 
     /**
      * Registra el comando `/lumen redo`.
@@ -35,11 +38,13 @@ public class RedoCommand {
     private static void handleRedoCommand(CommandContext<CommandSender> context) {
         CommandSender sender = context.getSender();
 
+        // Validar que sea un jugador
         if (!(sender instanceof Player player)) {
             sender.sendMessage("§cSolo los jugadores pueden usar este comando.");
             return;
         }
 
+        // Obtener el ID de la operación
         String operationId = context.getOrDefault("operation_id", "last");
         if (operationId.equals("last")) {
             operationId = LightRegistry.getLastSoftDeletedOperationId();
@@ -49,7 +54,7 @@ public class RedoCommand {
             }
         }
 
-        // Obtener los bloques marcados como eliminados
+        // Recuperar los bloques asociados a la operación (incluyendo eliminados)
         List<Location> blocks = LightRegistry.getSoftDeletedBlocksByOperationId(operationId);
 
         if (blocks.isEmpty()) {
@@ -57,27 +62,39 @@ public class RedoCommand {
             return;
         }
 
+        logger.info("Restaurando bloques de luz para operation_id: " + operationId + ". Total bloques: " + blocks.size());
+
         int restoredCount = 0;
         for (Location blockLocation : blocks) {
-            if (blockLocation.getWorld() != null) {
-                // Coloca el bloque de luz
-                blockLocation.getBlock().setType(Material.LIGHT);
-
-                // Ajusta el nivel de luz
-                org.bukkit.block.data.Levelled lightData = (org.bukkit.block.data.Levelled) blockLocation.getBlock().getBlockData();
-                int lightLevel = LightRegistry.getLightLevel(blockLocation);
-                lightData.setLevel(lightLevel);
-                blockLocation.getBlock().setBlockData(lightData, true);
-
-                restoredCount++;
-            } else {
-                player.sendMessage("§eEl mundo para el bloque en " + blockLocation + " no está cargado.");
+            if (blockLocation.getWorld() == null) {
+                logger.warning("El mundo para el bloque en " + blockLocation + " no está cargado.");
+                continue;
             }
+
+            // Restaurar el bloque como LIGHT
+            blockLocation.getBlock().setType(Material.LIGHT);
+            org.bukkit.block.data.Levelled lightData = (org.bukkit.block.data.Levelled) blockLocation.getBlock().getBlockData();
+
+            // Recuperar el nivel de luz desde la base de datos
+            int lightLevel = LightRegistry.getLightLevel(blockLocation);
+            if (lightLevel < 0 || lightLevel > 15) {
+                logger.warning("Nivel de luz inválido (" + lightLevel + ") para la ubicación: " + blockLocation);
+                continue;
+            }
+
+            lightData.setLevel(lightLevel);
+            blockLocation.getBlock().setBlockData(lightData, true);
+
+            restoredCount++;
         }
 
         // Restaurar el estado de los bloques en la base de datos
         LightRegistry.restoreBlocksByOperationId(operationId);
 
-        player.sendMessage("§aSe han restaurado " + restoredCount + " bloques de luz para la operación: §b" + operationId);
+        if (restoredCount > 0) {
+            player.sendMessage("§aSe han restaurado " + restoredCount + " bloques de luz para la operación: §b" + operationId);
+        } else {
+            player.sendMessage("§eNo se restauraron bloques de luz en el mundo.");
+        }
     }
 }
