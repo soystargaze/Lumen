@@ -107,16 +107,25 @@ public class RedoCommand {
      */
     private static void processBlock(Location blockLocation, String operationId) {
         Block block = blockLocation.getBlock();
+
+        // Establecer el bloque como Material.LIGHT
         block.setType(Material.LIGHT, false);
 
         if (block.getType() == Material.LIGHT) {
             try {
+                // Configurar el nivel de luz del bloque
                 Levelled lightData = (Levelled) block.getBlockData();
                 int lightLevel = LightRegistry.getLightLevel(blockLocation);
-                lightData.setLevel(lightLevel);
-                block.setBlockData(lightData, false);
 
-                LightRegistry.addBlock(blockLocation, lightLevel, operationId);
+                if (lightLevel > 0 && lightLevel <= 15) {
+                    lightData.setLevel(lightLevel);
+                    block.setBlockData(lightData, false);
+
+                    // Registrar el bloque restaurado en la base de datos
+                    LightRegistry.addBlock(blockLocation, lightLevel, operationId);
+                } else {
+                    logger.warning("El nivel de luz recuperado (" + lightLevel + ") no es válido para " + blockLocation);
+                }
             } catch (ClassCastException e) {
                 logger.warning("Error al configurar el nivel de luz para el bloque en " + blockLocation + ": " + e.getMessage());
             }
