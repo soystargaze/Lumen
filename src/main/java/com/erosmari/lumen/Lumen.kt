@@ -1,17 +1,13 @@
-package com.erosmari.lumen;
+package com.erosmari.lumen
 
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPlugin
 
-public final class Lumen extends JavaPlugin {
-
-    @Override
-    public void onEnable() {
+class Lumen : JavaPlugin() {
+    override fun onEnable() {
         // Plugin startup logic
-
     }
 
-    @Override
-    public void onDisable() {
+    override fun onDisable() {
         // Plugin shutdown logic
     }
 }
