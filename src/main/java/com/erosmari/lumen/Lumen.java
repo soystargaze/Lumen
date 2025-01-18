@@ -1,6 +1,7 @@
 package com.erosmari.lumen;
 
 import com.erosmari.lumen.commands.LumenCommandManager;
+import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -37,9 +38,9 @@ public class Lumen extends JavaPlugin {
     }
 
     private void loadConfigurations() {
-        saveDefaultConfig(); // Guarda la configuración predeterminada si no existe
+        ConfigHandler.setup(this);
         setupTranslations();
-        TranslationHandler.loadTranslations(this, getConfig().getString("language", "es_es"));
+        TranslationHandler.loadTranslations(this, ConfigHandler.getLanguage());
     }
 
     private void setupTranslations() {
