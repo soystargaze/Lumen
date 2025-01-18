@@ -5,6 +5,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.standard.BooleanArgument;
 import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.context.CommandContext;
+import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.lights.LightHandler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -51,7 +52,7 @@ public class LightCommand {
         String operationId = java.util.UUID.randomUUID().toString();
 
         // Colocar luces
-        LightHandler lightHandler = new LightHandler();
+        LightHandler lightHandler = new LightHandler(Lumen.getInstance());
         lightHandler.placeLights(player, areaBlocks, lightLevel, includeSkylight, operationId);
 
         sender.sendMessage("§aLuces colocadas con nivel de luz " + lightLevel + ".");
