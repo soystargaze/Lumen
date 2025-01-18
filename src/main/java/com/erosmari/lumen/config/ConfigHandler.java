@@ -5,8 +5,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
 
 public class ConfigHandler {
 
@@ -28,17 +26,6 @@ public class ConfigHandler {
 
         // Cargar el idioma configurado
         language = config.getString("language", "es_es"); // Idioma predeterminado: es_es
-    }
-
-    /**
-     * Recarga la configuración desde el archivo.
-     *
-     * @param plugin El plugin principal.
-     */
-    public static void reload(JavaPlugin plugin) {
-        plugin.reloadConfig();
-        config = plugin.getConfig();
-        language = config.getString("language", "es_es"); // Actualiza el idioma configurado
     }
 
     /**
