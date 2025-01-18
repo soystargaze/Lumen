@@ -2,6 +2,7 @@ package com.erosmari.lumen;
 
 import com.erosmari.lumen.commands.LumenCommandManager;
 import com.erosmari.lumen.config.ConfigHandler;
+import com.erosmari.lumen.database.DatabaseHandler;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -58,6 +59,15 @@ public class Lumen extends JavaPlugin {
             } catch (Exception e) {
                 getLogger().severe("Error: No se pudo crear el archivo de traducción: " + e.getMessage());
             }
+        }
+    }
+
+    private void initializeDatabase() {
+        try {
+            DatabaseHandler.initialize(this); // Delega la inicialización al DatabaseHandler
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, TranslationHandler.get("database.init_error"), e);
+            throw new IllegalStateException("Falló la inicialización de la base de datos.");
         }
     }
 
