@@ -51,7 +51,7 @@ public class RedoCommand {
             }
         }
 
-        // Recuperar los bloques asociados a la operación
+        // Recuperar los bloques asociados a la operación (incluyendo eliminados)
         List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
 
         if (blocks.isEmpty()) {
@@ -73,6 +73,9 @@ public class RedoCommand {
                 replacedCount++;
             }
         }
+
+        // Eliminar el estado de "soft delete" para esta operación
+        LightRegistry.softDeleteBlocksByOperationId(operationId); // Marca como no eliminados
 
         player.sendMessage("§aSe han restaurado " + replacedCount + " bloques de luz para la operación: §b" + operationId);
     }

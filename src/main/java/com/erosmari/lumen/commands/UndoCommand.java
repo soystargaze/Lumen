@@ -6,9 +6,9 @@ import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.database.LightRegistry;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.Material;
 
 import java.util.List;
 
@@ -64,8 +64,9 @@ public class UndoCommand {
             }
         }
 
-        // Elimina los registros de la base de datos
-        LightRegistry.removeBlocksByOperationId(operationId);
+        // En lugar de eliminar los registros, los marcamos como "soft delete" para poder rehacer la operación
+        LightRegistry.softDeleteBlocksByOperationId(operationId);
+
         return removedCount;
     }
 }

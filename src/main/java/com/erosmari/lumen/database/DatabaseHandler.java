@@ -37,6 +37,12 @@ public class DatabaseHandler {
         }
     }
 
+    /**
+     * Configura y conecta con SQLite.
+     *
+     * @param plugin El plugin principal.
+     * @throws SQLException Si ocurre un error al configurar SQLite.
+     */
     private static void initializeSQLite(JavaPlugin plugin) throws SQLException {
         File dbFolder = new File(plugin.getDataFolder(), "Data");
         if (!dbFolder.exists() && !dbFolder.mkdirs()) {
@@ -65,7 +71,8 @@ public class DatabaseHandler {
                     "y INTEGER NOT NULL," +
                     "z INTEGER NOT NULL," +
                     "light_level INTEGER NOT NULL," +
-                    "operation_id TEXT NOT NULL" +
+                    "operation_id TEXT NOT NULL," +
+                    "is_deleted BOOLEAN DEFAULT 0" +
                     ");";
             stmt.executeUpdate(createIlluminatedBlocksTable);
 

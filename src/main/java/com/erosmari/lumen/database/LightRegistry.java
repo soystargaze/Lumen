@@ -26,7 +26,7 @@ public class LightRegistry {
      * @param operationId Identificador de la operación.
      */
     public static void addBlock(Location location, int lightLevel, String operationId) {
-        String query = "INSERT INTO illuminated_blocks (world, x, y, z, light_level, operation_id) VALUES (?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO illuminated_blocks (world, x, y, z, light_level, operation_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0);";
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -45,40 +45,22 @@ public class LightRegistry {
     }
 
     /**
-     * Elimina un bloque iluminado de la base de datos.
+     * Marca los bloques de una operación como eliminados (soft delete).
      *
-     * @param location Ubicación del bloque.
+     * @param operationId El identificador de la operación.
      */
-    public static void removeBlock(Location location) {
-        String query = "DELETE FROM illuminated_blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;";
+    public static void softDeleteBlocksByOperationId(String operationId) {
+        String query = "UPDATE illuminated_blocks SET is_deleted = 1 WHERE operation_id = ?;";
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, location.getWorld().getName());
-            statement.setInt(2, location.getBlockX());
-            statement.setInt(3, location.getBlockY());
-            statement.setInt(4, location.getBlockZ());
-
+            statement.setString(1, operationId);
             statement.executeUpdate();
+            logger.info("Bloques de la operación " + operationId + " marcados como eliminados.");
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al eliminar el bloque en la base de datos.", e);
+            logger.log(Level.SEVERE, "Error al marcar como eliminados los bloques de la operación: " + operationId, e);
         }
-    }
-
-    private static Location createLocationFromResultSet(ResultSet resultSet) throws SQLException {
-        String worldName = resultSet.getString("world");
-        int x = resultSet.getInt("x");
-        int y = resultSet.getInt("y");
-        int z = resultSet.getInt("z");
-
-        World world = Bukkit.getWorld(worldName);
-        if (world != null) {
-            return new Location(world, x, y, z);
-        }
-
-        logger.warning("El mundo '" + worldName + "' no está cargado o no existe.");
-        return null; // Devuelve null si el mundo no es válido
     }
 
     /**
@@ -87,7 +69,7 @@ public class LightRegistry {
      * @return Una lista de ubicaciones de bloques iluminados.
      */
     public static List<Location> getAllBlocks() {
-        String query = "SELECT * FROM illuminated_blocks;";
+        String query = "SELECT * FROM illuminated_blocks WHERE is_deleted = 0;";
         List<Location> blocks = new ArrayList<>();
 
         try (Connection connection = DatabaseHandler.getConnection();
@@ -108,103 +90,11 @@ public class LightRegistry {
     }
 
     /**
-     * Elimina todos los bloques iluminados del servidor y de la base de datos.
+     * Obtiene los bloques por operation_id, incluso si están marcados como eliminados.
+     *
+     * @param operationId El identificador de la operación.
+     * @return Una lista de ubicaciones.
      */
-    @SuppressWarnings("SqlWithoutWhere")
-    public static void clearAllBlocks() {
-        String querySelect = "SELECT world, x, y, z FROM illuminated_blocks;";
-        String queryDelete = "DELETE FROM illuminated_blocks;";
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement selectStatement = connection.prepareStatement(querySelect);
-             PreparedStatement deleteStatement = connection.prepareStatement(queryDelete);
-             ResultSet resultSet = selectStatement.executeQuery()) {
-
-            // Eliminar bloques del mundo
-            while (resultSet.next()) {
-                String worldName = resultSet.getString("world");
-                int x = resultSet.getInt("x");
-                int y = resultSet.getInt("y");
-                int z = resultSet.getInt("z");
-
-                World world = Bukkit.getWorld(worldName);
-                if (world != null) {
-                    Location location = new Location(world, x, y, z);
-
-                    // Reemplazar el bloque de luz con aire
-                    if (location.getBlock().getType() == Material.LIGHT) {
-                        location.getBlock().setType(Material.AIR);
-                    }
-                }
-            }
-
-            // Limpiar la tabla en la base de datos
-            deleteStatement.executeUpdate();
-            logger.info("Todos los bloques iluminados han sido eliminados del mundo y la base de datos.");
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al eliminar todos los bloques iluminados.", e);
-        }
-    }
-
-    private static void setQueryParameters(PreparedStatement statement, Location center, int range) throws SQLException {
-        statement.setString(1, center.getWorld().getName());
-        statement.setInt(2, center.getBlockX() - range);
-        statement.setInt(3, center.getBlockX() + range);
-        statement.setInt(4, center.getBlockY() - range);
-        statement.setInt(5, center.getBlockY() + range);
-        statement.setInt(6, center.getBlockZ() - range);
-        statement.setInt(7, center.getBlockZ() + range);
-    }
-
-    public static List<Location> getBlocksInRange(Location center, int range) {
-        String querySelect = "SELECT * FROM illuminated_blocks WHERE world = ? AND x BETWEEN ? AND ? AND y BETWEEN ? AND ? AND z BETWEEN ? AND ?;";
-        String queryDelete = "DELETE FROM illuminated_blocks WHERE world = ? AND x BETWEEN ? AND ? AND y BETWEEN ? AND ? AND z BETWEEN ? AND ?;";
-        List<Location> blocks = new ArrayList<>();
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement selectStatement = connection.prepareStatement(querySelect);
-             PreparedStatement deleteStatement = connection.prepareStatement(queryDelete)) {
-
-            // Configurar los parámetros usando el método auxiliar
-            setQueryParameters(selectStatement, center, range);
-            setQueryParameters(deleteStatement, center, range);
-
-            // Obtener los bloques del rango
-            try (ResultSet resultSet = selectStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    Location location = createLocationFromResultSet(resultSet);
-                    if (location != null) {
-                        blocks.add(location);
-                    }
-                }
-            }
-
-            // Eliminar los registros en la base de datos
-            deleteStatement.executeUpdate();
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener o eliminar los bloques en el rango especificado.", e);
-        }
-
-        return blocks;
-    }
-
-    public static String getLastOperationId() {
-        String query = "SELECT operation_id FROM illuminated_blocks ORDER BY id DESC LIMIT 1;";
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            if (resultSet.next()) {
-                return resultSet.getString("operation_id");
-            }
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener el último operation_id.", e);
-        }
-
-        return null; // No hay operaciones registradas
-    }
-
     public static List<Location> getBlocksByOperationId(String operationId) {
         String query = "SELECT * FROM illuminated_blocks WHERE operation_id = ?;";
         List<Location> blocks = new ArrayList<>();
@@ -229,6 +119,11 @@ public class LightRegistry {
         return blocks;
     }
 
+    /**
+     * Elimina los bloques física y permanentemente de la base de datos.
+     *
+     * @param operationId El identificador de la operación.
+     */
     public static void removeBlocksByOperationId(String operationId) {
         String query = "DELETE FROM illuminated_blocks WHERE operation_id = ?;";
 
@@ -242,8 +137,25 @@ public class LightRegistry {
         }
     }
 
+    public static String getLastOperationId() {
+        String query = "SELECT operation_id FROM illuminated_blocks WHERE is_deleted = 0 ORDER BY id DESC LIMIT 1;";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            if (resultSet.next()) {
+                return resultSet.getString("operation_id");
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener el último operation_id.", e);
+        }
+
+        return null;
+    }
+
     public static int getLightLevel(Location location) {
-        String query = "SELECT light_level FROM illuminated_blocks WHERE world = ? AND x = ? AND y = ? AND z = ?;";
+        String query = "SELECT light_level FROM illuminated_blocks WHERE world = ? AND x = ? AND y = ? AND z = ? AND is_deleted = 0;";
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -262,6 +174,101 @@ public class LightRegistry {
             logger.log(Level.SEVERE, "Error al obtener el nivel de luz para la ubicación: " + location, e);
         }
 
-        return 0; // Retorna 0 si no se encuentra el nivel de luz
+        return 0;
+    }
+
+    /**
+     * Obtiene todos los bloques dentro de un rango específico.
+     *
+     * @param center Centro del rango.
+     * @param range  Radio del rango.
+     * @return Lista de bloques dentro del rango.
+     */
+    public static List<Location> getBlocksInRange(Location center, int range) {
+        String query = "SELECT * FROM illuminated_blocks WHERE is_deleted = 0 AND world = ? AND x BETWEEN ? AND ? AND y BETWEEN ? AND ? AND z BETWEEN ? AND ?;";
+        List<Location> blocks = new ArrayList<>();
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            setQueryParameters(statement, center, range);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    Location location = createLocationFromResultSet(resultSet);
+                    if (location != null) {
+                        blocks.add(location);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al obtener los bloques en el rango especificado.", e);
+        }
+
+        return blocks;
+    }
+
+    /**
+     * Elimina todos los bloques iluminados del servidor y de la base de datos.
+     */
+    @SuppressWarnings("SqlWithoutWhere")
+    public static void clearAllBlocks() {
+        String querySelect = "SELECT world, x, y, z FROM illuminated_blocks WHERE is_deleted = 0;";
+        String queryUpdate = "UPDATE illuminated_blocks SET is_deleted = 1;";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement selectStatement = connection.prepareStatement(querySelect);
+             PreparedStatement updateStatement = connection.prepareStatement(queryUpdate);
+             ResultSet resultSet = selectStatement.executeQuery()) {
+
+            // Eliminar bloques del mundo
+            while (resultSet.next()) {
+                String worldName = resultSet.getString("world");
+                int x = resultSet.getInt("x");
+                int y = resultSet.getInt("y");
+                int z = resultSet.getInt("z");
+
+                World world = Bukkit.getWorld(worldName);
+                if (world != null) {
+                    Location location = new Location(world, x, y, z);
+
+                    // Reemplazar el bloque de luz con aire
+                    if (location.getBlock().getType() == Material.LIGHT) {
+                        location.getBlock().setType(Material.AIR);
+                    }
+                }
+            }
+
+            // Marcar los bloques como eliminados en la base de datos
+            updateStatement.executeUpdate();
+            logger.info("Todos los bloques iluminados han sido eliminados del mundo y marcados como eliminados en la base de datos.");
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Error al eliminar todos los bloques iluminados.", e);
+        }
+    }
+
+    private static Location createLocationFromResultSet(ResultSet resultSet) throws SQLException {
+        String worldName = resultSet.getString("world");
+        int x = resultSet.getInt("x");
+        int y = resultSet.getInt("y");
+        int z = resultSet.getInt("z");
+
+        World world = Bukkit.getWorld(worldName);
+        if (world != null) {
+            return new Location(world, x, y, z);
+        }
+
+        logger.warning("El mundo '" + worldName + "' no está cargado o no existe.");
+        return null;
+    }
+
+    private static void setQueryParameters(PreparedStatement statement, Location center, int range) throws SQLException {
+        statement.setString(1, center.getWorld().getName());
+        statement.setInt(2, center.getBlockX() - range);
+        statement.setInt(3, center.getBlockX() + range);
+        statement.setInt(4, center.getBlockY() - range);
+        statement.setInt(5, center.getBlockY() + range);
+        statement.setInt(6, center.getBlockZ() - range);
+        statement.setInt(7, center.getBlockZ() + range);
     }
 }
