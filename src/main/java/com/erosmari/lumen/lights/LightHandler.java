@@ -3,6 +3,7 @@ package com.erosmari.lumen.lights;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.tasks.TaskManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -24,15 +26,6 @@ public class LightHandler {
         this.plugin = plugin;
     }
 
-    /**
-     * Coloca bloques de luz invisible en un área de forma asincrónica por lotes.
-     *
-     * @param player          El jugador que ejecutó el comando.
-     * @param areaBlocks      Tamaño del área en bloques.
-     * @param lightLevel      Nivel de luz.
-     * @param includeSkylight Si incluye skylight.
-     * @param operationId     Identificador único de la operación.
-     */
     public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight, String operationId) {
         Location center = player.getLocation();
         World world = center.getWorld();
@@ -42,6 +35,7 @@ public class LightHandler {
             return;
         }
 
+        // Ejecutar la recopilación y procesamiento de bloques asíncronamente
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             List<Location> blocksToLight = new ArrayList<>();
 
@@ -62,33 +56,21 @@ public class LightHandler {
         });
     }
 
-    /**
-     * Determina si un bloque debería ser iluminado.
-     */
     private boolean shouldPlaceLight(Location location, boolean includeSkylight) {
         if (!location.getBlock().getType().isAir()) {
             return false;
         }
-
         return includeSkylight || location.getWorld().getHighestBlockYAt(location) > location.getBlockY();
     }
 
-    /**
-     * Procesa los bloques de luz en lotes, respetando el máximo configurado por tick.
-     *
-     * @param player      El jugador que ejecutó el comando.
-     * @param blocks      Lista de ubicaciones de bloques a iluminar.
-     * @param lightLevel  Nivel de luz.
-     * @param operationId Identificador único de la operación.
-     */
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, String operationId) {
-        // Configuración del máximo de bloques por tick
         int maxBlocksPerTick = ConfigHandler.getInt("settings.light_per_tick_with_command", 1000);
-
-        // Cola para manejar los bloques pendientes
         Queue<Location> blockQueue = new LinkedList<>(blocks);
 
-        Bukkit.getScheduler().runTaskTimer(plugin, task -> {
+        // Usar un array para referencia mutable de la tarea
+        final BukkitTask[] taskHolder = new BukkitTask[1];
+
+        taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             int processedCount = 0;
 
             while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
@@ -103,18 +85,19 @@ public class LightHandler {
                 player.sendMessage("§aSe completó la colocación de bloques de luz con nivel " + lightLevel + ".");
                 player.sendMessage("§aID de operación: " + operationId);
                 plugin.getLogger().info("Colocación completada para operación: " + operationId);
-                Bukkit.getScheduler().cancelTask(task.getTaskId());
+
+                // Cancelar la tarea utilizando el array mutable
+                taskHolder[0].cancel();
+
+                // Limpiar la tarea en el TaskManager
+                TaskManager.cancelTask(player.getUniqueId());
             }
-        }, 0L, 1L); // Ejecutar cada tick
+        }, 0L, 1L);
+
+        // Registrar la tarea en el TaskManager
+        TaskManager.addTask(player.getUniqueId(), taskHolder[0]);
     }
 
-    /**
-     * Procesa un solo bloque, colocándolo y registrándolo en la base de datos.
-     *
-     * @param blockLocation Ubicación del bloque.
-     * @param lightLevel    Nivel de luz.
-     * @param operationId   Identificador único de la operación.
-     */
     private void processSingleBlock(Location blockLocation, int lightLevel, String operationId) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);

@@ -68,6 +68,9 @@ public class LumenCommandManager {
         LightCommand.register(commandManager, parentBuilder);
 
         // Subcomando: /lumen undo
+        CancelCommand.register(commandManager, parentBuilder);
+
+        // Subcomando: /lumen undo
         UndoCommand.register(commandManager, parentBuilder);
 
         // Subcomando: /lumen redo
