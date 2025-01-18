@@ -1,20 +1,33 @@
 package com.erosmari.lumen.config;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
 
 public class ConfigHandler {
 
-    private static FileConfiguration config;
+    private static FileConfiguration config; // Configuración general (config.yml)
+    private static String language; // Idioma seleccionado (es_es, en_us, etc.)
 
     /**
-     * Configuración inicial del manejador.
+     * Configura y carga los archivos de configuración.
      *
      * @param plugin El plugin principal.
      */
     public static void setup(JavaPlugin plugin) {
-        plugin.saveDefaultConfig(); // Guarda la configuración predeterminada si no existe
-        config = plugin.getConfig(); // Carga la configuración
+        // Configuración general (config.yml)
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            plugin.saveResource("config.yml", false);
+        }
+        config = YamlConfiguration.loadConfiguration(configFile);
+
+        // Cargar el idioma configurado
+        language = config.getString("language", "es_es"); // Idioma predeterminado: es_es
     }
 
     /**
@@ -25,6 +38,25 @@ public class ConfigHandler {
     public static void reload(JavaPlugin plugin) {
         plugin.reloadConfig();
         config = plugin.getConfig();
+        language = config.getString("language", "es_es"); // Actualiza el idioma configurado
+    }
+
+    /**
+     * Retorna la configuración general (config.yml).
+     *
+     * @return Configuración general.
+     */
+    public static FileConfiguration getConfig() {
+        return config;
+    }
+
+    /**
+     * Retorna el idioma configurado en config.yml.
+     *
+     * @return Idioma configurado.
+     */
+    public static String getLanguage() {
+        return language;
     }
 
     /**
@@ -52,14 +84,5 @@ public class ConfigHandler {
      */
     public static boolean isInvisibleLightEnabled() {
         return config.getBoolean("settings.invisible_light_enabled", true); // Valor predeterminado: true
-    }
-
-    /**
-     * Obtiene el idioma configurado.
-     *
-     * @return Idioma configurado (por ejemplo, "es_es").
-     */
-    public static String getLanguage() {
-        return config.getString("language", "es_es"); // Valor predeterminado: es_es
     }
 }
