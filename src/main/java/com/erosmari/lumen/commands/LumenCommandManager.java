@@ -65,13 +65,13 @@ public class LumenCommandManager {
      */
     private void registerSubCommands(Command.Builder<CommandSender> parentBuilder) {
         // Subcomando: /lumen light
-        LightCommand.register(commandManager, parentBuilder, plugin);
+        //LightCommand.register(commandManager, parentBuilder, plugin);
 
         // Subcomando: /lumen undo
-        UndoCommand.register(commandManager, parentBuilder, plugin);
+        //UndoCommand.register(commandManager, parentBuilder, plugin);
 
         // Subcomando: /lumen redo
-        RedoCommand.register(commandManager, parentBuilder, plugin);
+        //RedoCommand.register(commandManager, parentBuilder, plugin);
 
         // Subcomando: /lumen reload
         ReloadCommand.register(commandManager, parentBuilder, plugin);
