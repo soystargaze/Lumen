@@ -11,7 +11,7 @@ public class Lumen extends JavaPlugin {
     public void onEnable() {
         // Inicializar el sistema de comandos
         commandManager = new LumenCommandManager(this);
-        commandManager.initialize();
+        commandManager.registerCommands();
 
         getLogger().info("Lumen habilitado correctamente.");
     }
