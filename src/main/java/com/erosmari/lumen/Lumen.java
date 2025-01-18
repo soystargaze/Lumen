@@ -3,6 +3,7 @@ package com.erosmari.lumen;
 import com.erosmari.lumen.commands.LumenCommandManager;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.DatabaseHandler;
+import com.erosmari.lumen.utils.ConsoleUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,6 +19,7 @@ public class Lumen extends JavaPlugin {
     public void onEnable() {
         instance = this; // Inicializa la instancia estática
 
+        ConsoleUtils.displayAsciiArt(this);
         getLogger().info("--------------------------------------------");
         getLogger().info("Lumen Plugin");
         getLogger().info("v1.0");
