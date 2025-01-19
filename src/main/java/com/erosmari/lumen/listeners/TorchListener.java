@@ -1,5 +1,6 @@
 package com.erosmari.lumen.listeners;
 
+import com.erosmari.lumen.lights.ItemLightsHandler;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -14,9 +15,11 @@ import java.util.Objects;
 public class TorchListener implements Listener {
 
     private final Plugin plugin;
+    private final ItemLightsHandler lightsHandler;
 
-    public TorchListener(Plugin plugin) {
+    public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler) {
         this.plugin = plugin;
+        this.lightsHandler = lightsHandler;
     }
 
     @EventHandler
@@ -27,20 +30,13 @@ public class TorchListener implements Listener {
         if (itemInHand.getItemMeta() != null && itemInHand.getItemMeta().displayName() != null) {
             String displayName = Objects.requireNonNull(itemInHand.getItemMeta().displayName()).toString();
 
-            if (displayName.contains("Lumen Torch")) {
+            if (displayName.contains("Lumen Torch") && !displayName.contains("Mob")) {
                 Block placedBlock = event.getBlock();
 
-                if (displayName.contains("Mob")) {
-                    // Acción para "Lumen Torch Mob"
-                    plugin.getLogger().info("Lumen Torch Mob colocada en: " + placedBlock.getLocation());
-                    // Lógica específica para la Lumen Torch Mob
-                    createLightAreaAroundBlock(placedBlock, 5); // Por ejemplo, ilumina un área de radio 5
-                } else {
-                    // Acción para "Lumen Torch"
-                    plugin.getLogger().info("Lumen Torch colocada en: " + placedBlock.getLocation());
-                    // Lógica específica para la Lumen Torch normal
-                    createLightAreaAroundBlock(placedBlock, 3); // Por ejemplo, ilumina un área de radio 3
-                }
+                plugin.getLogger().info("Lumen Torch colocada en: " + placedBlock.getLocation());
+                // Llama a la lógica de iluminación para la Lumen Torch
+                String operationId = "torch-" + placedBlock.getLocation().hashCode();
+                lightsHandler.placeLights(event.getPlayer(), placedBlock.getLocation(), operationId);
             }
         }
     }
@@ -51,22 +47,10 @@ public class TorchListener implements Listener {
 
         // Verifica si el bloque roto es una "Lumen Torch"
         if (brokenBlock.getType() == Material.PLAYER_HEAD) {
-            // Realiza acciones específicas según el tipo de antorcha
+            // Usa la lógica de eliminación de luces del ItemLightsHandler
+            String operationId = "torch-" + brokenBlock.getLocation().hashCode();
             plugin.getLogger().info("Lumen Torch rota en: " + brokenBlock.getLocation());
-            // Aquí puedes eliminar la luz generada o cualquier otra acción
-            removeLightAreaAroundBlock(brokenBlock);
+            lightsHandler.removeLights(event.getPlayer(), operationId);
         }
-    }
-
-    private void createLightAreaAroundBlock(Block block, int radius) {
-        // Implementa aquí la lógica para iluminar un área alrededor del bloque
-        plugin.getLogger().info("Generando luz en un radio de " + radius + " alrededor del bloque.");
-        // Puedes usar el LightHandler o cualquier lógica de iluminación que tengas
-    }
-
-    private void removeLightAreaAroundBlock(Block block) {
-        // Implementa aquí la lógica para eliminar la luz generada alrededor del bloque
-        plugin.getLogger().info("Eliminando luz generada alrededor del bloque.");
-        // Asegúrate de rastrear las luces creadas para poder eliminarlas correctamente
     }
 }

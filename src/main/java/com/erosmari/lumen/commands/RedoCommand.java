@@ -67,7 +67,7 @@ public class RedoCommand {
         logger.info("Restaurando bloques de luz para operation_id: " + operationId + ". Total bloques: " + blocksWithLightLevels.size());
 
         Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
-        int maxBlocksPerTick = ConfigHandler.getInt("settings.light_per_tick_with_command", 1000);
+        int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
 
         Bukkit.getScheduler().runTaskTimer(
                 Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Lumen")),

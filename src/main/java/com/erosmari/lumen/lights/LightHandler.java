@@ -143,7 +143,7 @@ public class LightHandler {
     }
 
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, String operationId) {
-        int maxBlocksPerTick = ConfigHandler.getInt("settings.light_per_tick_with_command", 1000);
+        int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
         Queue<Location> blockQueue = new LinkedList<>(blocks);
 
         // Usar un array para referencia mutable de la tarea
