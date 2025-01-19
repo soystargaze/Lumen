@@ -3,6 +3,7 @@ package com.erosmari.lumen;
 import com.erosmari.lumen.commands.LumenCommandManager;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.DatabaseHandler;
+import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.utils.ConsoleUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,6 +15,7 @@ public class Lumen extends JavaPlugin {
 
     private static Lumen instance; // Instancia estática para obtener el plugin fácilmente
     private LumenCommandManager commandManager;
+    private LumenItems lumenItems; // Nueva instancia de LumenItems
 
     @Override
     public void onEnable() {
@@ -89,6 +91,7 @@ public class Lumen extends JavaPlugin {
 
     private void initializeSystems() {
         initializeCommandManager();
+        initializeItems(); // Inicializa los objetos personalizados
     }
 
     private void initializeCommandManager() {
@@ -103,13 +106,26 @@ public class Lumen extends JavaPlugin {
         }
     }
 
+    private void initializeItems() {
+        try {
+            if (lumenItems == null) {
+                lumenItems = new LumenItems(this);
+                lumenItems.registerItems(); // Registra los objetos personalizados
+                getLogger().info("Objetos personalizados registrados correctamente.");
+            }
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Error al inicializar los objetos personalizados.", e);
+        }
+    }
+
     private void registerComponents() {
         registerEvents();
     }
 
     private void registerEvents() {
         try {
-            // Registrar eventos relevantes aquí si son necesarios
+            // Registrar eventos aquí en el futuro.
+            getLogger().info("No hay eventos para registrar en este momento.");
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("events.register_error"), e);
         }
