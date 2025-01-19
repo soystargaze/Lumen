@@ -4,13 +4,13 @@ import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.tasks.TaskManager;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.LinkedList;
@@ -20,9 +20,11 @@ import java.util.Queue;
 public class ItemLightsHandler {
 
     private final Lumen plugin;
+    private final NamespacedKey lightKey;
 
     public ItemLightsHandler(Lumen plugin) {
         this.plugin = plugin;
+        this.lightKey = new NamespacedKey(plugin, "lumen_light");
     }
 
     public void placeLights(Player player, Location center, String operationId) {
@@ -167,5 +169,15 @@ public class ItemLightsHandler {
         // Elimina las luces de la operación específica
         removeLights(player, operationId);
         plugin.getLogger().info("Operación cancelada y luces eliminadas para la ID: " + operationId);
+    }
+
+    public boolean isLightTorch(Block block) {
+        if (block.getType() == Material.PLAYER_HEAD) {
+            if (block.getState() instanceof BlockStateMeta meta) {
+                PersistentDataContainer container = meta.getPersistentDataContainer();
+                return "light".equals(container.get(lightKey, PersistentDataType.STRING));
+            }
+        }
+        return false;
     }
 }

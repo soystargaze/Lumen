@@ -3,19 +3,25 @@ package com.erosmari.lumen.mobs;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.Skull;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class ItemMobsHandler implements Listener {
@@ -23,20 +29,20 @@ public class ItemMobsHandler implements Listener {
     private final Plugin plugin;
     private final Map<Location, Integer> protectedAreas = new HashMap<>(); // Áreas protegidas
     private final Set<Location> recentlyCancelled = new HashSet<>(); // Controlar duplicados en eventos recientes
+    private final NamespacedKey mobTorchKey; // Clave para identificar la antorcha de mobs
 
     public ItemMobsHandler(Plugin plugin) {
         this.plugin = plugin;
+        this.mobTorchKey = new NamespacedKey(plugin, "mob_torch");
         Bukkit.getPluginManager().registerEvents(this, plugin);
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getItemInHand().getType() == Material.PLAYER_HEAD &&
-                event.getItemInHand().getItemMeta() != null &&
-                event.getItemInHand().getItemMeta().displayName() != null &&
-                Objects.requireNonNull(event.getItemInHand().getItemMeta().displayName()).toString().contains("Lumen Torch Mob")) {
+        Block placedBlock = event.getBlock();
 
-            Location placedLocation = event.getBlock().getLocation();
+        if (isMobTorch(event.getItemInHand())) {
+            Location placedLocation = placedBlock.getLocation();
             int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 15); // Radio configurable desde el config.yml
 
             // Registrar el área protegida
@@ -101,5 +107,35 @@ public class ItemMobsHandler implements Listener {
 
         double distanceSquared = center.distanceSquared(target);
         return distanceSquared <= (radius * radius);
+    }
+
+    private boolean isMobTorch(ItemStack item) {
+        if (item.getType() != Material.PLAYER_HEAD || item.getItemMeta() == null) {
+            return false;
+        }
+
+        PersistentDataContainer container = item.getItemMeta().getPersistentDataContainer();
+        return "mob".equals(container.get(mobTorchKey, PersistentDataType.STRING));
+    }
+
+    public boolean isMobTorch(Block block) {
+        if (block.getType() != Material.PLAYER_HEAD || !(block.getState() instanceof Skull skull)) {
+            return false;
+        }
+
+        PersistentDataContainer container = skull.getPersistentDataContainer();
+        return "mob".equals(container.get(mobTorchKey, PersistentDataType.STRING));
+    }
+
+    public void registerAntiMobArea(Player player, Location location) {
+        int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 15); // Radio configurable
+        protectedAreas.put(location, radius);
+        plugin.getLogger().info("Área protegida contra mobs hostiles creada en: " + location + " por " + player.getName());
+    }
+
+    public void unregisterAntiMobArea(Location location) {
+        if (protectedAreas.remove(location) != null) {
+            plugin.getLogger().info("Área protegida contra mobs hostiles eliminada en: " + location);
+        }
     }
 }

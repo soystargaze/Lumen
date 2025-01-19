@@ -133,8 +133,10 @@ public class Lumen extends JavaPlugin {
             // Crear instancia del manejador de mobs
             ItemMobsHandler mobsHandler = new ItemMobsHandler(this);
 
-            // Registrar eventos para la TorchListener y el mobsHandler
-            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler), this);
+            // Registrar eventos para la TorchListener con ambos manejadores
+            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, mobsHandler), this);
+
+            // Registrar eventos específicos para el mobsHandler
             getServer().getPluginManager().registerEvents(mobsHandler, this);
 
             getLogger().info("Eventos registrados correctamente.");

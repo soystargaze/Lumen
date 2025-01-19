@@ -10,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
 import java.util.UUID;
@@ -24,23 +26,35 @@ public class LumenItems {
 
     public void registerItems() {
         // Crear los objetos con texturas
-        ItemStack lumenTorch = createLumenTorch("Lumen Torch",
-                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzViNTFjYzJlOTlkMDhkZDI4NzlhNzkyZjA2MmUwNzc4MzJhMDE2M2YzZDg1YzI0NGUwYmExYzM5MmFiMDlkZSJ9fX0=");
-        ItemStack lumenTorchMob = createLumenTorch("Lumen Torch Mob",
-                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg0NDE3MjViZDQzMDczNmNmNDBkNGNlOTVjYjVhNWUxMDMwNWI3OTVhYzRmZjg0NzRlMDUzNWRmN2FmMWRkNyJ9fX0=");
+        ItemStack lumenTorch = createLumenTorch(
+                "Lumen Torch",
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzViNTFjYzJlOTlkMDhkZDI4NzlhNzkyZjA2MmUwNzc4MzJhMDE2M2YzZDg1YzI0NGUwYmExYzM5MmFiMDlkZSJ9fX0=",
+                "light"
+        );
+        ItemStack lumenTorchMob = createLumenTorch(
+                "Lumen Torch Mob",
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg0NDE3MjViZDQzMDczNmNmNDBkNGNlOTVjYjVhNWUxMDMwNWI3OTVhYzRmZjg0NzRlMDUzNWRmN2FmMWRkNyJ9fX0=",
+                "mob"
+        );
 
         // Registrar las recetas de los objetos
         registerRecipe("lumen_torch", lumenTorch, Material.GOLD_INGOT);
         registerRecipe("lumen_torch_mob", lumenTorchMob, Material.DIAMOND);
     }
 
-    private ItemStack createLumenTorch(String name, String texture) {
+    private ItemStack createLumenTorch(String name, String texture, String identifier) {
         // Crear la cabeza personalizada con la textura
         ItemStack head = getSkull(texture);
         ItemMeta meta = head.getItemMeta();
 
         if (meta != null) {
             meta.displayName(Component.text(name)); // Asignar el nombre al objeto
+
+            // Agregar el identificador al PersistentDataContainer
+            NamespacedKey key = new NamespacedKey(plugin, "lumen_id");
+            PersistentDataContainer container = meta.getPersistentDataContainer();
+            container.set(key, PersistentDataType.STRING, identifier);
+
             head.setItemMeta(meta);
         }
 
