@@ -76,6 +76,17 @@ public class DatabaseHandler {
                     ");";
             stmt.executeUpdate(createIlluminatedBlocksTable);
 
+            // Tabla para áreas protegidas contra mobs
+            String createProtectedAreasTable = "CREATE TABLE IF NOT EXISTS protected_areas (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "world TEXT NOT NULL," +
+                    "x INTEGER NOT NULL," +
+                    "y INTEGER NOT NULL," +
+                    "z INTEGER NOT NULL," +
+                    "radius INTEGER NOT NULL" +
+                    ");";
+            stmt.executeUpdate(createProtectedAreasTable);
+
             logger.info(TranslationHandler.get("database.tables.success"));
         } catch (SQLException e) {
             logger.log(Level.SEVERE, TranslationHandler.get("database.tables.error"), e);

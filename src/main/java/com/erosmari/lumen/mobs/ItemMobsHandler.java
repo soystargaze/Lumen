@@ -1,5 +1,6 @@
 package com.erosmari.lumen.mobs;
 
+import com.erosmari.lumen.database.MobRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -27,7 +28,7 @@ import java.util.Set;
 public class ItemMobsHandler implements Listener {
 
     private final Plugin plugin;
-    private final Map<Location, Integer> protectedAreas = new HashMap<>(); // Áreas protegidas
+    private final Map<Location, Integer> protectedAreas = new HashMap<>(); // Áreas protegidas en memoria
     private final Set<Location> recentlyCancelled = new HashSet<>(); // Controlar duplicados en eventos recientes
     private final NamespacedKey mobTorchKey; // Clave para identificar la antorcha de mobs
 
@@ -35,6 +36,14 @@ public class ItemMobsHandler implements Listener {
         this.plugin = plugin;
         this.mobTorchKey = new NamespacedKey(plugin, "mob_torch");
         Bukkit.getPluginManager().registerEvents(this, plugin);
+
+        // Cargar áreas protegidas desde la base de datos
+        loadProtectedAreasFromDatabase();
+    }
+
+    private void loadProtectedAreasFromDatabase() {
+        protectedAreas.putAll(MobRegistry.getProtectedAreas());
+        plugin.getLogger().info("Áreas protegidas cargadas desde la base de datos.");
     }
 
     @EventHandler
@@ -45,8 +54,9 @@ public class ItemMobsHandler implements Listener {
             Location placedLocation = placedBlock.getLocation();
             int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 15); // Radio configurable desde el config.yml
 
-            // Registrar el área protegida
+            // Registrar el área protegida en memoria y en la base de datos
             protectedAreas.put(placedLocation, radius);
+            MobRegistry.addProtectedArea(placedLocation, radius);
 
             plugin.getLogger().info("Área protegida contra mobs hostiles creada en: " + placedLocation + " con un radio de " + radius);
         }
@@ -57,8 +67,10 @@ public class ItemMobsHandler implements Listener {
         Location brokenLocation = event.getBlock().getLocation();
 
         if (protectedAreas.containsKey(brokenLocation)) {
-            // Eliminar el área protegida al romper la antorcha
+            // Eliminar el área protegida de memoria y de la base de datos
             protectedAreas.remove(brokenLocation);
+            MobRegistry.removeProtectedArea(brokenLocation);
+
             plugin.getLogger().info("Área protegida contra mobs hostiles eliminada en: " + brokenLocation);
         }
     }
@@ -130,11 +142,13 @@ public class ItemMobsHandler implements Listener {
     public void registerAntiMobArea(Player player, Location location) {
         int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 15); // Radio configurable
         protectedAreas.put(location, radius);
+        MobRegistry.addProtectedArea(location, radius);
         plugin.getLogger().info("Área protegida contra mobs hostiles creada en: " + location + " por " + player.getName());
     }
 
     public void unregisterAntiMobArea(Location location) {
         if (protectedAreas.remove(location) != null) {
+            MobRegistry.removeProtectedArea(location);
             plugin.getLogger().info("Área protegida contra mobs hostiles eliminada en: " + location);
         }
     }
