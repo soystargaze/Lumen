@@ -33,7 +33,7 @@ public class ItemLightsHandler {
             return;
         }
 
-        int radius = ConfigHandler.getInt("settings.default_torch_radius", 25); // Radio configurable
+        int radius = ConfigHandler.getInt("settings.default_torch_radius", 15); // Radio configurable
         int lightLevel = 15; // Nivel de luz fijo
         int lightsPerTick = ConfigHandler.getInt("settings.torch_lights_per_tick", 5);
         int tickInterval = ConfigHandler.getInt("settings.torch_tick_interval", 5);
