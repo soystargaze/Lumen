@@ -42,7 +42,7 @@ public class TorchListener implements Listener {
 
                 Block placedBlock = event.getBlock();
                 if ("light".equals(id)) {
-                    // Lógica para la Lumen Torch (luz)
+                    // Lógica para el Lumen Torch (luz)
                     String operationId = "torch-" + placedBlock.getLocation().hashCode();
                     lightsHandler.placeLights(event.getPlayer(), placedBlock.getLocation(), operationId);
 

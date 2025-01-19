@@ -39,7 +39,7 @@ public class ItemEffectUtil {
     }
 
     /**
-     * Efecto de partículas y sonido para la Lumen Torch.
+     * Efecto de partículas y sonido para el Lumen Torch.
      */
     private static void playTorchEffect(World world, Location location) {
         // Partículas de chispa y humo
@@ -51,7 +51,7 @@ public class ItemEffectUtil {
     }
 
     /**
-     * Efecto de partículas y sonido para la Lumen Torch Mob.
+     * Efecto de partículas y sonido para el Lumen Torch Mob.
      */
     private static void playMobTorchEffect(World world, Location location) {
         // Partículas de esmeralda y chispa
