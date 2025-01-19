@@ -3,8 +3,8 @@ language: "es_es" # Idioma del plugin
 settings:
   command_lights_per_tick: 1000 # Cantidad de luz que se añade por tick usando comandos
 
-  default_torch_radius: 15 # Radio de la antorcha por defecto
-  torch_lights_per_tick: 5 # Cantidad de luces que se añaden por tick con la antorcha
-  torch_tick_interval: 5 # Intervalo de ticks entre cada tick de la antorcha
+  default_torch_radius: 20 # Radio de la antorcha por defecto
+  torch_lights_per_tick: 10 # Cantidad de luces que se añaden por tick con la antorcha
+  torch_tick_interval: 10 # Intervalo de ticks entre cada tick de la antorcha
 
   mob_torch_radius: 20 # Radio de la antorcha anti-monstruos
