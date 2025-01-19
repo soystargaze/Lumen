@@ -3,6 +3,7 @@ package com.erosmari.lumen.listeners;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -30,13 +31,17 @@ public class TorchListener implements Listener {
         if (itemInHand.getItemMeta() != null && itemInHand.getItemMeta().displayName() != null) {
             String displayName = Objects.requireNonNull(itemInHand.getItemMeta().displayName()).toString();
 
-            if (displayName.contains("Lumen Torch") && !displayName.contains("Mob")) {
+            if (displayName.contains("Lumen Torch")) {
                 Block placedBlock = event.getBlock();
 
-                plugin.getLogger().info("Lumen Torch colocada en: " + placedBlock.getLocation());
-                // Llama a la lógica de iluminación para la Lumen Torch
+                // Generar un operationId único basado en la ubicación del bloque
                 String operationId = "torch-" + placedBlock.getLocation().hashCode();
+
+                // Registrar la operación y comenzar la colocación de luces
                 lightsHandler.placeLights(event.getPlayer(), placedBlock.getLocation(), operationId);
+
+                plugin.getLogger().info("Lumen Torch colocada en: " + placedBlock.getLocation() +
+                        " con ID de operación: " + operationId);
             }
         }
     }
@@ -44,13 +49,17 @@ public class TorchListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Block brokenBlock = event.getBlock();
+        Player player = event.getPlayer(); // Obtiene al jugador que rompió el bloque
 
         // Verifica si el bloque roto es una "Lumen Torch"
         if (brokenBlock.getType() == Material.PLAYER_HEAD) {
-            // Usa la lógica de eliminación de luces del ItemLightsHandler
             String operationId = "torch-" + brokenBlock.getLocation().hashCode();
-            plugin.getLogger().info("Lumen Torch rota en: " + brokenBlock.getLocation());
-            lightsHandler.removeLights(event.getPlayer(), operationId);
+
+            // Cancela la tarea y elimina las luces asociadas
+            lightsHandler.cancelOperation(player, operationId);
+            lightsHandler.removeLights(player, operationId);
+
+            plugin.getLogger().info("Lumen Torch rota. Operación cancelada y luces eliminadas: " + operationId);
         }
     }
 }

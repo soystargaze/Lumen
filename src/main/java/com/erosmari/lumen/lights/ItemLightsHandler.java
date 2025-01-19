@@ -93,6 +93,13 @@ public class ItemLightsHandler {
         final BukkitTask[] taskHolder = new BukkitTask[1];
 
         taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            // Verifica si la tarea ha sido cancelada
+            if (!TaskManager.hasActiveTask(player.getUniqueId())) {
+                plugin.getLogger().info("Operación cancelada durante el proceso: " + operationId);
+                taskHolder[0].cancel(); // Cancela el proceso de colocación
+                return;
+            }
+
             int processed = 0;
 
             while (!blockQueue.isEmpty() && processed < lightsPerTick) {
@@ -139,7 +146,8 @@ public class ItemLightsHandler {
             return;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        // Ejecutar la eliminación en el hilo principal
+        Bukkit.getScheduler().runTask(plugin, () -> {
             blocksToRemove.forEach(location -> {
                 Block block = location.getBlock();
                 if (block.getType() == Material.LIGHT) {
@@ -149,6 +157,15 @@ public class ItemLightsHandler {
 
             LightRegistry.removeBlocksByOperationId(operationId);
             player.sendMessage("§aSe eliminaron todas las luces generadas por la operación: " + operationId);
+            plugin.getLogger().info("Se eliminaron las luces para la operación: " + operationId);
         });
+    }
+
+    public void cancelOperation(Player player, String operationId) {
+        // Cancela la tarea activa asociada al jugador
+        TaskManager.cancelTask(player.getUniqueId());
+        // Elimina las luces de la operación específica
+        removeLights(player, operationId);
+        plugin.getLogger().info("Operación cancelada y luces eliminadas para la ID: " + operationId);
     }
 }

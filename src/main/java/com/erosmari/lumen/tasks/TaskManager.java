@@ -7,17 +7,17 @@ import java.util.Map;
 import java.util.UUID;
 
 public class TaskManager {
-    private static final Map<UUID, BukkitTask> activeTasks = new HashMap<>();
+    private static final Map<UUID, BukkitTask> playerTasks = new HashMap<>();
 
     /**
      * Añade una tarea activa para un jugador.
      *
-     * @param playerId  El UUID del jugador.
-     * @param task      La tarea programada.
+     * @param playerId El UUID del jugador.
+     * @param task     La tarea programada.
      */
     public static void addTask(UUID playerId, BukkitTask task) {
         cancelTask(playerId); // Cancelar cualquier tarea previa antes de añadir una nueva.
-        activeTasks.put(playerId, task);
+        playerTasks.put(playerId, task);
     }
 
     /**
@@ -26,7 +26,7 @@ public class TaskManager {
      * @param playerId El UUID del jugador.
      */
     public static void cancelTask(UUID playerId) {
-        BukkitTask task = activeTasks.remove(playerId);
+        BukkitTask task = playerTasks.remove(playerId);
         if (task != null) {
             task.cancel();
         }
@@ -39,6 +39,7 @@ public class TaskManager {
      * @return Verdadero si hay una tarea activa.
      */
     public static boolean hasActiveTask(UUID playerId) {
-        return activeTasks.containsKey(playerId);
+        return playerTasks.containsKey(playerId);
     }
+
 }
