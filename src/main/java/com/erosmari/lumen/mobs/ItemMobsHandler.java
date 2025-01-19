@@ -37,7 +37,7 @@ public class ItemMobsHandler implements Listener {
                 Objects.requireNonNull(event.getItemInHand().getItemMeta().displayName()).toString().contains("Lumen Torch Mob")) {
 
             Location placedLocation = event.getBlock().getLocation();
-            int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 10); // Radio configurable desde el config.yml
+            int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 15); // Radio configurable desde el config.yml
 
             // Registrar el área protegida
             protectedAreas.put(placedLocation, radius);
