@@ -37,30 +37,109 @@ public class LightHandler {
 
         // Ejecutar la recopilación y procesamiento de bloques asíncronamente
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            List<Location> blocksToLight = new ArrayList<>();
-
-            // Recopilar bloques que deben iluminarse
-            for (int x = -areaBlocks; x <= areaBlocks; x++) {
-                for (int y = -areaBlocks; y <= areaBlocks; y++) {
-                    for (int z = -areaBlocks; z <= areaBlocks; z++) {
-                        Location blockLocation = center.clone().add(x, y, z);
-                        if (shouldPlaceLight(blockLocation, includeSkylight)) {
-                            blocksToLight.add(blockLocation);
-                        }
-                    }
-                }
-            }
+            List<Location> blocksToLight = calculateLightPositions(center, areaBlocks, lightLevel, includeSkylight);
 
             // Procesar los bloques en lotes
             processBlocksAsync(player, blocksToLight, lightLevel, operationId);
         });
     }
 
-    private boolean shouldPlaceLight(Location location, boolean includeSkylight) {
-        if (!location.getBlock().getType().isAir()) {
+    /**
+     * Calcula las posiciones óptimas para colocar bloques de luz, teniendo en cuenta la propagación y bloques sólidos.
+     */
+    private List<Location> calculateLightPositions(Location center, int areaBlocks, int lightLevel, boolean includeSkylight) {
+        List<Location> positions = new ArrayList<>();
+        World world = center.getWorld();
+        if (world == null) {
+            plugin.getLogger().warning("El mundo del jugador no pudo ser determinado.");
+            return positions;
+        }
+
+        // Máxima distancia que puede cubrir el nivel de luz
+        int maxDistance = lightLevel;
+
+        for (int x = -areaBlocks; x <= areaBlocks; x++) {
+            for (int y = -areaBlocks; y <= areaBlocks; y++) {
+                for (int z = -areaBlocks; z <= areaBlocks; z++) {
+                    Location location = center.clone().add(x, y, z);
+
+                    // Verificar si es un bloque válido para colocar luz
+                    if (isValidLightPosition(location, center, maxDistance, includeSkylight)) {
+                        positions.add(location);
+                    }
+                }
+            }
+        }
+
+        plugin.getLogger().info("Se calcularon " + positions.size() + " bloques para iluminar.");
+        return positions;
+    }
+
+    /**
+     * Determina si un bloque es válido para colocar luz, basado en la propagación de luz y su vecindad.
+     */
+    private boolean isValidLightPosition(Location location, Location center, int maxDistance, boolean includeSkylight) {
+        World world = location.getWorld();
+        if (world == null) return false;
+
+        Block block = location.getBlock();
+
+        // Asegurarse de que el bloque actual sea aire
+        if (!block.getType().isAir()) {
+            plugin.getLogger().info("Bloque no es aire en " + location + " (tipo: " + block.getType() + ")");
             return false;
         }
-        return includeSkylight || location.getWorld().getHighestBlockYAt(location) > location.getBlockY();
+
+        // Verificar distancia máxima desde el centro
+        double taxicabDistance = Math.abs(location.getBlockX() - center.getBlockX())
+                + Math.abs(location.getBlockY() - center.getBlockY())
+                + Math.abs(location.getBlockZ() - center.getBlockZ());
+        if (taxicabDistance > maxDistance) {
+            plugin.getLogger().info("Bloque fuera de rango en " + location + " (distancia: " + taxicabDistance + ")");
+            return false;
+        }
+
+        // Verificar si hay un bloque sólido adyacente
+        if (!isAdjacentToSolidBlock(location)) {
+            plugin.getLogger().info("No hay bloques sólidos adyacentes en " + location);
+            return false;
+        }
+
+        // Si se requiere skylight, verificar que el bloque esté bajo luz natural
+        if (includeSkylight) {
+            int highestY = world.getHighestBlockYAt(location);
+            if (location.getBlockY() < highestY) {
+                plugin.getLogger().info("Bloque no está bajo luz natural en " + location);
+                return false;
+            }
+        }
+
+        // Si pasa todas las verificaciones, es válido
+        return true;
+    }
+
+    /**
+     * Verifica si un bloque de aire está en contacto con al menos un bloque sólido.
+     */
+    private boolean isAdjacentToSolidBlock(Location location) {
+        World world = location.getWorld();
+        if (world == null) return false;
+
+        // Coordenadas relativas para bloques adyacentes
+        int[][] offsets = {
+                {1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}
+        };
+
+        for (int[] offset : offsets) {
+            Location adjacent = location.clone().add(offset[0], offset[1], offset[2]);
+            Block adjacentBlock = adjacent.getBlock();
+
+            // Verificar si el bloque adyacente no es aire (es sólido)
+            if (!adjacentBlock.getType().isAir()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, String operationId) {
