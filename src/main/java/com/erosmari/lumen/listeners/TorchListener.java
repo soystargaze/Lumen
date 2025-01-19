@@ -2,6 +2,7 @@ package com.erosmari.lumen.listeners;
 
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
+import com.erosmari.lumen.utils.ItemEffectUtil;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -45,11 +46,17 @@ public class TorchListener implements Listener {
                     String operationId = "torch-" + placedBlock.getLocation().hashCode();
                     lightsHandler.placeLights(event.getPlayer(), placedBlock.getLocation(), operationId);
 
+                    // Efecto visual y sonoro
+                    ItemEffectUtil.playEffect(placedBlock.getLocation(), "torch");
+
                     plugin.getLogger().info("Lumen Torch colocada en: " + placedBlock.getLocation() +
                             " con ID de operación: " + operationId);
                 } else if ("mob".equals(id)) {
                     // Lógica para la Lumen Torch Mob (anti-mobs)
                     mobsHandler.registerAntiMobArea(event.getPlayer(), placedBlock.getLocation());
+
+                    // Efecto visual y sonoro
+                    ItemEffectUtil.playEffect(placedBlock.getLocation(), "mob_torch");
 
                     plugin.getLogger().info("Lumen Torch Mob colocada en: " + placedBlock.getLocation());
                 }
