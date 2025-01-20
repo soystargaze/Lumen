@@ -71,6 +71,13 @@ command:
     error: "§cOcurrió un error al recargar la configuración."
     success_log: "El comando /reload se ejecutó correctamente por {0}. Se cargaron {1} traducciones."
     error_log: "El comando /reload falló al ejecutarse por {0}."
+  give:
+    invalid_amount: "¡La cantidad debe ser mayor a 0!"
+    invalid_torch: "¡Tipo de antorcha no válido! Usa 'light' o 'mob'."
+    invalid_player: "¡Jugador no encontrado o desconectado!"
+    success_one: "Has dado {0} antorchas tipo '{1}' a {2}."
+    success_all: "Has dado {0} antorchas tipo '{1}' a todos los jugadores."
+    received: "Has recibido {0} antorchas tipo '{1}'."
 
 items:
   registered: "Objetos personalizados registrados correctamente."
