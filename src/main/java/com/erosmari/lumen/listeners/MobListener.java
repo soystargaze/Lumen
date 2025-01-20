@@ -42,16 +42,26 @@ public class MobListener implements Listener {
         ItemStack itemInHand = event.getItemInHand();
 
         if (itemInHand.getItemMeta() != null) {
-            PersistentDataContainer container = itemInHand.getItemMeta().getPersistentDataContainer();
-            NamespacedKey idKey = new NamespacedKey(plugin, "lumen_id"); // Clave registrada en LumenItems
+            PersistentDataContainer itemContainer = itemInHand.getItemMeta().getPersistentDataContainer();
+            NamespacedKey idKey = new NamespacedKey(plugin, "lumen_id"); // Clave única para identificar mob_torch
 
-            if (container.has(idKey, PersistentDataType.STRING)) {
-                String id = container.get(idKey, PersistentDataType.STRING);
+            if (itemContainer.has(idKey, PersistentDataType.STRING)) {
+                String id = itemContainer.get(idKey, PersistentDataType.STRING);
 
-                // Comprueba si el ID es "mob_torch"
+                // Comprueba si el ID es "anti_mob"
                 if ("anti_mob".equals(id)) {
-                    Location placedLocation = event.getBlock().getLocation();
+                    Block placedBlock = event.getBlock();
+                    Location placedLocation = placedBlock.getLocation();
                     Player player = event.getPlayer();
+
+                    // Transfiere el ID al bloque colocado si es compatible con TileState
+                    if (placedBlock.getState() instanceof TileState tileState) {
+                        PersistentDataContainer blockContainer = tileState.getPersistentDataContainer();
+                        blockContainer.set(idKey, PersistentDataType.STRING, id);
+                        tileState.update(); // Aplica los cambios al bloque
+                    } else {
+                        plugin.getLogger().warning("El bloque colocado no soporta TileState.");
+                    }
 
                     // Registra el área protegida
                     itemMobsHandler.registerAntiMobArea(player, placedLocation);
@@ -59,7 +69,8 @@ public class MobListener implements Listener {
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "mob_torch");
 
-                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.mob_torch_placed", placedLocation));
+                    plugin.getLogger().info(TranslationHandler.getFormatted(
+                            "torch.mob_torch_placed", placedLocation));
                 }
             }
         }
@@ -73,14 +84,22 @@ public class MobListener implements Listener {
         if (brokenBlock.getState() instanceof TileState tileState) {
             PersistentDataContainer container = tileState.getPersistentDataContainer();
             NamespacedKey key = new NamespacedKey(plugin, "lumen_id"); // Clave registrada en LumenItems
-            String id = container.get(key, PersistentDataType.STRING);
 
-            // Comprueba que el ID sea exactamente "mob_torch"
-            if ("anti_mob".equals(id)) {
-                Location brokenLocation = event.getBlock().getLocation();
-                // Elimina el área protegida
-                itemMobsHandler.unregisterAntiMobArea(brokenBlock.getLocation());
-                plugin.getLogger().info(TranslationHandler.getFormatted("torch.mob_torch_broken", brokenLocation));
+            if (container.has(key, PersistentDataType.STRING)) {
+                String id = container.get(key, PersistentDataType.STRING);
+
+                // Comprueba que el ID sea exactamente "anti_mob"
+                if ("anti_mob".equals(id)) {
+                    Location brokenLocation = brokenBlock.getLocation();
+
+                    // Elimina el área protegida
+                    try {
+                        itemMobsHandler.unregisterAntiMobArea(brokenLocation);
+                        plugin.getLogger().info(TranslationHandler.getFormatted("torch.mob_torch_broken", brokenLocation));
+                    } catch (Exception e) {
+                        plugin.getLogger().severe("Error al eliminar el área protegida: " + e.getMessage());
+                    }
+                }
             }
         }
     }

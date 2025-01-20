@@ -15,11 +15,16 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class LumenItems {
 
     private final Plugin plugin;
+
+    // Mapa para almacenar los ítems personalizados
+    private final Map<String, ItemStack> lumenItems = new HashMap<>();
 
     public LumenItems(Plugin plugin) {
         this.plugin = plugin;
@@ -38,9 +43,23 @@ public class LumenItems {
                 "anti_mob"
         );
 
+        // Agregar los ítems al mapa
+        lumenItems.put("light", lumenTorch);
+        lumenItems.put("anti_mob", lumenTorchMob);
+
         // Registrar las recetas de los objetos
         registerRecipe("lumen_torch", lumenTorch, Material.GOLD_INGOT);
         registerRecipe("lumen_torch_mob", lumenTorchMob, Material.DIAMOND);
+    }
+
+    /**
+     * Obtiene un ítem personalizado por su clave.
+     *
+     * @param key La clave del ítem (por ejemplo, "light" o "anti_mob").
+     * @return El ItemStack correspondiente, o null si no existe.
+     */
+    public ItemStack getLumenItem(String key) {
+        return lumenItems.getOrDefault(key, null);
     }
 
     private ItemStack createLumenTorch(String name, String texture, String identifier) {

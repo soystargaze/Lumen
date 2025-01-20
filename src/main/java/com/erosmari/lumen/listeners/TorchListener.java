@@ -3,6 +3,7 @@ package com.erosmari.lumen.listeners;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
@@ -21,12 +22,9 @@ public class TorchListener implements Listener {
     private final Plugin plugin;
     private final ItemLightsHandler lightsHandler;
 
-    private final NamespacedKey idKey;
-
     public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler) {
         this.plugin = plugin;
         this.lightsHandler = lightsHandler;
-        this.idKey = new NamespacedKey(plugin, "lumen_id");
     }
 
     @EventHandler
@@ -34,21 +32,33 @@ public class TorchListener implements Listener {
         ItemStack itemInHand = event.getItemInHand();
 
         if (itemInHand.getItemMeta() != null) {
-            PersistentDataContainer container = itemInHand.getItemMeta().getPersistentDataContainer();
-            if (container.has(idKey, PersistentDataType.STRING)) {
-                String id = container.get(idKey, PersistentDataType.STRING);
+            PersistentDataContainer itemContainer = itemInHand.getItemMeta().getPersistentDataContainer();
+            NamespacedKey idKey = new NamespacedKey(plugin, "lumen_id"); // Clave única para identificar Lumen Torch
 
-                Block placedBlock = event.getBlock();
+            if (itemContainer.has(idKey, PersistentDataType.STRING)) {
+                String id = itemContainer.get(idKey, PersistentDataType.STRING);
+
                 if ("light".equals(id)) {
+                    Block placedBlock = event.getBlock();
+                    Player player = event.getPlayer();
+                    Location placedLocation = placedBlock.getLocation();
+
+                    // Transfiere el ID al bloque colocado si es compatible con TileState
+                    if (placedBlock.getState() instanceof TileState tileState) {
+                        PersistentDataContainer blockContainer = tileState.getPersistentDataContainer();
+                        blockContainer.set(idKey, PersistentDataType.STRING, id);
+                        tileState.update(); // Aplica los cambios al bloque
+                    }
+
                     // Lógica para el Lumen Torch (luz)
-                    String operationId = "torch-" + placedBlock.getLocation().hashCode();
-                    lightsHandler.placeLights(event.getPlayer(), placedBlock.getLocation(), operationId);
+                    String operationId = "torch-" + placedLocation.hashCode();
+                    lightsHandler.placeLights(player, placedLocation, operationId);
 
                     // Efecto visual y sonoro
-                    ItemEffectUtil.playEffect(placedBlock.getLocation(), "torch");
+                    ItemEffectUtil.playEffect(placedLocation, "torch");
 
                     plugin.getLogger().info(TranslationHandler.getFormatted(
-                            "torch.light_placed", placedBlock.getLocation(), operationId));
+                            "torch.light_placed", placedLocation, operationId));
                 }
             }
         }
@@ -63,17 +73,24 @@ public class TorchListener implements Listener {
         if (brokenBlock.getState() instanceof TileState tileState) {
             PersistentDataContainer container = tileState.getPersistentDataContainer();
             NamespacedKey key = new NamespacedKey(plugin, "lumen_id"); // Clave registrada en LumenItems
-            String id = container.get(key, PersistentDataType.STRING);
 
-            // Comprueba que el ID sea exactamente "light"
-            if ("light".equals(id)) {
-                // Lógica para el Lumen Torch (luz)
-                String operationId = "torch-" + brokenBlock.getLocation().hashCode();
+            if (container.has(key, PersistentDataType.STRING)) {
+                String id = container.get(key, PersistentDataType.STRING);
 
-                lightsHandler.cancelOperation(player, operationId);
-                lightsHandler.removeLights(player, operationId);
+                // Comprueba que el ID sea exactamente "light"
+                if ("light".equals(id)) {
+                    try {
+                        // Lógica para el Lumen Torch (luz)
+                        String operationId = "torch-" + brokenBlock.getLocation().hashCode();
 
-                plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_broken", operationId));
+                        lightsHandler.cancelOperation(player, operationId);
+                        lightsHandler.removeLights(player, operationId);
+
+                        plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_broken", operationId));
+                    } catch (Exception e) {
+                        plugin.getLogger().severe("Error handling Lumen Torch removal: " + e.getMessage());
+                    }
+                }
             }
         }
     }

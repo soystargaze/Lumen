@@ -83,6 +83,9 @@ public class LumenCommandManager {
         // Subcomando: /lumen remove
         RemoveCommand.register(commandManager, parentBuilder);
 
+        // Subcomando: /lumen remove
+        GiveCommand.register(commandManager, parentBuilder);
+
         // Subcomando: /lumen reload
         ReloadCommand.register(commandManager, parentBuilder, plugin);
     }

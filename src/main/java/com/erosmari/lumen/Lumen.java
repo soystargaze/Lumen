@@ -55,6 +55,8 @@ public class Lumen extends JavaPlugin {
     public static Lumen getInstance() {
         return instance;
     }
+    public LumenItems getLumenItems() {return lumenItems;}
+
 
     private void loadConfigurations() {
         ConfigHandler.setup(this);
