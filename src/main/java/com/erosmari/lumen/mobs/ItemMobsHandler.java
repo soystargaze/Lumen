@@ -141,7 +141,7 @@ public class ItemMobsHandler implements Listener {
     }
 
     private void registerAntiMobArea(Player player, Location location) {
-        int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 15);
+        int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 20);
         protectedAreas.put(location, radius);
         MobRegistry.addProtectedArea(location, radius);
         plugin.getLogger().info(TranslationHandler.getFormatted("mobs.area_created_by_player", location, player.getName()));
