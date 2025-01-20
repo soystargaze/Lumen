@@ -7,7 +7,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Skull;
 import org.bukkit.entity.Monster;
@@ -76,32 +75,40 @@ public class ItemMobsHandler implements Listener {
 
     @EventHandler
     public void onCreatureSpawn(CreatureSpawnEvent event) {
+        // Verifica si el mob es un Monster (hostil)
         if (!(event.getEntity() instanceof Monster)) {
-            return;
+            return; // Ignora mobs que no sean hostiles
         }
 
         Location spawnLocation = event.getLocation();
-        World world = spawnLocation.getWorld();
 
-        if (world == null) return;
-
+        // Verifica si el spawn ya fue cancelado recientemente
         if (recentlyCancelled.contains(spawnLocation)) {
-            return;
+            return; // Salta si ya se procesó esta ubicación
         }
 
-        for (Map.Entry<Location, Integer> entry : protectedAreas.entrySet()) {
+        // Define el rango de búsqueda desde la configuración
+        int searchRange = plugin.getConfig().getInt("settings.mob_torch_search_range", 50);
+
+        // Obtén solo las áreas cercanas desde MobRegistry
+        Map<Location, Integer> nearbyAreas = MobRegistry.getNearbyProtectedAreas(spawnLocation, searchRange);
+
+        for (Map.Entry<Location, Integer> entry : nearbyAreas.entrySet()) {
             Location center = entry.getKey();
             int radius = entry.getValue();
 
+            // Comprueba si el mob intenta aparecer dentro de un área protegida
             if (isWithinRadius(center, spawnLocation, radius)) {
+                // Cancela el spawn y registra el evento
                 event.setCancelled(true);
                 plugin.getLogger().info(TranslationHandler.getFormatted("mobs.spawn_cancelled", spawnLocation));
 
+                // Agrega la ubicación a recentlyCancelled para evitar redundancia
                 recentlyCancelled.add(spawnLocation);
 
+                // Limpia recentlyCancelled después de un tiempo
                 Bukkit.getScheduler().runTaskLater(plugin, () -> recentlyCancelled.remove(spawnLocation), 20L);
-
-                break;
+                return; // No es necesario continuar verificando otras áreas
             }
         }
     }

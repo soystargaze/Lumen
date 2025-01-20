@@ -17,3 +17,4 @@ settings:
 
   # Lumen Mob Torch settings
   mob_torch_radius: 20 # Radius of the mob torch
+  mob_torch_search_range: 50 # Range of the mob torch search

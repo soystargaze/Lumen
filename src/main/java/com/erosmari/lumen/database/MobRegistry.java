@@ -18,12 +18,6 @@ public class MobRegistry {
 
     private static final Logger logger = Logger.getLogger("Lumen-MobRegistry");
 
-    /**
-     * Añade un área protegida contra mobs.
-     *
-     * @param location La ubicación central del área.
-     * @param radius   El radio del área protegida.
-     */
     public static void addProtectedArea(Location location, int radius) {
         String query = "INSERT INTO protected_areas (world, x, y, z, radius) VALUES (?, ?, ?, ?, ?);";
         try (Connection connection = DatabaseHandler.getConnection();
@@ -42,11 +36,6 @@ public class MobRegistry {
         }
     }
 
-    /**
-     * Elimina un área protegida contra mobs.
-     *
-     * @param location La ubicación central del área.
-     */
     public static void removeProtectedArea(Location location) {
         String query = "DELETE FROM protected_areas WHERE world = ? AND x = ? AND y = ? AND z = ?;";
         try (Connection connection = DatabaseHandler.getConnection();
@@ -64,11 +53,40 @@ public class MobRegistry {
         }
     }
 
-    /**
-     * Obtiene todas las áreas protegidas contra mobs.
-     *
-     * @return Un mapa de ubicaciones y radios de las áreas protegidas.
-     */
+    public static Map<Location, Integer> getNearbyProtectedAreas(Location location, int range) {
+        String query = "SELECT world, x, y, z, radius " +
+                "FROM protected_areas " +
+                "WHERE world = ? " +
+                "AND x BETWEEN ? AND ? " +
+                "AND z BETWEEN ? AND ?;";
+
+        Map<Location, Integer> areas = new HashMap<>();
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+
+            int minX = location.getBlockX() - range;
+            int maxX = location.getBlockX() + range;
+            int minZ = location.getBlockZ() - range;
+            int maxZ = location.getBlockZ() + range;
+
+            stmt.setString(1, location.getWorld().getName());
+            stmt.setInt(2, minX);
+            stmt.setInt(3, maxX);
+            stmt.setInt(4, minZ);
+            stmt.setInt(5, maxZ);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                areas.putAll(processResultSet(rs));
+            }
+
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, TranslationHandler.get("mob_registry.error.fetching_areas"), e);
+        }
+
+        return areas;
+    }
+
     public static Map<Location, Integer> getProtectedAreas() {
         String query = "SELECT world, x, y, z, radius FROM protected_areas;";
         Map<Location, Integer> areas = new HashMap<>();
@@ -77,23 +95,32 @@ public class MobRegistry {
              PreparedStatement stmt = connection.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                String worldName = rs.getString("world");
-                int x = rs.getInt("x");
-                int y = rs.getInt("y");
-                int z = rs.getInt("z");
-                int radius = rs.getInt("radius");
+            areas.putAll(processResultSet(rs));
 
-                World world = Bukkit.getWorld(worldName);
-                if (world != null) {
-                    Location location = new Location(world, x, y, z);
-                    areas.put(location, radius);
-                } else {
-                    logger.warning(TranslationHandler.getFormatted("mob_registry.warning.world_not_found", worldName));
-                }
-            }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, TranslationHandler.get("mob_registry.error.fetching_areas"), e);
+        }
+
+        return areas;
+    }
+
+    private static Map<Location, Integer> processResultSet(ResultSet rs) throws SQLException {
+        Map<Location, Integer> areas = new HashMap<>();
+
+        while (rs.next()) {
+            String worldName = rs.getString("world");
+            int x = rs.getInt("x");
+            int y = rs.getInt("y");
+            int z = rs.getInt("z");
+            int radius = rs.getInt("radius");
+
+            World world = Bukkit.getWorld(worldName);
+            if (world != null) {
+                Location location = new Location(world, x, y, z);
+                areas.put(location, radius);
+            } else {
+                logger.warning(TranslationHandler.getFormatted("mob_registry.warning.world_not_found", worldName));
+            }
         }
 
         return areas;
