@@ -98,7 +98,7 @@ public class MobListener implements Listener {
         }
 
         // Define el rango de búsqueda desde la configuración
-        int searchRange = plugin.getConfig().getInt("settings.mob_torch_search_range", 50);
+        int searchRange = plugin.getConfig().getInt("settings.mob_torch_search_range", 100);
 
         // Obtén solo las áreas cercanas desde MobRegistry
         Map<Location, Integer> nearbyAreas = MobRegistry.getNearbyProtectedAreas(spawnLocation, searchRange);
