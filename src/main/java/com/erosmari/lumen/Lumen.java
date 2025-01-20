@@ -5,6 +5,7 @@ import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.DatabaseHandler;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
+import com.erosmari.lumen.listeners.MobListener;
 import com.erosmari.lumen.listeners.TorchListener;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
 import com.erosmari.lumen.utils.ConsoleUtils;
@@ -126,7 +127,7 @@ public class Lumen extends JavaPlugin {
             ItemMobsHandler mobsHandler = new ItemMobsHandler(this);
 
             getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler), this);
-            getServer().getPluginManager().registerEvents(mobsHandler, this);
+            getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler), this);
 
             getLogger().info(TranslationHandler.get("events.registered"));
         } catch (Exception e) {
