@@ -115,27 +115,6 @@ public class LightRegistry {
         return null;
     }
 
-    public static List<Location> getAllBlocks() {
-        String query = "SELECT * FROM illuminated_blocks WHERE is_deleted = 0;";
-        List<Location> blocks = new ArrayList<>();
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            while (resultSet.next()) {
-                Location location = createLocationFromResultSet(resultSet);
-                if (location != null) {
-                    blocks.add(location);
-                }
-            }
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.fetch_all_blocks"), e);
-        }
-
-        return blocks;
-    }
-
     public static List<Location> getBlocksByOperationId(String operationId) {
         String query = "SELECT * FROM illuminated_blocks WHERE operation_id = ?;";
         List<Location> blocks = new ArrayList<>();
@@ -202,35 +181,6 @@ public class LightRegistry {
         return null;
     }
 
-    public static int getLightLevel(Location location) {
-        String query = "SELECT light_level FROM illuminated_blocks WHERE world = ? AND x = ? AND y = ? AND z = ? AND is_deleted = 0;";
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
-
-            statement.setString(1, location.getWorld().getName());
-            statement.setInt(2, location.getBlockX());
-            statement.setInt(3, location.getBlockY());
-            statement.setInt(4, location.getBlockZ());
-
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    int lightLevel = resultSet.getInt("light_level");
-                    if (lightLevel > 0 && lightLevel <= 15) {
-                        return lightLevel;
-                    }
-                    logger.warning(TranslationHandler.getFormatted("light_registry.error.invalid_light_level_retrieved", lightLevel, location));
-                } else {
-                    logger.warning(TranslationHandler.getFormatted("light_registry.warning.no_light_level", location));
-                }
-            }
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, TranslationHandler.getFormatted("light_registry.error.fetch_light_level", location), e);
-        }
-
-        return 0;
-    }
-
     public static List<Location> getBlocksInRange(Location center, int range) {
         String query = "SELECT * FROM illuminated_blocks WHERE is_deleted = 0 AND world = ? AND x BETWEEN ? AND ? AND y BETWEEN ? AND ? AND z BETWEEN ? AND ?;";
         List<Location> blocks = new ArrayList<>();
@@ -255,6 +205,7 @@ public class LightRegistry {
         return blocks;
     }
 
+    @SuppressWarnings("SqlWithoutWhere")
     public static void clearAllBlocks() {
         String querySelect = "SELECT world, x, y, z FROM illuminated_blocks WHERE is_deleted = 0;";
         String queryUpdate = "UPDATE illuminated_blocks SET is_deleted = 1;";
