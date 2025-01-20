@@ -6,6 +6,9 @@ import com.erosmari.lumen.utils.ItemEffectUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
+import org.bukkit.block.TileState;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +16,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashSet;
@@ -33,23 +39,49 @@ public class MobListener implements Listener {
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (itemMobsHandler.isMobTorch(event.getItemInHand(), "mob_torch")) {
-            Location placedLocation = event.getBlock().getLocation();
-            Player player = event.getPlayer();
+        ItemStack itemInHand = event.getItemInHand();
 
-            // Registra el área protegida
-            itemMobsHandler.registerAntiMobArea(player, placedLocation);
+        if (itemInHand.getItemMeta() != null) {
+            PersistentDataContainer container = itemInHand.getItemMeta().getPersistentDataContainer();
+            NamespacedKey idKey = new NamespacedKey(plugin, "lumen_id"); // Clave registrada en LumenItems
 
-            // Efecto visual y sonoro
-            ItemEffectUtil.playEffect(placedLocation, "mob_torch");
+            if (container.has(idKey, PersistentDataType.STRING)) {
+                String id = container.get(idKey, PersistentDataType.STRING);
+
+                // Comprueba si el ID es "mob_torch"
+                if ("anti_mob".equals(id)) {
+                    Location placedLocation = event.getBlock().getLocation();
+                    Player player = event.getPlayer();
+
+                    // Registra el área protegida
+                    itemMobsHandler.registerAntiMobArea(player, placedLocation);
+
+                    // Efecto visual y sonoro
+                    ItemEffectUtil.playEffect(placedLocation, "mob_torch");
+
+                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.mob_torch_placed", placedLocation));
+                }
+            }
         }
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        if (itemMobsHandler.isMobTorch(event.getBlock(), "mob_torch")) {
-            // Elimina el área protegida
-            itemMobsHandler.unregisterAntiMobArea(event.getBlock().getLocation());
+        Block brokenBlock = event.getBlock();
+
+        // Verifica si el bloque tiene un valor de ID almacenado en su PersistentDataContainer
+        if (brokenBlock.getState() instanceof TileState tileState) {
+            PersistentDataContainer container = tileState.getPersistentDataContainer();
+            NamespacedKey key = new NamespacedKey(plugin, "lumen_id"); // Clave registrada en LumenItems
+            String id = container.get(key, PersistentDataType.STRING);
+
+            // Comprueba que el ID sea exactamente "mob_torch"
+            if ("anti_mob".equals(id)) {
+                Location brokenLocation = event.getBlock().getLocation();
+                // Elimina el área protegida
+                itemMobsHandler.unregisterAntiMobArea(brokenBlock.getLocation());
+                plugin.getLogger().info(TranslationHandler.getFormatted("torch.mob_torch_broken", brokenLocation));
+            }
         }
     }
 

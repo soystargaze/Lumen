@@ -35,7 +35,7 @@ public class LumenItems {
         ItemStack lumenTorchMob = createLumenTorch(
                 TranslationHandler.get("items.lumen_torch_mob.name"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg0NDE3MjViZDQzMDczNmNmNDBkNGNlOTVjYjVhNWUxMDMwNWI3OTVhYzRmZjg0NzRlMDUzNWRmN2FmMWRkNyJ9fX0=",
-                "mob"
+                "anti_mob"
         );
 
         // Registrar las recetas de los objetos

@@ -1,7 +1,4 @@
 plugin:
-  name: "Lumen Plugin"
-  version: "v1.0"
-  author: "by Eros Marí"
   enabled: "Lumen habilitado correctamente."
   disabled: "Lumen deshabilitado correctamente."
   enable_error: "Error al habilitar el plugin. Consulta la consola para más detalles."
@@ -97,9 +94,9 @@ mobs:
 
 torch:
   light_placed: "Lumen Torch colocada en: {0} con ID de operación: {1}."
-  mob_placed: "Lumen Torch Mob colocada en: {0}."
+  mob_torch_placed: "Lumen Torch Mob colocada en: {0}."
   light_broken: "Lumen Torch rota. Operación cancelada y luces eliminadas: {0}."
-  mob_broken: "Lumen Torch Mob rota. Área de protección eliminada en: {0}."
+  mob_torch_broken: "Lumen Torch Mob rota. Área de protección eliminada en: {0}."
 
 light:
   error:
