@@ -5,6 +5,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.execution.CommandExecutionCoordinator;
 import cloud.commandframework.paper.PaperCommandManager;
 import com.erosmari.lumen.Lumen;
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.command.CommandSender;
 
 import java.util.function.Function;
@@ -26,8 +27,8 @@ public class LumenCommandManager {
                     Function.identity()
             );
         } catch (Exception e) {
-            plugin.getLogger().severe("Error al inicializar el CommandManager: " + e.getMessage());
-            throw new RuntimeException("Error al inicializar el CommandManager", e);
+            plugin.getLogger().severe(TranslationHandler.getFormatted("commandmanager.init_error", e.getMessage()));
+            throw new RuntimeException(TranslationHandler.get("commandmanager.init_failure"), e);
         }
     }
 
@@ -53,7 +54,7 @@ public class LumenCommandManager {
                 mainCommand
                         .handler(context -> {
                             CommandSender sender = context.getSender();
-                            sender.sendMessage("Uso: /lumen <subcomando>");
+                            sender.sendMessage(TranslationHandler.get("command.usage"));
                         })
         );
     }
@@ -67,7 +68,7 @@ public class LumenCommandManager {
         // Subcomando: /lumen light
         LightCommand.register(commandManager, parentBuilder);
 
-        // Subcomando: /lumen undo
+        // Subcomando: /lumen cancel
         CancelCommand.register(commandManager, parentBuilder);
 
         // Subcomando: /lumen undo

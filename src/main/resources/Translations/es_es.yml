@@ -1,0 +1,161 @@
+plugin:
+  name: "Lumen Plugin"
+  version: "v1.0"
+  author: "by Eros Marí"
+  enabled: "Lumen habilitado correctamente."
+  disabled: "Lumen deshabilitado correctamente."
+  enable_error: "Error al habilitar el plugin. Consulta la consola para más detalles."
+
+translations:
+  folder_error: "Error: No se pudo crear la carpeta de traducciones."
+  file_error: "Error: No se pudo crear el archivo de traducción"
+
+database:
+  init_error: "Error al inicializar la base de datos."
+  init_fatal_error: "Falló la inicialización de la base de datos. Plugin deshabilitado."
+  init:
+    already_initialized: "El gestor de la base de datos ya fue inicializado."
+    error: "Error al inicializar la base de datos."
+    failed: "Falló la inicialización de la base de datos."
+  sqlite:
+    error_directory: "Error al crear el directorio de la base de datos: {0}."
+    success: "Conexión con SQLite establecida correctamente."
+  tables:
+    success: "Tablas de la base de datos creadas o verificadas correctamente."
+    error: "Error al crear las tablas necesarias en la base de datos."
+  connection:
+    uninitialized: "El pool de conexiones no está inicializado."
+  close:
+    success: "El pool de conexiones fue cerrado correctamente."
+
+commandmanager:
+  init_error: "Error al inicializar el CommandManager: {0}"
+  init_failure: "Falló la inicialización del CommandManager."
+
+command:
+  usage: "§aUso: /lumen <subcomando>"
+  only_players: "§cSolo los jugadores pueden usar este comando."
+  register_error: "Error al registrar los comandos. Plugin deshabilitado."
+  undo:
+    only_players: "§cSolo los jugadores pueden usar este comando."
+    no_previous_operations: "§eNo hay operaciones previas para deshacer."
+    success: "§aSe han eliminado {0} bloques de luz para la operación: {1}."
+    no_blocks: "§eNo se encontraron bloques para la operación: {0}."
+  redo:
+    no_previous_operations: "§eNo hay operaciones previas para rehacer."
+    no_blocks_found: "§eNo se encontraron bloques para la operación: §b{0}"
+    restoring_blocks_log: "Restaurando bloques de luz para operation_id: {0}. Total bloques: {1}"
+    restoration_completed_log: "Restauración completada para operation_id: {0}"
+    restoration_started: "§aRestauración iniciada para {0} bloques. Procesando en lotes de hasta {1} bloques por tick..."
+    light_level_error: "Error al configurar el nivel de luz para el bloque en {0}: {1}"
+    cannot_set_light: "No se pudo establecer el bloque como LIGHT en la ubicación: {0}"
+  remove:
+    only_players: "§cSolo los jugadores pueden usar este comando."
+    area:
+      success: "§aSe han eliminado {0} bloques de luz en un rango de {1} bloques."
+      no_blocks: "§eNo se encontraron bloques de luz en un rango de {0} bloques."
+    operation:
+      success: "§aSe han eliminado {0} bloques de luz para la operación: §b{1}."
+      no_blocks: "§eNo se encontraron bloques para la operación: §b{0}."
+  light:
+    invalid_level: "§cEl nivel de luz debe estar entre 0 y 15."
+    success: "§aSe han colocado luces con nivel de luz {0}. ID de operación: {1}."
+  cancel:
+    success: "§aTu tarea de iluminación ha sido cancelada."
+    no_task: "§eNo tienes ninguna tarea activa para cancelar."
+  clear:
+    request: "§e¿Estás seguro de que deseas eliminar todos los bloques iluminados? Escribe §a/lumen clear confirm §epara confirmar. Tienes 30 segundos."
+    no_request: "§cNo tienes ninguna solicitud de confirmación activa."
+    expired: "§cTu solicitud de confirmación ha expirado."
+    success: "§aTodos los bloques iluminados han sido eliminados."
+  reload:
+    no_permission: "§cNo tienes permiso para usar este comando."
+    success: "§aConfiguración recargada. Se cargaron {0} traducciones."
+    error: "§cOcurrió un error al recargar la configuración."
+    success_log: "El comando /reload se ejecutó correctamente por {0}. Se cargaron {1} traducciones."
+    error_log: "El comando /reload falló al ejecutarse por {0}."
+
+items:
+  registered: "Objetos personalizados registrados correctamente."
+  init_error: "Error al inicializar los objetos personalizados."
+  lumen_torch:
+    name: "Antorcha Lumen"
+  lumen_torch_mob:
+    name: "Antorcha Lumen Antimobs"
+  recipe_registered: "Receta registrada: {0}."
+
+events:
+  registered: "Eventos registrados correctamente."
+  register_error: "Error al registrar los eventos."
+
+mobs:
+  protected_areas_loaded: "Áreas protegidas cargadas desde la base de datos."
+  area_created: "Área protegida contra mobs hostiles creada en: {0} con un radio de {1}."
+  area_removed: "Área protegida contra mobs hostiles eliminada en: {0}."
+  spawn_cancelled: "Spawn de mob hostil cancelado en: {0}."
+  area_created_by_player: "Área protegida contra mobs hostiles creada en: {0} por {1}."
+
+torch:
+  light_placed: "Lumen Torch colocada en: {0} con ID de operación: {1}."
+  mob_placed: "Lumen Torch Mob colocada en: {0}."
+  light_broken: "Lumen Torch rota. Operación cancelada y luces eliminadas: {0}."
+  mob_broken: "Lumen Torch Mob rota. Área de protección eliminada en: {0}."
+
+light:
+  error:
+    no_world: "§cError: No se pudo determinar el mundo."
+    setting_level: "Error al configurar el nivel de luz para el bloque en {0}: {1}."
+    setting_level_torch: "Error al configurar el bloque en {0}: {1}."
+    no_lights_to_remove: "§cNo se encontraron luces para eliminar con la operación: {0}."
+  warning:
+    no_world: "Advertencia: No se pudo determinar el mundo."
+  info:
+    calculated_blocks: "Se calcularon {0} bloques para iluminar."
+    not_air: "El bloque en {0} no es aire. Tipo: {1}."
+    out_of_range: "El bloque en {0} está fuera de rango. Distancia: {1}."
+    no_adjacent_blocks: "El bloque en {0} no tiene bloques sólidos adyacentes."
+    not_sky_light: "El bloque en {0} no está bajo luz natural."
+    completed_operation: "Colocación completada para la operación: {0}."
+    operation_cancelled: "Operación cancelada durante el proceso: {0}."
+    removed_lights: "Se eliminaron las luces para la operación: {0}."
+    cancelled_and_removed: "Operación cancelada y luces eliminadas para la ID: {0}."
+  success:
+    completed: "§aSe completó la colocación de bloques de luz con nivel {0}. ID de operación: {1}."
+    placed: "§aLuces colocadas con éxito. ID de operación: {0}."
+    removed: "§aSe eliminaron todas las luces generadas por la operación: {0}."
+
+mob_registry:
+  protected_area_added: "Área protegida añadida en {0} con un radio de {1}."
+  protected_area_removed: "Área protegida eliminada en {0}."
+  warning:
+    world_not_found: "No se pudo encontrar el mundo: {0}."
+  error:
+    adding_area: "Error al añadir el área protegida en {0}."
+    removing_area: "Error al eliminar el área protegida en {0}."
+    fetching_areas: "Error al obtener las áreas protegidas."
+
+light_registry:
+  error:
+    invalid_light_level: "Nivel de luz inválido ({0}) intentado registrar en {1}."
+    invalid_light_level_retrieved: "Nivel de luz inválido ({0}) recuperado para la ubicación: {1}."
+    add_block: "Error al registrar el bloque en la base de datos."
+    soft_delete: "Error al marcar los bloques como eliminados para la operación: {0}."
+    restore: "Error al restaurar los bloques para la operación: {0}."
+    fetch_soft_deleted: "Error al obtener los bloques eliminados para la operación: {0}."
+    fetch_last_soft_deleted: "Error al obtener el último operation_id marcado como eliminado."
+    fetch_last_operation: "Error al obtener el último operation_id."
+    fetch_all_blocks: "Error al obtener todos los bloques iluminados."
+    fetch_blocks_by_operation: "Error al obtener los bloques para la operación: {0}."
+    remove_blocks: "Error al eliminar los bloques para la operación: {0}."
+    fetch_light_level: "Error al obtener el nivel de luz para la ubicación: {0}."
+    fetch_blocks_in_range: "Error al obtener los bloques en el rango especificado."
+    clear_all_blocks: "Error al eliminar todos los bloques iluminados."
+  warning:
+    no_light_level: "No se encontró nivel de luz para la ubicación: {0}."
+    world_not_found: "El mundo '{0}' no está cargado o no existe."
+  info:
+    blocks_soft_deleted: "Bloques de la operación {0} marcados como eliminados."
+    blocks_restored: "Bloques restaurados para la operación {0}."
+    blocks_removed: "Bloques eliminados del mundo para la operación {0}."
+    all_blocks_removed: "Todos los bloques iluminados han sido eliminados del mundo y marcados como eliminados en la base de datos."
+

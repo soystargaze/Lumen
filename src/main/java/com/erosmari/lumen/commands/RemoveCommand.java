@@ -6,6 +6,7 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -47,7 +48,7 @@ public class RemoveCommand {
 
         // Validar que sea un jugador
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cSolo los jugadores pueden usar este comando.");
+            sender.sendMessage(TranslationHandler.get("command.remove.only_players"));
             return;
         }
 
@@ -68,9 +69,9 @@ public class RemoveCommand {
 
         // Informar al jugador
         if (removedCount > 0) {
-            player.sendMessage("§aSe han eliminado " + removedCount + " bloques de luz en un rango de " + range + " bloques.");
+            player.sendMessage(TranslationHandler.getFormatted("command.remove.area.success", removedCount, range));
         } else {
-            player.sendMessage("§eNo se encontraron bloques de luz en el rango especificado.");
+            player.sendMessage(TranslationHandler.getFormatted("command.remove.area.no_blocks", range));
         }
     }
 
@@ -82,7 +83,7 @@ public class RemoveCommand {
 
         // Validar que sea un jugador
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cSolo los jugadores pueden usar este comando.");
+            sender.sendMessage(TranslationHandler.get("command.remove.only_players"));
             return;
         }
 
@@ -93,7 +94,7 @@ public class RemoveCommand {
         List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
 
         if (blocks.isEmpty()) {
-            player.sendMessage("§eNo se encontraron bloques para la operación: §b" + operationId);
+            player.sendMessage(TranslationHandler.getFormatted("command.remove.operation.no_blocks", operationId));
             return;
         }
 
@@ -110,9 +111,9 @@ public class RemoveCommand {
 
         // Informar al jugador
         if (removedCount > 0) {
-            player.sendMessage("§aSe han eliminado " + removedCount + " bloques de luz para la operación: §b" + operationId);
+            player.sendMessage(TranslationHandler.getFormatted("command.remove.operation.success", removedCount, operationId));
         } else {
-            player.sendMessage("§eNo se encontraron bloques para la operación: §b" + operationId);
+            player.sendMessage(TranslationHandler.getFormatted("command.remove.operation.no_blocks", operationId));
         }
     }
 }

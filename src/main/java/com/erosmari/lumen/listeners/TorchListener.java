@@ -1,8 +1,8 @@
 package com.erosmari.lumen.listeners;
 
 import com.erosmari.lumen.lights.ItemLightsHandler;
-import com.erosmari.lumen.mobs.ItemMobsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -20,14 +20,12 @@ public class TorchListener implements Listener {
 
     private final Plugin plugin;
     private final ItemLightsHandler lightsHandler;
-    private final ItemMobsHandler mobsHandler;
 
     private final NamespacedKey idKey;
 
-    public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler, ItemMobsHandler mobsHandler) {
+    public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler) {
         this.plugin = plugin;
         this.lightsHandler = lightsHandler;
-        this.mobsHandler = mobsHandler;
         this.idKey = new NamespacedKey(plugin, "lumen_id");
     }
 
@@ -49,16 +47,8 @@ public class TorchListener implements Listener {
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedBlock.getLocation(), "torch");
 
-                    plugin.getLogger().info("Lumen Torch colocada en: " + placedBlock.getLocation() +
-                            " con ID de operación: " + operationId);
-                } else if ("mob".equals(id)) {
-                    // Lógica para la Lumen Torch Mob (anti-mobs)
-                    mobsHandler.registerAntiMobArea(event.getPlayer(), placedBlock.getLocation());
-
-                    // Efecto visual y sonoro
-                    ItemEffectUtil.playEffect(placedBlock.getLocation(), "mob_torch");
-
-                    plugin.getLogger().info("Lumen Torch Mob colocada en: " + placedBlock.getLocation());
+                    plugin.getLogger().info(TranslationHandler.getFormatted(
+                            "torch.light_placed", placedBlock.getLocation(), operationId));
                 }
             }
         }
@@ -72,19 +62,10 @@ public class TorchListener implements Listener {
         if (brokenBlock.getType() == Material.PLAYER_HEAD) {
             String operationId = "torch-" + brokenBlock.getLocation().hashCode();
 
-            // Verificar si es una Lumen Torch de luz
-            if (lightsHandler.isLightTorch(brokenBlock)) {
-                lightsHandler.cancelOperation(player, operationId);
-                lightsHandler.removeLights(player, operationId);
+            lightsHandler.cancelOperation(player, operationId);
+            lightsHandler.removeLights(player, operationId);
 
-                plugin.getLogger().info("Lumen Torch rota. Operación cancelada y luces eliminadas: " + operationId);
-            }
-
-            // Verificar si es una Lumen Torch Mob
-            if (mobsHandler.isMobTorch(brokenBlock)) {
-                mobsHandler.unregisterAntiMobArea(brokenBlock.getLocation());
-                plugin.getLogger().info("Lumen Torch Mob rota. Área de protección eliminada.");
-            }
+            plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_broken", operationId));
         }
     }
 }

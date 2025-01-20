@@ -4,6 +4,7 @@ import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.tasks.TaskManager;
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -31,31 +32,24 @@ public class LightHandler {
         World world = center.getWorld();
 
         if (world == null) {
-            player.sendMessage("§cError: No se pudo determinar el mundo.");
+            player.sendMessage(TranslationHandler.get("light.error.no_world"));
             return;
         }
 
-        // Ejecutar la recopilación y procesamiento de bloques asíncronamente
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             List<Location> blocksToLight = calculateLightPositions(center, areaBlocks, lightLevel, includeSkylight);
-
-            // Procesar los bloques en lotes
             processBlocksAsync(player, blocksToLight, lightLevel, operationId);
         });
     }
 
-    /**
-     * Calcula las posiciones óptimas para colocar bloques de luz, teniendo en cuenta la propagación y bloques sólidos.
-     */
     private List<Location> calculateLightPositions(Location center, int areaBlocks, int lightLevel, boolean includeSkylight) {
         List<Location> positions = new ArrayList<>();
         World world = center.getWorld();
         if (world == null) {
-            plugin.getLogger().warning("El mundo del jugador no pudo ser determinado.");
+            plugin.getLogger().warning(TranslationHandler.get("light.warning.no_world"));
             return positions;
         }
 
-        // Máxima distancia que puede cubrir el nivel de luz
         int maxDistance = lightLevel;
 
         for (int x = -areaBlocks; x <= areaBlocks; x++) {
@@ -63,7 +57,6 @@ public class LightHandler {
                 for (int z = -areaBlocks; z <= areaBlocks; z++) {
                     Location location = center.clone().add(x, y, z);
 
-                    // Verificar si es un bloque válido para colocar luz
                     if (isValidLightPosition(location, center, maxDistance, includeSkylight)) {
                         positions.add(location);
                     }
@@ -71,61 +64,49 @@ public class LightHandler {
             }
         }
 
-        plugin.getLogger().info("Se calcularon " + positions.size() + " bloques para iluminar.");
+        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.calculated_blocks", positions.size()));
         return positions;
     }
 
-    /**
-     * Determina si un bloque es válido para colocar luz, basado en la propagación de luz y su vecindad.
-     */
     private boolean isValidLightPosition(Location location, Location center, int maxDistance, boolean includeSkylight) {
         World world = location.getWorld();
         if (world == null) return false;
 
         Block block = location.getBlock();
 
-        // Asegurarse de que el bloque actual sea aire
         if (!block.getType().isAir()) {
-            plugin.getLogger().info("Bloque no es aire en " + location + " (tipo: " + block.getType() + ")");
+            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.not_air", location, block.getType()));
             return false;
         }
 
-        // Verificar distancia máxima desde el centro
         double taxicabDistance = Math.abs(location.getBlockX() - center.getBlockX())
                 + Math.abs(location.getBlockY() - center.getBlockY())
                 + Math.abs(location.getBlockZ() - center.getBlockZ());
         if (taxicabDistance > maxDistance) {
-            plugin.getLogger().info("Bloque fuera de rango en " + location + " (distancia: " + taxicabDistance + ")");
+            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.out_of_range", location, taxicabDistance));
             return false;
         }
 
-        // Verificar si hay un bloque sólido adyacente
         if (!isAdjacentToSolidBlock(location)) {
-            plugin.getLogger().info("No hay bloques sólidos adyacentes en " + location);
+            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.no_adjacent_blocks", location));
             return false;
         }
 
-        // Si se requiere skylight, verificar que el bloque esté bajo luz natural
         if (includeSkylight) {
             int highestY = world.getHighestBlockYAt(location);
             if (location.getBlockY() < highestY) {
-                plugin.getLogger().info("Bloque no está bajo luz natural en " + location);
+                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.not_sky_light", location));
                 return false;
             }
         }
 
-        // Si pasa todas las verificaciones, es válido
         return true;
     }
 
-    /**
-     * Verifica si un bloque de aire está en contacto con al menos un bloque sólido.
-     */
     private boolean isAdjacentToSolidBlock(Location location) {
         World world = location.getWorld();
         if (world == null) return false;
 
-        // Coordenadas relativas para bloques adyacentes
         int[][] offsets = {
                 {1, 0, 0}, {-1, 0, 0}, {0, 1, 0}, {0, -1, 0}, {0, 0, 1}, {0, 0, -1}
         };
@@ -134,7 +115,6 @@ public class LightHandler {
             Location adjacent = location.clone().add(offset[0], offset[1], offset[2]);
             Block adjacentBlock = adjacent.getBlock();
 
-            // Verificar si el bloque adyacente no es aire (es sólido)
             if (!adjacentBlock.getType().isAir()) {
                 return true;
             }
@@ -146,7 +126,6 @@ public class LightHandler {
         int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
         Queue<Location> blockQueue = new LinkedList<>(blocks);
 
-        // Usar un array para referencia mutable de la tarea
         final BukkitTask[] taskHolder = new BukkitTask[1];
 
         taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
@@ -161,19 +140,13 @@ public class LightHandler {
             }
 
             if (blockQueue.isEmpty()) {
-                player.sendMessage("§aSe completó la colocación de bloques de luz con nivel " + lightLevel + ".");
-                player.sendMessage("§aID de operación: " + operationId);
-                plugin.getLogger().info("Colocación completada para operación: " + operationId);
-
-                // Cancelar la tarea utilizando el array mutable
+                player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
+                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 taskHolder[0].cancel();
-
-                // Limpiar la tarea en el TaskManager
                 TaskManager.cancelTask(player.getUniqueId());
             }
         }, 0L, 1L);
 
-        // Registrar la tarea en el TaskManager
         TaskManager.addTask(player.getUniqueId(), taskHolder[0]);
     }
 
@@ -189,7 +162,7 @@ public class LightHandler {
 
                 LightRegistry.addBlock(blockLocation, lightLevel, operationId);
             } catch (ClassCastException e) {
-                plugin.getLogger().warning("Error al configurar el nivel de luz para el bloque en " + blockLocation + ": " + e.getMessage());
+                plugin.getLogger().warning(TranslationHandler.getFormatted("light.error.setting_level", blockLocation, e.getMessage()));
             }
         }
     }

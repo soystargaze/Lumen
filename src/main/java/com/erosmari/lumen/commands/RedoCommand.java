@@ -6,6 +6,7 @@ import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -43,7 +44,7 @@ public class RedoCommand {
         CommandSender sender = context.getSender();
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cSolo los jugadores pueden usar este comando.");
+            sender.sendMessage(TranslationHandler.get("command.only_players"));
             return;
         }
 
@@ -52,7 +53,7 @@ public class RedoCommand {
                 : context.get("operation_id");
 
         if (operationId == null) {
-            player.sendMessage("§eNo hay operaciones previas para rehacer.");
+            player.sendMessage(TranslationHandler.get("command.redo.no_previous_operations"));
             return;
         }
 
@@ -60,11 +61,11 @@ public class RedoCommand {
         Map<Location, Integer> blocksWithLightLevels = LightRegistry.getSoftDeletedBlocksWithLightLevelByOperationId(operationId);
 
         if (blocksWithLightLevels.isEmpty()) {
-            player.sendMessage("§eNo se encontraron bloques para la operación: §b" + operationId);
+            player.sendMessage(TranslationHandler.getFormatted("command.redo.no_blocks_found", operationId));
             return;
         }
 
-        logger.info("Restaurando bloques de luz para operation_id: " + operationId + ". Total bloques: " + blocksWithLightLevels.size());
+        logger.info(TranslationHandler.getFormatted("command.redo.restoring_blocks_log", operationId, blocksWithLightLevels.size()));
 
         Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
         int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
@@ -83,7 +84,7 @@ public class RedoCommand {
                     }
 
                     if (blockQueue.isEmpty()) {
-                        logger.info("Restauración completada para operation_id: " + operationId);
+                        logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", operationId));
                         LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
                         Bukkit.getScheduler().cancelTasks(Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Lumen")));
                     }
@@ -91,13 +92,14 @@ public class RedoCommand {
                 0L, 1L
         );
 
-        player.sendMessage("§aRestauración iniciada para " + blocksWithLightLevels.size() + " bloques. Procesando en lotes de hasta " + maxBlocksPerTick + " bloques por tick...");
+        player.sendMessage(TranslationHandler.getFormatted("command.redo.restoration_started", blocksWithLightLevels.size(), maxBlocksPerTick));
     }
 
     /**
      * Procesa un solo bloque en el mundo.
      *
      * @param blockLocation Ubicación del bloque.
+     * @param lightLevel    Nivel de luz.
      * @param operationId   ID de la operación.
      */
     private static void processBlock(Location blockLocation, int lightLevel, String operationId) {
@@ -112,10 +114,10 @@ public class RedoCommand {
 
                 LightRegistry.addBlock(blockLocation, lightLevel, operationId);
             } catch (ClassCastException e) {
-                logger.warning("Error al configurar el nivel de luz para el bloque en " + blockLocation + ": " + e.getMessage());
+                logger.warning(TranslationHandler.getFormatted("command.redo.light_level_error", blockLocation, e.getMessage()));
             }
         } else {
-            logger.warning("No se pudo establecer el bloque como LIGHT en la ubicación: " + blockLocation);
+            logger.warning(TranslationHandler.getFormatted("command.redo.cannot_set_light", blockLocation));
         }
     }
 }

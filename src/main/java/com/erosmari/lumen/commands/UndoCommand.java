@@ -5,6 +5,7 @@ import cloud.commandframework.CommandManager;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -27,7 +28,7 @@ public class UndoCommand {
         CommandSender sender = context.getSender();
 
         if (!(sender instanceof Player)) {
-            sender.sendMessage("§cSolo los jugadores pueden usar este comando."); // Mensaje en rojo
+            sender.sendMessage(TranslationHandler.get("command.undo.only_players")); // Mensaje traducido
             return;
         }
 
@@ -36,7 +37,7 @@ public class UndoCommand {
             // Obtener el último operation_id
             operationId = LightRegistry.getLastOperationId();
             if (operationId == null) {
-                sender.sendMessage("§eNo hay operaciones previas para deshacer."); // Mensaje en amarillo
+                sender.sendMessage(TranslationHandler.get("command.undo.no_previous_operations")); // Mensaje traducido
                 return;
             }
         }
@@ -44,9 +45,9 @@ public class UndoCommand {
         int removedBlocks = removeLightBlocksByOperation(operationId);
 
         if (removedBlocks > 0) {
-            sender.sendMessage("§aSe han eliminado " + removedBlocks + " bloques de luz para la operación: " + operationId); // Mensaje en verde
+            sender.sendMessage(TranslationHandler.getFormatted("command.undo.success", removedBlocks, operationId)); // Mensaje traducido
         } else {
-            sender.sendMessage("§eNo se encontraron bloques para la operación: " + operationId); // Mensaje en amarillo
+            sender.sendMessage(TranslationHandler.getFormatted("command.undo.no_blocks", operationId)); // Mensaje traducido
         }
     }
 

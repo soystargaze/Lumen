@@ -1,5 +1,6 @@
 package com.erosmari.lumen.database;
 
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -20,16 +21,9 @@ public class LightRegistry {
 
     private static final Logger logger = Logger.getLogger("Lumen-LightRegistry");
 
-    /**
-     * Registra un bloque iluminado en la base de datos.
-     *
-     * @param location   Ubicación del bloque.
-     * @param lightLevel Nivel de luz del bloque.
-     * @param operationId Identificador de la operación.
-     */
     public static void addBlock(Location location, int lightLevel, String operationId) {
         if (lightLevel <= 0 || lightLevel > 15) {
-            logger.warning("Intento de registrar un nivel de luz inválido (" + lightLevel + ") para " + location);
+            logger.warning(TranslationHandler.getFormatted("light_registry.error.invalid_light_level", lightLevel, location));
             return;
         }
 
@@ -47,15 +41,10 @@ public class LightRegistry {
 
             statement.executeUpdate();
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al registrar el bloque en la base de datos.", e);
+            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.add_block"), e);
         }
     }
 
-    /**
-     * Marca los bloques de una operación como eliminados (soft delete).
-     *
-     * @param operationId El identificador de la operación.
-     */
     public static void softDeleteBlocksByOperationId(String operationId) {
         String query = "UPDATE illuminated_blocks SET is_deleted = 1 WHERE operation_id = ?;";
 
@@ -64,9 +53,9 @@ public class LightRegistry {
 
             statement.setString(1, operationId);
             statement.executeUpdate();
-            logger.info("Bloques de la operación " + operationId + " marcados como eliminados.");
+            logger.info(TranslationHandler.getFormatted("light_registry.info.blocks_soft_deleted", operationId));
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al marcar como eliminados los bloques de la operación: " + operationId, e);
+            logger.log(Level.SEVERE, TranslationHandler.getFormatted("light_registry.error.soft_delete", operationId), e);
         }
     }
 
@@ -78,9 +67,9 @@ public class LightRegistry {
 
             statement.setString(1, operationId);
             statement.executeUpdate();
-            logger.info("Bloques restaurados para operation_id: " + operationId);
+            logger.info(TranslationHandler.getFormatted("light_registry.info.blocks_restored", operationId));
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al restaurar los bloques para operation_id: " + operationId, e);
+            logger.log(Level.SEVERE, TranslationHandler.getFormatted("light_registry.error.restore", operationId), e);
         }
     }
 
@@ -103,7 +92,7 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener bloques eliminados con niveles de luz para operation_id: " + operationId, e);
+            logger.log(Level.SEVERE, TranslationHandler.getFormatted("light_registry.error.fetch_soft_deleted", operationId), e);
         }
 
         return blocksWithLightLevel;
@@ -120,17 +109,12 @@ public class LightRegistry {
                 return resultSet.getString("operation_id");
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener el último operation_id marcado como eliminado.", e);
+            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.fetch_last_soft_deleted"), e);
         }
 
         return null;
     }
 
-    /**
-     * Obtiene todos los bloques iluminados almacenados en la base de datos.
-     *
-     * @return Una lista de ubicaciones de bloques iluminados.
-     */
     public static List<Location> getAllBlocks() {
         String query = "SELECT * FROM illuminated_blocks WHERE is_deleted = 0;";
         List<Location> blocks = new ArrayList<>();
@@ -146,18 +130,12 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener todos los bloques iluminados.", e);
+            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.fetch_all_blocks"), e);
         }
 
         return blocks;
     }
 
-    /**
-     * Obtiene los bloques por operation_id, incluso si están marcados como eliminados.
-     *
-     * @param operationId El identificador de la operación.
-     * @return Una lista de ubicaciones.
-     */
     public static List<Location> getBlocksByOperationId(String operationId) {
         String query = "SELECT * FROM illuminated_blocks WHERE operation_id = ?;";
         List<Location> blocks = new ArrayList<>();
@@ -176,36 +154,12 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener los bloques por operation_id: " + operationId, e);
+            logger.log(Level.SEVERE, TranslationHandler.getFormatted("light_registry.error.fetch_blocks_by_operation", operationId), e);
         }
 
         return blocks;
     }
 
-    private static void processResultSetToRemoveBlock(ResultSet resultSet) throws SQLException {
-        String worldName = resultSet.getString("world");
-        int x = resultSet.getInt("x");
-        int y = resultSet.getInt("y");
-        int z = resultSet.getInt("z");
-
-        World world = Bukkit.getWorld(worldName);
-        if (world != null) {
-            Location location = new Location(world, x, y, z);
-
-            // Reemplazar el bloque de luz con aire
-            if (location.getBlock().getType() == Material.LIGHT) {
-                location.getBlock().setType(Material.AIR);
-            }
-        } else {
-            logger.warning("El mundo '" + worldName + "' no está cargado o no existe.");
-        }
-    }
-
-    /**
-     * Marca los bloques como eliminados (soft delete) en la base de datos y los elimina del mundo.
-     *
-     * @param operationId El identificador de la operación.
-     */
     public static void removeBlocksByOperationId(String operationId) {
         String queryUpdate = "UPDATE illuminated_blocks SET is_deleted = 1 WHERE operation_id = ?;";
         String querySelect = "SELECT world, x, y, z FROM illuminated_blocks WHERE operation_id = ? AND is_deleted = 0;";
@@ -225,9 +179,9 @@ public class LightRegistry {
             updateStatement.setString(1, operationId);
             updateStatement.executeUpdate();
 
-            logger.info("Bloques marcados como eliminados y eliminados del mundo para operation_id: " + operationId);
+            logger.info(TranslationHandler.getFormatted("light_registry.info.blocks_removed", operationId));
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al marcar los bloques como eliminados y eliminarlos del mundo para operation_id: " + operationId, e);
+            logger.log(Level.SEVERE, TranslationHandler.getFormatted("light_registry.error.remove_blocks", operationId), e);
         }
     }
 
@@ -242,7 +196,7 @@ public class LightRegistry {
                 return resultSet.getString("operation_id");
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener el último operation_id.", e);
+            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.fetch_last_operation"), e);
         }
 
         return null;
@@ -265,25 +219,18 @@ public class LightRegistry {
                     if (lightLevel > 0 && lightLevel <= 15) {
                         return lightLevel;
                     }
-                    logger.warning("Nivel de luz inválido recuperado: " + lightLevel + " para " + location);
+                    logger.warning(TranslationHandler.getFormatted("light_registry.error.invalid_light_level_retrieved", lightLevel, location));
                 } else {
-                    logger.warning("No se encontró nivel de luz para la ubicación: " + location);
+                    logger.warning(TranslationHandler.getFormatted("light_registry.warning.no_light_level", location));
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener el nivel de luz para la ubicación: " + location, e);
+            logger.log(Level.SEVERE, TranslationHandler.getFormatted("light_registry.error.fetch_light_level", location), e);
         }
 
-        return 0; // Valor por defecto si no se encuentra o es inválido
+        return 0;
     }
 
-    /**
-     * Obtiene todos los bloques dentro de un rango específico.
-     *
-     * @param center Centro del rango.
-     * @param range  Radio del rango.
-     * @return Lista de bloques dentro del rango.
-     */
     public static List<Location> getBlocksInRange(Location center, int range) {
         String query = "SELECT * FROM illuminated_blocks WHERE is_deleted = 0 AND world = ? AND x BETWEEN ? AND ? AND y BETWEEN ? AND ? AND z BETWEEN ? AND ?;";
         List<Location> blocks = new ArrayList<>();
@@ -302,16 +249,12 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener los bloques en el rango especificado.", e);
+            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.fetch_blocks_in_range"), e);
         }
 
         return blocks;
     }
 
-    /**
-     * Elimina todos los bloques iluminados del servidor y de la base de datos.
-     */
-    @SuppressWarnings("SqlWithoutWhere")
     public static void clearAllBlocks() {
         String querySelect = "SELECT world, x, y, z FROM illuminated_blocks WHERE is_deleted = 0;";
         String queryUpdate = "UPDATE illuminated_blocks SET is_deleted = 1;";
@@ -326,9 +269,9 @@ public class LightRegistry {
             }
 
             updateStatement.executeUpdate();
-            logger.info("Todos los bloques iluminados han sido eliminados del mundo y marcados como eliminados en la base de datos.");
+            logger.info(TranslationHandler.get("light_registry.info.all_blocks_removed"));
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al eliminar todos los bloques iluminados.", e);
+            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.clear_all_blocks"), e);
         }
     }
 
@@ -343,8 +286,15 @@ public class LightRegistry {
             return new Location(world, x, y, z);
         }
 
-        logger.warning("El mundo '" + worldName + "' no está cargado o no existe.");
+        logger.warning(TranslationHandler.getFormatted("light_registry.warning.world_not_found", worldName));
         return null;
+    }
+
+    private static void processResultSetToRemoveBlock(ResultSet resultSet) throws SQLException {
+        Location location = createLocationFromResultSet(resultSet);
+        if (location != null && location.getBlock().getType() == Material.LIGHT) {
+            location.getBlock().setType(Material.AIR);
+        }
     }
 
     private static void setQueryParameters(PreparedStatement statement, Location center, int range) throws SQLException {

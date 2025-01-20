@@ -4,6 +4,7 @@ import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.tasks.TaskManager;
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Levelled;
@@ -31,12 +32,12 @@ public class ItemLightsHandler {
         World world = center.getWorld();
 
         if (world == null) {
-            player.sendMessage("§cError: No se pudo determinar el mundo.");
+            player.sendMessage(TranslationHandler.get("light.error.no_world"));
             return;
         }
 
-        int radius = ConfigHandler.getInt("settings.default_torch_radius", 20); // Radio configurable
-        int lightLevel = 15; // Nivel de luz fijo
+        int radius = ConfigHandler.getInt("settings.default_torch_radius", 20);
+        int lightLevel = 15;
         int lightsPerTick = ConfigHandler.getInt("settings.torch_lights_per_tick", 10);
         int tickInterval = ConfigHandler.getInt("settings.torch_tick_interval", 10);
 
@@ -63,7 +64,7 @@ public class ItemLightsHandler {
                 }
             }
         }
-        plugin.getLogger().info("Se calcularon " + positions.size() + " bloques para iluminar.");
+        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.calculated_blocks", positions.size()));
         return positions;
     }
 
@@ -95,10 +96,9 @@ public class ItemLightsHandler {
         final BukkitTask[] taskHolder = new BukkitTask[1];
 
         taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            // Verifica si la tarea ha sido cancelada
             if (!TaskManager.hasActiveTask(player.getUniqueId())) {
-                plugin.getLogger().info("Operación cancelada durante el proceso: " + operationId);
-                taskHolder[0].cancel(); // Cancela el proceso de colocación
+                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.operation_cancelled", operationId));
+                taskHolder[0].cancel();
                 return;
             }
 
@@ -113,8 +113,8 @@ public class ItemLightsHandler {
             }
 
             if (blockQueue.isEmpty()) {
-                player.sendMessage("§aLuces colocadas con éxito. ID de operación: " + operationId);
-                plugin.getLogger().info("Colocación completada para operación: " + operationId);
+                player.sendMessage(TranslationHandler.getFormatted("light.success.placed", operationId));
+                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 taskHolder[0].cancel();
                 TaskManager.cancelTask(player.getUniqueId());
             }
@@ -135,7 +135,7 @@ public class ItemLightsHandler {
 
                 LightRegistry.addBlock(location, lightLevel, operationId);
             } catch (ClassCastException e) {
-                plugin.getLogger().warning("Error al configurar el nivel de luz en " + location + ": " + e.getMessage());
+                plugin.getLogger().warning(TranslationHandler.getFormatted("light.error.setting_level_torch", location, e.getMessage()));
             }
         }
     }
@@ -144,11 +144,10 @@ public class ItemLightsHandler {
         List<Location> blocksToRemove = LightRegistry.getBlocksByOperationId(operationId);
 
         if (blocksToRemove.isEmpty()) {
-            player.sendMessage("§cNo se encontraron luces para eliminar con la operación: " + operationId);
+            player.sendMessage(TranslationHandler.getFormatted("light.error.no_lights_to_remove", operationId));
             return;
         }
 
-        // Ejecutar la eliminación en el hilo principal
         Bukkit.getScheduler().runTask(plugin, () -> {
             blocksToRemove.forEach(location -> {
                 Block block = location.getBlock();
@@ -158,17 +157,15 @@ public class ItemLightsHandler {
             });
 
             LightRegistry.removeBlocksByOperationId(operationId);
-            player.sendMessage("§aSe eliminaron todas las luces generadas por la operación: " + operationId);
-            plugin.getLogger().info("Se eliminaron las luces para la operación: " + operationId);
+            player.sendMessage(TranslationHandler.getFormatted("light.success.removed", operationId));
+            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.removed_lights", operationId));
         });
     }
 
     public void cancelOperation(Player player, String operationId) {
-        // Cancela la tarea activa asociada al jugador
         TaskManager.cancelTask(player.getUniqueId());
-        // Elimina las luces de la operación específica
         removeLights(player, operationId);
-        plugin.getLogger().info("Operación cancelada y luces eliminadas para la ID: " + operationId);
+        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.cancelled_and_removed", operationId));
     }
 
     public boolean isLightTorch(Block block) {

@@ -22,7 +22,7 @@ public class DatabaseHandler {
      */
     public static void initialize(JavaPlugin plugin) {
         if (dataSource != null) {
-            logger.warning("DatabaseHandler ya fue inicializado.");
+            logger.warning(TranslationHandler.get("database.init.already_initialized"));
             return;
         }
 
@@ -32,8 +32,8 @@ public class DatabaseHandler {
             initializeSQLite(plugin);
             createTables();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, TranslationHandler.get("database.init_error"), e);
-            throw new IllegalStateException("Falló la inicialización de la base de datos.");
+            logger.log(Level.SEVERE, TranslationHandler.get("database.init.error"), e);
+            throw new IllegalStateException(TranslationHandler.get("database.init.failed"));
         }
     }
 
@@ -46,7 +46,7 @@ public class DatabaseHandler {
     private static void initializeSQLite(JavaPlugin plugin) throws SQLException {
         File dbFolder = new File(plugin.getDataFolder(), "Data");
         if (!dbFolder.exists() && !dbFolder.mkdirs()) {
-            throw new SQLException(TranslationHandler.get("database.sqlite.error_directory") + dbFolder.getAbsolutePath());
+            throw new SQLException(TranslationHandler.getFormatted("database.sqlite.error_directory", dbFolder.getAbsolutePath()));
         }
 
         String dbFilePath = new File(dbFolder, "lumen.db").getAbsolutePath();
@@ -76,7 +76,6 @@ public class DatabaseHandler {
                     ");";
             stmt.executeUpdate(createIlluminatedBlocksTable);
 
-            // Tabla para áreas protegidas contra mobs
             String createProtectedAreasTable = "CREATE TABLE IF NOT EXISTS protected_areas (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "world TEXT NOT NULL," +
@@ -101,7 +100,7 @@ public class DatabaseHandler {
      */
     public static Connection getConnection() throws SQLException {
         if (dataSource == null) {
-            throw new IllegalStateException("El pool de conexiones no está inicializado.");
+            throw new IllegalStateException(TranslationHandler.get("database.connection.uninitialized"));
         }
         return dataSource.getConnection();
     }

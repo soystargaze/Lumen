@@ -1,5 +1,6 @@
 package com.erosmari.lumen.database;
 
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -35,9 +36,9 @@ public class MobRegistry {
             stmt.setInt(5, radius);
             stmt.executeUpdate();
 
-            logger.info("Área protegida añadida en " + location);
+            logger.info(TranslationHandler.getFormatted("mob_registry.protected_area_added", location, radius));
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al añadir el área protegida: " + location, e);
+            logger.log(Level.SEVERE, TranslationHandler.getFormatted("mob_registry.error.adding_area", location), e);
         }
     }
 
@@ -57,9 +58,9 @@ public class MobRegistry {
             stmt.setInt(4, location.getBlockZ());
             stmt.executeUpdate();
 
-            logger.info("Área protegida eliminada en " + location);
+            logger.info(TranslationHandler.getFormatted("mob_registry.protected_area_removed", location));
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al eliminar el área protegida: " + location, e);
+            logger.log(Level.SEVERE, TranslationHandler.getFormatted("mob_registry.error.removing_area", location), e);
         }
     }
 
@@ -88,11 +89,11 @@ public class MobRegistry {
                     Location location = new Location(world, x, y, z);
                     areas.put(location, radius);
                 } else {
-                    logger.warning("No se pudo encontrar el mundo: " + worldName);
+                    logger.warning(TranslationHandler.getFormatted("mob_registry.warning.world_not_found", worldName));
                 }
             }
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Error al obtener las áreas protegidas.", e);
+            logger.log(Level.SEVERE, TranslationHandler.get("mob_registry.error.fetching_areas"), e);
         }
 
         return areas;

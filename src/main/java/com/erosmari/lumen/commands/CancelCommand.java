@@ -4,6 +4,7 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.tasks.TaskManager;
+import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -25,20 +26,22 @@ public class CancelCommand {
 
     /**
      * Maneja el comando `/lumen cancel`.
+     *
+     * @param context Contexto del comando.
      */
     public static void handleCancelCommand(CommandContext<CommandSender> context) {
         CommandSender sender = context.getSender();
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("§cSolo los jugadores pueden usar este comando.");
+            sender.sendMessage(TranslationHandler.get("command.only_players"));
             return;
         }
 
         if (TaskManager.hasActiveTask(player.getUniqueId())) {
             TaskManager.cancelTask(player.getUniqueId());
-            player.sendMessage("§aTu tarea de iluminación ha sido cancelada.");
+            player.sendMessage(TranslationHandler.get("command.cancel.success"));
         } else {
-            player.sendMessage("§eNo tienes ninguna tarea activa para cancelar.");
+            player.sendMessage(TranslationHandler.get("command.cancel.no_task"));
         }
     }
 }

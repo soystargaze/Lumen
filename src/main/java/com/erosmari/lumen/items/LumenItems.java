@@ -2,6 +2,7 @@ package com.erosmari.lumen.items;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.erosmari.lumen.utils.TranslationHandler;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -27,12 +28,12 @@ public class LumenItems {
     public void registerItems() {
         // Crear los objetos con texturas
         ItemStack lumenTorch = createLumenTorch(
-                "Lumen Torch",
+                TranslationHandler.get("items.lumen_torch.name"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzViNTFjYzJlOTlkMDhkZDI4NzlhNzkyZjA2MmUwNzc4MzJhMDE2M2YzZDg1YzI0NGUwYmExYzM5MmFiMDlkZSJ9fX0=",
                 "light"
         );
         ItemStack lumenTorchMob = createLumenTorch(
-                "Lumen Torch Mob",
+                TranslationHandler.get("items.lumen_torch_mob.name"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg0NDE3MjViZDQzMDczNmNmNDBkNGNlOTVjYjVhNWUxMDMwNWI3OTVhYzRmZjg0NzRlMDUzNWRmN2FmMWRkNyJ9fX0=",
                 "mob"
         );
@@ -48,7 +49,7 @@ public class LumenItems {
         ItemMeta meta = head.getItemMeta();
 
         if (meta != null) {
-            meta.displayName(Component.text(name)); // Asignar el nombre al objeto
+            meta.displayName(Component.text(name)); // Asignar el nombre traducido al objeto
 
             // Agregar el identificador al PersistentDataContainer
             NamespacedKey key = new NamespacedKey(plugin, "lumen_id");
@@ -83,6 +84,6 @@ public class LumenItems {
         recipe.setIngredient('F', Material.GLASS);
 
         Bukkit.addRecipe(recipe);
-        plugin.getLogger().info("Registered recipe: " + key);
+        plugin.getLogger().info(TranslationHandler.getFormatted("items.recipe_registered", key));
     }
 }

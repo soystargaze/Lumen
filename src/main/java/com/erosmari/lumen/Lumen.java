@@ -37,7 +37,7 @@ public class Lumen extends JavaPlugin {
             initializeSystems();
             registerComponents();
 
-            getLogger().info("Lumen habilitado correctamente.");
+            getLogger().info(TranslationHandler.get("plugin.enabled"));
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("plugin.enable_error"), e);
             getServer().getPluginManager().disablePlugin(this);
@@ -46,16 +46,11 @@ public class Lumen extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        DatabaseHandler.close(); // Cierra el pool de conexiones de la base de datos
+        DatabaseHandler.close();
         getLogger().info(TranslationHandler.get("plugin.disabled"));
-        instance = null; // Limpia la instancia estática al desactivar el plugin
+        instance = null;
     }
 
-    /**
-     * Devuelve la instancia estática del plugin.
-     *
-     * @return Instancia del plugin.
-     */
     public static Lumen getInstance() {
         return instance;
     }
@@ -69,7 +64,7 @@ public class Lumen extends JavaPlugin {
     private void setupTranslations() {
         File translationsFolder = new File(getDataFolder(), "Translations");
         if (!translationsFolder.exists() && !translationsFolder.mkdirs()) {
-            getLogger().severe("Error: No se pudo crear la carpeta de traducciones.");
+            getLogger().severe(TranslationHandler.get("translations.folder_error"));
             return;
         }
 
@@ -78,23 +73,23 @@ public class Lumen extends JavaPlugin {
             try {
                 saveResource("Translations/es_es.yml", false);
             } catch (Exception e) {
-                getLogger().severe("Error: No se pudo crear el archivo de traducción: " + e.getMessage());
+                getLogger().severe(TranslationHandler.get("translations.file_error") + ": " + e.getMessage());
             }
         }
     }
 
     private void initializeDatabase() {
         try {
-            DatabaseHandler.initialize(this); // Delega la inicialización al DatabaseHandler
+            DatabaseHandler.initialize(this);
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("database.init_error"), e);
-            throw new IllegalStateException("Falló la inicialización de la base de datos.");
+            throw new IllegalStateException(TranslationHandler.get("database.init_fatal_error"));
         }
     }
 
     private void initializeSystems() {
         initializeCommandManager();
-        initializeItems(); // Inicializa los objetos personalizados
+        initializeItems();
     }
 
     private void initializeCommandManager() {
@@ -113,11 +108,11 @@ public class Lumen extends JavaPlugin {
         try {
             if (lumenItems == null) {
                 lumenItems = new LumenItems(this);
-                lumenItems.registerItems(); // Registra los objetos personalizados
-                getLogger().info("Objetos personalizados registrados correctamente.");
+                lumenItems.registerItems();
+                getLogger().info(TranslationHandler.get("items.registered"));
             }
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Error al inicializar los objetos personalizados.", e);
+            getLogger().log(Level.SEVERE, TranslationHandler.get("items.init_error"), e);
         }
     }
 
@@ -127,19 +122,13 @@ public class Lumen extends JavaPlugin {
 
     private void registerEvents() {
         try {
-            // Crear instancia del manejador de luces
             ItemLightsHandler lightsHandler = new ItemLightsHandler(this);
-
-            // Crear instancia del manejador de mobs
             ItemMobsHandler mobsHandler = new ItemMobsHandler(this);
 
-            // Registrar eventos para la TorchListener con ambos manejadores
-            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, mobsHandler), this);
-
-            // Registrar eventos específicos para el mobsHandler
+            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler), this);
             getServer().getPluginManager().registerEvents(mobsHandler, this);
 
-            getLogger().info("Eventos registrados correctamente.");
+            getLogger().info(TranslationHandler.get("events.registered"));
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("events.register_error"), e);
         }

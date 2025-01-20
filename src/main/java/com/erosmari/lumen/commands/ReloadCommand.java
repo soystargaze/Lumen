@@ -43,7 +43,7 @@ public class ReloadCommand {
 
         // Validar permisos del remitente
         if (!sender.hasPermission("lumen.reload")) {
-            sendMessage(sender, "reload.no_permission", NamedTextColor.RED);
+            sendMessage(sender, "command.reload.no_permission", NamedTextColor.RED);
             return;
         }
 
@@ -53,12 +53,12 @@ public class ReloadCommand {
             int loadedTranslations = reloadTranslations();
 
             // Mensajes de éxito
-            sendMessage(sender, "reload.success", NamedTextColor.GREEN, loadedTranslations);
+            sendMessage(sender, "command.reload.success", NamedTextColor.GREEN, loadedTranslations);
             logInfo(sender.getName(), loadedTranslations);
         } catch (Exception e) {
             // Manejo de errores
             logError(sender.getName(), e);
-            sendMessage(sender, "reload.error", NamedTextColor.RED);
+            sendMessage(sender, "command.reload.error", NamedTextColor.RED);
         }
     }
 
@@ -98,7 +98,7 @@ public class ReloadCommand {
      * @param placeholders Reemplazos dinámicos en el mensaje.
      */
     private void logInfo(Object... placeholders) {
-        plugin.getLogger().info(TranslationHandler.getFormatted("reload.success_log", placeholders));
+        plugin.getLogger().info(TranslationHandler.getFormatted("command.reload.success_log", placeholders));
     }
 
     /**
@@ -108,6 +108,6 @@ public class ReloadCommand {
      * @param exception  La excepción capturada.
      */
     private void logError(String playerName, Exception exception) {
-        plugin.getLogger().log(Level.SEVERE, TranslationHandler.getFormatted("reload.error_log", playerName), exception);
+        plugin.getLogger().log(Level.SEVERE, TranslationHandler.getFormatted("command.reload.error_log", playerName), exception);
     }
 }
