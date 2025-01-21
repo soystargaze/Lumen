@@ -2,6 +2,7 @@ plugin:
   enabled: "Lumen habilitado correctamente."
   disabled: "Lumen deshabilitado correctamente."
   enable_error: "Error al habilitar el plugin. Consulta la consola para más detalles."
+  language_loaded: "Idioma cargado: {0}.yml ({1} traducciones)"
 
 translations:
   folder_error: "Error: No se pudo crear la carpeta de traducciones."
@@ -10,15 +11,14 @@ translations:
 database:
   init_error: "Error al inicializar la base de datos."
   init_fatal_error: "Falló la inicialización de la base de datos. Plugin deshabilitado."
+  initialized: "Base de datos inicializada correctamente."
   init:
     already_initialized: "El gestor de la base de datos ya fue inicializado."
     error: "Error al inicializar la base de datos."
     failed: "Falló la inicialización de la base de datos."
   sqlite:
     error_directory: "Error al crear el directorio de la base de datos: {0}."
-    success: "Conexión con SQLite establecida correctamente."
   tables:
-    success: "Tablas de la base de datos creadas o verificadas correctamente."
     error: "Error al crear las tablas necesarias en la base de datos."
   connection:
     uninitialized: "El pool de conexiones no está inicializado."
@@ -30,6 +30,7 @@ commandmanager:
   init_failure: "Falló la inicialización del CommandManager."
 
 command:
+  registered: "Comandos registrados correctamente."
   usage: "§aUso: /lumen <subcomando>"
   only_players: "§cSolo los jugadores pueden usar este comando."
   register_error: "Error al registrar los comandos. Plugin deshabilitado."

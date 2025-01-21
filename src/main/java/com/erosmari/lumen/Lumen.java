@@ -38,7 +38,7 @@ public class Lumen extends JavaPlugin {
             initializeSystems();
             registerComponents();
 
-            getLogger().info(TranslationHandler.get("plugin.enabled"));
+            ConsoleUtils.displaySuccessMessage(this);
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("plugin.enable_error"), e);
             getServer().getPluginManager().disablePlugin(this);
@@ -112,7 +112,6 @@ public class Lumen extends JavaPlugin {
             if (lumenItems == null) {
                 lumenItems = new LumenItems(this);
                 lumenItems.registerItems();
-                getLogger().info(TranslationHandler.get("items.registered"));
             }
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("items.init_error"), e);
@@ -130,8 +129,6 @@ public class Lumen extends JavaPlugin {
 
             getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems), this);
             getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler, lumenItems), this);
-
-            getLogger().info(TranslationHandler.get("events.registered"));
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("events.register_error"), e);
         }

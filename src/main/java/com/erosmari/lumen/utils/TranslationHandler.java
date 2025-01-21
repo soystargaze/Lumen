@@ -12,7 +12,7 @@ import java.util.Map;
 public class TranslationHandler {
 
     private static final Map<String, String> translations = new HashMap<>();
-    public static int loadedKeys = 0; // Hacer que sea pública
+    public static int loadedKeys = 0;
 
     /**
      * Loads translations from the specified language file.

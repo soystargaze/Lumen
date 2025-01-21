@@ -103,6 +103,5 @@ public class LumenItems {
         recipe.setIngredient('F', Material.GLASS);
 
         Bukkit.addRecipe(recipe);
-        plugin.getLogger().info(TranslationHandler.getFormatted("items.recipe_registered", key));
     }
 }

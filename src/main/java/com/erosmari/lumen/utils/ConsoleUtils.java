@@ -29,15 +29,17 @@ public class ConsoleUtils {
      * Muestra el mensaje de éxito en la consola.
      *
      * @param plugin El plugin que ejecuta el mensaje.
-     * @param mythicMobsEnabled Estado de la integración con MythicMobs.
-     */
-    public static void displaySuccessMessage(JavaPlugin plugin, boolean mythicMobsEnabled) {
+     * */
+    public static void displaySuccessMessage(JavaPlugin plugin) {
 
         plugin.getLogger().info("--------------------------------------------");
         plugin.getLogger().info(TranslationHandler.get("plugin.enabled"));
         plugin.getLogger().info(TranslationHandler.getFormatted("plugin.language_loaded", ConfigHandler.getLanguage(), loadedKeys));
         plugin.getLogger().info(TranslationHandler.get("database.initialized"));
+        plugin.getLogger().info(TranslationHandler.get("items.registered"));
+        plugin.getLogger().info(TranslationHandler.get("mobs.protected_areas_loaded"));
         plugin.getLogger().info(TranslationHandler.get("command.registered"));
+        plugin.getLogger().info(TranslationHandler.get("events.registered"));
         plugin.getLogger().info("--------------------------------------------");
     }
 }

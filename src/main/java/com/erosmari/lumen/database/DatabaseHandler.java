@@ -56,7 +56,6 @@ public class DatabaseHandler {
         hikariConfig.setPoolName("Lumen-SQLite");
 
         dataSource = new HikariDataSource(hikariConfig);
-        logger.info(TranslationHandler.get("database.sqlite.success"));
     }
 
     /**
@@ -85,8 +84,6 @@ public class DatabaseHandler {
                     "radius INTEGER NOT NULL" +
                     ");";
             stmt.executeUpdate(createProtectedAreasTable);
-
-            logger.info(TranslationHandler.get("database.tables.success"));
         } catch (SQLException e) {
             logger.log(Level.SEVERE, TranslationHandler.get("database.tables.error"), e);
         }
