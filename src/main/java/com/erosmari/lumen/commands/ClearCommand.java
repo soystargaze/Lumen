@@ -1,98 +1,93 @@
 package com.erosmari.lumen.commands;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.utils.TranslationHandler;
-import org.bukkit.command.CommandSender;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+@SuppressWarnings("UnstableApiUsage")
 public class ClearCommand {
 
-    private static final Map<UUID, Long> confirmationRequests = new HashMap<>(); // Mapa para confirmaciones pendientes
+    private static final Map<UUID, Long> confirmationRequests = new HashMap<>(); // Solicitudes de confirmación
     private static final long CONFIRMATION_TIMEOUT = 30_000; // Tiempo límite para confirmar (30 segundos)
 
     /**
-     * Registra el comando `/lumen clear` y su subcomando `confirm`.
+     * Registra el subcomando `/lumen clear` y su subcomando `/lumen clear confirm` en el sistema nativo de Paper.
      *
-     * @param commandManager El administrador de comandos.
-     * @param parentBuilder  El constructor del comando principal.
+     * @return Nodo literal del comando para registrarlo en el comando principal.
      */
-    public static void register(CommandManager<CommandSender> commandManager, Command.Builder<CommandSender> parentBuilder) {
-        // Comando `/lumen clear`
-        commandManager.command(
-                parentBuilder.literal("clear")
-                        .permission("lumen.clear")
-                        .handler(ClearCommand::handleClearRequest) // Solicita confirmación
-        );
-
-        // Subcomando `/lumen clear confirm`
-        commandManager.command(
-                parentBuilder.literal("clear")
-                        .literal("confirm")
-                        .permission("lumen.clear")
-                        .handler(ClearCommand::handleClearConfirm) // Ejecuta la limpieza
-        );
+    public static LiteralArgumentBuilder<CommandSourceStack> register() {
+        return Commands.literal("clear")
+                .requires(source -> source.getSender().hasPermission("lumen.clear")) // Validar permisos
+                .executes(ctx -> handleClearRequest(ctx.getSource())) // Solicita confirmación
+                .then(
+                        Commands.literal("confirm")
+                                .executes(ctx -> handleClearConfirm(ctx.getSource())) // Ejecuta la limpieza
+                );
     }
 
     /**
      * Maneja la solicitud de confirmación para `/lumen clear`.
      *
-     * @param context Contexto del comando.
+     * @param source Fuente del comando.
+     * @return Código de éxito.
      */
-    private static void handleClearRequest(CommandContext<CommandSender> context) {
-        CommandSender sender = context.getSender();
-
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(TranslationHandler.get("command.only_players"));
-            return;
+    private static int handleClearRequest(CommandSourceStack source) {
+        if (!(source.getSender() instanceof Player player)) {
+            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
+            return 0;
         }
 
         UUID playerId = player.getUniqueId();
 
         // Registra la solicitud de confirmación
         confirmationRequests.put(playerId, System.currentTimeMillis());
-        player.sendMessage(TranslationHandler.get("command.clear.request"));
+        player.sendMessage(Component.text(TranslationHandler.get("command.clear.request")).color(NamedTextColor.YELLOW));
+
+        return 1; // Comando ejecutado con éxito
     }
 
     /**
      * Maneja la confirmación para `/lumen clear confirm`.
      *
-     * @param context Contexto del comando.
+     * @param source Fuente del comando.
+     * @return Código de éxito.
      */
-    private static void handleClearConfirm(CommandContext<CommandSender> context) {
-        CommandSender sender = context.getSender();
-
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(TranslationHandler.get("command.only_players"));
-            return;
+    private static int handleClearConfirm(CommandSourceStack source) {
+        if (!(source.getSender() instanceof Player player)) {
+            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
+            return 0;
         }
 
         UUID playerId = player.getUniqueId();
 
         // Verifica si hay una solicitud de confirmación activa
         if (!confirmationRequests.containsKey(playerId)) {
-            player.sendMessage(TranslationHandler.get("command.clear.no_request"));
-            return;
+            player.sendMessage(Component.text(TranslationHandler.get("command.clear.no_request")).color(NamedTextColor.RED));
+            return 0;
         }
 
         // Verifica si la solicitud ha expirado
         long requestTime = confirmationRequests.get(playerId);
         if (System.currentTimeMillis() - requestTime > CONFIRMATION_TIMEOUT) {
             confirmationRequests.remove(playerId);
-            player.sendMessage(TranslationHandler.get("command.clear.expired"));
-            return;
+            player.sendMessage(Component.text(TranslationHandler.get("command.clear.expired")).color(NamedTextColor.RED));
+            return 0;
         }
 
         // Ejecuta la limpieza
         LightRegistry.clearAllBlocks();
         confirmationRequests.remove(playerId);
 
-        player.sendMessage(TranslationHandler.get("command.clear.success"));
+        player.sendMessage(Component.text(TranslationHandler.get("command.clear.success")).color(NamedTextColor.GREEN));
+        return 1; // Comando ejecutado con éxito
     }
 }

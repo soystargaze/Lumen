@@ -1,92 +1,49 @@
 package com.erosmari.lumen.commands;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.paper.PaperCommandManager;
 import com.erosmari.lumen.Lumen;
-import com.erosmari.lumen.utils.TranslationHandler;
-import org.bukkit.command.CommandSender;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bukkit.plugin.Plugin;
 
-import java.util.function.Function;
-
+@SuppressWarnings("UnstableApiUsage")
 public class LumenCommandManager {
 
     private final Lumen plugin;
-    private final CommandManager<CommandSender> commandManager;
 
     public LumenCommandManager(Lumen plugin) {
         this.plugin = plugin;
-
-        try {
-            // Configuración del CommandManager usando Paper
-            this.commandManager = new PaperCommandManager<>(
-                    plugin,
-                    CommandExecutionCoordinator.simpleCoordinator(),
-                    Function.identity(),
-                    Function.identity()
-            );
-        } catch (Exception e) {
-            plugin.getLogger().severe(TranslationHandler.getFormatted("commandmanager.init_error", e.getMessage()));
-            throw new RuntimeException(TranslationHandler.get("commandmanager.init_failure"), e);
-        }
     }
 
     /**
      * Registra todos los comandos principales y sus subcomandos.
      */
     public void registerCommands() {
-        // Crear el comando principal `/lumen`
-        Command.Builder<CommandSender> mainCommand = commandManager.commandBuilder("lumen");
+        LifecycleEventManager<@org.jetbrains.annotations.NotNull Plugin> manager = plugin.getLifecycleManager();
+        // Registrar comandos usando el evento COMMANDS
+        manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+            Commands commands = event.registrar();
 
-        // Registro del comando principal y subcomandos
-        registerMainCommand(mainCommand);
-        registerSubCommands(mainCommand);
-    }
-
-    /**
-     * Registro del comando principal `/lumen`.
-     *
-     * @param mainCommand El constructor del comando principal.
-     */
-    private void registerMainCommand(Command.Builder<CommandSender> mainCommand) {
-        commandManager.command(
-                mainCommand
-                        .handler(context -> {
-                            CommandSender sender = context.getSender();
-                            sender.sendMessage(TranslationHandler.get("command.usage"));
-                        })
-        );
-    }
-
-    /**
-     * Registro de subcomandos bajo `/lumen`.
-     *
-     * @param parentBuilder El constructor del comando principal.
-     */
-    private void registerSubCommands(Command.Builder<CommandSender> parentBuilder) {
-        // Subcomando: /lumen light
-        LightCommand.register(commandManager, parentBuilder);
-
-        // Subcomando: /lumen cancel
-        CancelCommand.register(commandManager, parentBuilder);
-
-        // Subcomando: /lumen undo
-        UndoCommand.register(commandManager, parentBuilder);
-
-        // Subcomando: /lumen redo
-        RedoCommand.register(commandManager, parentBuilder);
-
-        // Subcomando: /lumen clear
-        ClearCommand.register(commandManager, parentBuilder);
-
-        // Subcomando: /lumen remove
-        RemoveCommand.register(commandManager, parentBuilder);
-
-        // Subcomando: /lumen remove
-        GiveCommand.register(commandManager, parentBuilder);
-
-        // Subcomando: /lumen reload
-        ReloadCommand.register(commandManager, parentBuilder, plugin);
+            // Registro del comando principal `/lumen` y sus subcomandos
+            commands.register(
+                    Commands.literal("lumen")
+                            .executes(ctx -> {
+                                CommandSourceStack source = ctx.getSource();
+                                source.getSender().sendMessage("Uso del comando /lumen:");
+                                return 1; // Comando ejecutado con éxito
+                            })
+                            // Añadir subcomandos
+                            .then(LightCommand.register())
+                            .then(CancelCommand.register())
+                            .then(UndoCommand.register())
+                            .then(RedoCommand.register())
+                            .then(ClearCommand.register())
+                            .then(RemoveCommand.register())
+                            .then(GiveCommand.register())
+                            .then(ReloadCommand.register(plugin))
+                            .build()
+            );
+        });
     }
 }

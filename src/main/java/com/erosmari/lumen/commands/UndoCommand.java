@@ -1,56 +1,78 @@
 package com.erosmari.lumen.commands;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.utils.TranslationHandler;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
+@SuppressWarnings("UnstableApiUsage")
 public class UndoCommand {
 
-    public static void register(CommandManager<CommandSender> commandManager, Command.Builder<CommandSender> parentBuilder) {
-        commandManager.command(
-                parentBuilder.literal("undo")
-                        .argument(StringArgument.optional("operation_id")) // Argumento opcional para el identificador
-                        .permission("lumen.undo")
-                        .handler(UndoCommand::handleUndoCommand)
-        );
+    /**
+     * Registra el subcomando `/lumen undo` en el sistema nativo de Paper.
+     *
+     * @return Nodo literal del comando para registrarlo en el comando principal.
+     */
+    public static LiteralArgumentBuilder<CommandSourceStack> register() {
+        return Commands.literal("undo")
+                .requires(source -> source.getSender().hasPermission("lumen.undo"))
+                .then(
+                        Commands.argument("operation_id", StringArgumentType.string())
+                                .executes(ctx -> {
+                                    String operationId = ctx.getArgument("operation_id", String.class);
+                                    return handleUndoCommand(ctx.getSource(), operationId);
+                                })
+                )
+                .executes(ctx -> handleUndoCommand(ctx.getSource(), "last"));
     }
 
-    private static void handleUndoCommand(CommandContext<CommandSender> context) {
-        CommandSender sender = context.getSender();
-
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(TranslationHandler.get("command.undo.only_players")); // Mensaje traducido
-            return;
+    /**
+     * Maneja el comando `/lumen undo`.
+     *
+     * @param source      Fuente del comando.
+     * @param operationId Identificador de la operación.
+     * @return Código de éxito (1 para éxito, 0 para fallo).
+     */
+    private static int handleUndoCommand(CommandSourceStack source, String operationId) {
+        if (!(source.getSender() instanceof Player player)) {
+            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.undo.only_players")).color(NamedTextColor.RED));
+            return 0;
         }
 
-        String operationId = context.getOrDefault("operation_id", "last");
         if (operationId.equals("last")) {
-            // Obtener el último operation_id
             operationId = LightRegistry.getLastOperationId();
             if (operationId == null) {
-                sender.sendMessage(TranslationHandler.get("command.undo.no_previous_operations")); // Mensaje traducido
-                return;
+                player.sendMessage(Component.text(TranslationHandler.get("command.undo.no_previous_operations")).color(NamedTextColor.RED));
+                return 0;
             }
         }
 
         int removedBlocks = removeLightBlocksByOperation(operationId);
 
         if (removedBlocks > 0) {
-            sender.sendMessage(TranslationHandler.getFormatted("command.undo.success", removedBlocks, operationId)); // Mensaje traducido
+            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.undo.success", removedBlocks, operationId)).color(NamedTextColor.GREEN));
+            return 1;
         } else {
-            sender.sendMessage(TranslationHandler.getFormatted("command.undo.no_blocks", operationId)); // Mensaje traducido
+            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.undo.no_blocks", operationId)).color(NamedTextColor.RED));
+            return 0;
         }
     }
 
+    /**
+     * Elimina bloques de luz asociados a una operación.
+     *
+     * @param operationId Identificador de la operación.
+     * @return Número de bloques eliminados.
+     */
     private static int removeLightBlocksByOperation(String operationId) {
         List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
         if (blocks.isEmpty()) {
@@ -65,9 +87,7 @@ public class UndoCommand {
             }
         }
 
-        // En lugar de eliminar los registros, los marcamos como "soft delete" para poder rehacer la operación
         LightRegistry.softDeleteBlocksByOperationId(operationId);
-
         return removedCount;
     }
 }

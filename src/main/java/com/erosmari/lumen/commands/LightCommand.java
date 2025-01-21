@@ -1,67 +1,67 @@
 package com.erosmari.lumen.commands;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.standard.BooleanArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.lights.LightHandler;
 import com.erosmari.lumen.utils.TranslationHandler;
-import org.bukkit.command.CommandSender;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("UnstableApiUsage")
 public class LightCommand {
 
-    /**
-     * Registra el comando `/lumen light`.
-     *
-     * @param commandManager El administrador de comandos.
-     * @param parentBuilder  El constructor del comando principal.
-     */
-    public static void register(CommandManager<CommandSender> commandManager, Command.Builder<CommandSender> parentBuilder) {
-        commandManager.command(
-                parentBuilder.literal("light")
-                        .argument(IntegerArgument.of("area_blocks")) // Tamaño del área en bloques
-                        .argument(IntegerArgument.of("light_level")) // Nivel de luz deseado
-                        .argument(BooleanArgument.optional("include_skylight", false)) // Luz natural opcional
-                        .handler(LightCommand::handleLightCommand)
-        );
+    public static LiteralArgumentBuilder<CommandSourceStack> register() {
+        return Commands.literal("light")
+                .then(
+                        Commands.argument("area_blocks", IntegerArgumentType.integer(1, 100)) // Tamaño del área en bloques
+                                .then(
+                                        Commands.argument("light_level", IntegerArgumentType.integer(0, 15)) // Nivel de luz
+                                                .then(
+                                                        Commands.argument("include_skylight", BoolArgumentType.bool()) // Luz natural opcional
+                                                                .executes(ctx -> handleLightCommand(
+                                                                        ctx.getSource(),
+                                                                        ctx.getArgument("area_blocks", Integer.class),
+                                                                        ctx.getArgument("light_level", Integer.class),
+                                                                        ctx.getArgument("include_skylight", Boolean.class)
+                                                                ))
+                                                )
+                                                .executes(ctx -> handleLightCommand(
+                                                        ctx.getSource(),
+                                                        ctx.getArgument("area_blocks", Integer.class),
+                                                        ctx.getArgument("light_level", Integer.class),
+                                                        false // Valor predeterminado
+                                                ))
+                                )
+                )
+                .executes(ctx -> {
+                    ctx.getSource().getSender().sendMessage(Component.text("Uso: /lumen light <area_blocks> <light_level> [include_skylight]")
+                            .color(NamedTextColor.RED));
+                    return 0;
+                });
     }
 
-    /**
-     * Maneja el comando `/lumen light`.
-     *
-     * @param context Contexto del comando.
-     */
-    private static void handleLightCommand(CommandContext<CommandSender> context) {
-        CommandSender sender = context.getSender();
-
-        // Verificar que el remitente sea un jugador
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(TranslationHandler.get("command.only_players"));
-            return;
+    private static int handleLightCommand(CommandSourceStack source, int areaBlocks, int lightLevel, boolean includeSkylight) {
+        if (!(source.getSender() instanceof Player player)) {
+            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
+            return 0;
         }
 
-        // Obtener argumentos
-        int areaBlocks = context.get("area_blocks");
-        int lightLevel = context.get("light_level");
-        boolean includeSkylight = context.getOrDefault("include_skylight", false);
-
-        // Validar nivel de luz
         if (lightLevel < 0 || lightLevel > 15) {
-            player.sendMessage(TranslationHandler.get("command.light.invalid_level"));
-            return;
+            player.sendMessage(Component.text(TranslationHandler.get("command.light.invalid_level")).color(NamedTextColor.RED));
+            return 0;
         }
 
-        // Generar un identificador único para la operación
         String operationId = java.util.UUID.randomUUID().toString();
 
-        // Instanciar el manejador de luces y colocar luces
         LightHandler lightHandler = new LightHandler(Lumen.getInstance());
         lightHandler.placeLights(player, areaBlocks, lightLevel, includeSkylight, operationId);
 
-        // Notificar al jugador
-        player.sendMessage(TranslationHandler.getFormatted("command.light.success", lightLevel, operationId));
+        player.sendMessage(Component.text(TranslationHandler.getFormatted("command.light.success", lightLevel, operationId)).color(NamedTextColor.GREEN));
+        return 1;
     }
 }

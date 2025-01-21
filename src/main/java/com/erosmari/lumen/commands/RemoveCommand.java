@@ -1,62 +1,67 @@
 package com.erosmari.lumen.commands;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.utils.TranslationHandler;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.List;
 
+@SuppressWarnings("UnstableApiUsage")
 public class RemoveCommand {
 
     /**
-     * Registra el comando `/lumen remove`.
+     * Registra el subcomando `/lumen remove` en el sistema nativo de Paper.
      *
-     * @param commandManager El administrador de comandos.
-     * @param parentBuilder  El constructor del comando principal.
+     * @return Nodo literal del comando para registrarlo en el comando principal.
      */
-    public static void register(CommandManager<CommandSender> commandManager, Command.Builder<CommandSender> parentBuilder) {
-        commandManager.command(
-                parentBuilder.literal("remove")
-                        .permission("lumen.remove")
-                        .literal("area")
-                        .argument(IntegerArgument.of("range")) // Rango del área
-                        .handler(RemoveCommand::handleRemoveAreaCommand)
-        );
-
-        commandManager.command(
-                parentBuilder.literal("remove")
-                        .permission("lumen.remove")
-                        .literal("operation")
-                        .argument(StringArgument.of("operation_id")) // Identificador de operación
-                        .handler(RemoveCommand::handleRemoveOperationCommand)
-        );
+    public static LiteralArgumentBuilder<CommandSourceStack> register() {
+        return Commands.literal("remove")
+                .requires(source -> source.getSender().hasPermission("lumen.remove"))
+                .then(
+                        Commands.literal("area")
+                                .then(
+                                        Commands.argument("range", IntegerArgumentType.integer(1, 100)) // Rango del área
+                                                .executes(ctx -> {
+                                                    int range = ctx.getArgument("range", Integer.class);
+                                                    return handleRemoveAreaCommand(ctx.getSource(), range);
+                                                })
+                                )
+                )
+                .then(
+                        Commands.literal("operation")
+                                .then(
+                                        Commands.argument("operation_id", StringArgumentType.string()) // Identificador de operación
+                                                .executes(ctx -> {
+                                                    String operationId = ctx.getArgument("operation_id", String.class);
+                                                    return handleRemoveOperationCommand(ctx.getSource(), operationId);
+                                                })
+                                )
+                );
     }
 
     /**
      * Maneja el comando `/lumen remove area <range>`.
+     *
+     * @param source Fuente del comando.
+     * @param range  Rango del área en bloques.
+     * @return Código de éxito.
      */
-    private static void handleRemoveAreaCommand(CommandContext<CommandSender> context) {
-        CommandSender sender = context.getSender();
-
-        // Validar que sea un jugador
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(TranslationHandler.get("command.remove.only_players"));
-            return;
+    private static int handleRemoveAreaCommand(CommandSourceStack source, int range) {
+        if (!(source.getSender() instanceof Player player)) {
+            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.remove.only_players")).color(NamedTextColor.RED));
+            return 0;
         }
 
-        // Obtener el rango del comando
-        int range = context.get("range");
         Location playerLocation = player.getLocation();
-
-        // Obtener y eliminar bloques dentro del rango
         List<Location> blocks = LightRegistry.getBlocksInRange(playerLocation, range);
 
         int removedCount = 0;
@@ -67,35 +72,33 @@ public class RemoveCommand {
             }
         }
 
-        // Informar al jugador
         if (removedCount > 0) {
-            player.sendMessage(TranslationHandler.getFormatted("command.remove.area.success", removedCount, range));
+            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.success", removedCount, range)).color(NamedTextColor.GREEN));
         } else {
-            player.sendMessage(TranslationHandler.getFormatted("command.remove.area.no_blocks", range));
+            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.no_blocks", range)).color(NamedTextColor.RED));
         }
+
+        return 1;
     }
 
     /**
      * Maneja el comando `/lumen remove operation <operation_id>`.
+     *
+     * @param source      Fuente del comando.
+     * @param operationId Identificador de la operación.
+     * @return Código de éxito.
      */
-    private static void handleRemoveOperationCommand(CommandContext<CommandSender> context) {
-        CommandSender sender = context.getSender();
-
-        // Validar que sea un jugador
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage(TranslationHandler.get("command.remove.only_players"));
-            return;
+    private static int handleRemoveOperationCommand(CommandSourceStack source, String operationId) {
+        if (!(source.getSender() instanceof Player player)) {
+            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.remove.only_players")).color(NamedTextColor.RED));
+            return 0;
         }
 
-        // Obtener el ID de la operación
-        String operationId = context.get("operation_id");
-
-        // Recuperar los bloques asociados a la operación
         List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
 
         if (blocks.isEmpty()) {
-            player.sendMessage(TranslationHandler.getFormatted("command.remove.operation.no_blocks", operationId));
-            return;
+            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.operation.no_blocks", operationId)).color(NamedTextColor.RED));
+            return 0;
         }
 
         int removedCount = 0;
@@ -106,14 +109,14 @@ public class RemoveCommand {
             }
         }
 
-        // Eliminar los registros de la base de datos
         LightRegistry.removeBlocksByOperationId(operationId);
 
-        // Informar al jugador
         if (removedCount > 0) {
-            player.sendMessage(TranslationHandler.getFormatted("command.remove.operation.success", removedCount, operationId));
+            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.operation.success", removedCount, operationId)).color(NamedTextColor.GREEN));
         } else {
-            player.sendMessage(TranslationHandler.getFormatted("command.remove.operation.no_blocks", operationId));
+            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.operation.no_blocks", operationId)).color(NamedTextColor.RED));
         }
+
+        return 1;
     }
 }
