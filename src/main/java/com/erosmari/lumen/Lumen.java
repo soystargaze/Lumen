@@ -128,8 +128,8 @@ public class Lumen extends JavaPlugin {
             ItemLightsHandler lightsHandler = new ItemLightsHandler(this);
             ItemMobsHandler mobsHandler = new ItemMobsHandler(this);
 
-            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler), this);
-            getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler), this);
+            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems), this);
+            getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler, lumenItems), this);
 
             getLogger().info(TranslationHandler.get("events.registered"));
         } catch (Exception e) {

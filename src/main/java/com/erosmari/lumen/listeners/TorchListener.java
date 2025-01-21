@@ -1,5 +1,6 @@
 package com.erosmari.lumen.listeners;
 
+import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
@@ -17,14 +18,22 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Objects;
+
 public class TorchListener implements Listener {
 
     private final Plugin plugin;
     private final ItemLightsHandler lightsHandler;
+    private final LumenItems lumenItems;
 
-    public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler) {
+    // Clave única para identificar ítems Lumen
+    private final NamespacedKey lumenIdKey;
+
+    public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler, LumenItems lumenItems) {
         this.plugin = plugin;
         this.lightsHandler = lightsHandler;
+        this.lumenItems = lumenItems;
+        this.lumenIdKey = new NamespacedKey(plugin, "lumen_id"); // Constante reutilizable
     }
 
     @EventHandler
@@ -33,10 +42,9 @@ public class TorchListener implements Listener {
 
         if (itemInHand.getItemMeta() != null) {
             PersistentDataContainer itemContainer = itemInHand.getItemMeta().getPersistentDataContainer();
-            NamespacedKey idKey = new NamespacedKey(plugin, "lumen_id"); // Clave única para identificar Lumen Torch
 
-            if (itemContainer.has(idKey, PersistentDataType.STRING)) {
-                String id = itemContainer.get(idKey, PersistentDataType.STRING);
+            if (itemContainer.has(lumenIdKey, PersistentDataType.STRING)) {
+                String id = itemContainer.get(lumenIdKey, PersistentDataType.STRING);
 
                 if ("light".equals(id)) {
                     Block placedBlock = event.getBlock();
@@ -45,8 +53,7 @@ public class TorchListener implements Listener {
 
                     // Transfiere el ID al bloque colocado si es compatible con TileState
                     if (placedBlock.getState() instanceof TileState tileState) {
-                        PersistentDataContainer blockContainer = tileState.getPersistentDataContainer();
-                        blockContainer.set(idKey, PersistentDataType.STRING, id);
+                        transferPersistentData(itemContainer, tileState.getPersistentDataContainer());
                         tileState.update(); // Aplica los cambios al bloque
                     }
 
@@ -69,28 +76,53 @@ public class TorchListener implements Listener {
         Block brokenBlock = event.getBlock();
         Player player = event.getPlayer();
 
-        // Verifica si el bloque tiene un valor de ID almacenado en su PersistentDataContainer
         if (brokenBlock.getState() instanceof TileState tileState) {
-            PersistentDataContainer container = tileState.getPersistentDataContainer();
-            NamespacedKey key = new NamespacedKey(plugin, "lumen_id"); // Clave registrada en LumenItems
+            PersistentDataContainer blockContainer = tileState.getPersistentDataContainer();
 
-            if (container.has(key, PersistentDataType.STRING)) {
-                String id = container.get(key, PersistentDataType.STRING);
+            if (blockContainer.has(lumenIdKey, PersistentDataType.STRING)) {
+                String id = blockContainer.get(lumenIdKey, PersistentDataType.STRING);
 
-                // Comprueba que el ID sea exactamente "light"
                 if ("light".equals(id)) {
                     try {
-                        // Lógica para el Lumen Torch (luz)
                         String operationId = "torch-" + brokenBlock.getLocation().hashCode();
 
+                        // Cancela operaciones de luz asociadas con la antorcha
                         lightsHandler.cancelOperation(player, operationId);
                         lightsHandler.removeLights(player, operationId);
 
-                        plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_broken", operationId));
+                        // Obtener el ítem original desde la instancia de lumenItems
+                        ItemStack customItem = lumenItems.getLumenItem(id);
+
+                        if (customItem != null) {
+                            // Soltar el ítem clonado
+                            brokenBlock.getWorld().dropItemNaturally(brokenBlock.getLocation(), customItem.clone());
+
+                            // Evitar el drop predeterminado
+                            event.setDropItems(false);
+
+                            plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_broken", operationId));
+                        }
                     } catch (Exception e) {
-                        plugin.getLogger().severe("Error handling Lumen Torch removal: " + e.getMessage());
+                        plugin.getLogger().severe(String.format(
+                                "Error handling Lumen Torch removal for player %s at %s: %s",
+                                player.getName(), brokenBlock.getLocation(), e.getMessage()
+                        ));
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Transfiere los datos de un PersistentDataContainer fuente a otro destino.
+     *
+     * @param source El contenedor de datos fuente.
+     * @param target El contenedor de datos destino.
+     */
+    private void transferPersistentData(PersistentDataContainer source, PersistentDataContainer target) {
+        for (NamespacedKey key : source.getKeys()) {
+            if (source.has(key, PersistentDataType.STRING)) {
+                target.set(key, PersistentDataType.STRING, Objects.requireNonNull(source.get(key, PersistentDataType.STRING)));
             }
         }
     }
