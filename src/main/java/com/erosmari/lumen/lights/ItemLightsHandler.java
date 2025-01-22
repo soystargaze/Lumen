@@ -2,8 +2,10 @@ package com.erosmari.lumen.lights;
 
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
+import com.erosmari.lumen.connections.CoreProtectCompatibility; // Importa la integración
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.tasks.TaskManager;
+import com.erosmari.lumen.utils.CoreProtectUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -18,9 +20,11 @@ import java.util.Queue;
 public class ItemLightsHandler {
 
     private final Lumen plugin;
+    private final CoreProtectCompatibility coreProtectCompatibility;
 
     public ItemLightsHandler(Lumen plugin) {
         this.plugin = plugin;
+        this.coreProtectCompatibility = plugin.getCoreProtectCompatibility(); // Obtén la instancia de CoreProtect
     }
 
     public void placeLights(Player player, Location center, String operationId) {
@@ -102,7 +106,7 @@ public class ItemLightsHandler {
             while (!blockQueue.isEmpty() && processed < lightsPerTick) {
                 Location blockLocation = blockQueue.poll();
                 if (blockLocation != null) {
-                    placeLight(blockLocation, lightLevel, operationId);
+                    placeLight(player, blockLocation, lightLevel, operationId);
                     processed++;
                 }
             }
@@ -118,7 +122,7 @@ public class ItemLightsHandler {
         TaskManager.addTask(player.getUniqueId(), taskHolder[0]);
     }
 
-    private void placeLight(Location location, int lightLevel, String operationId) {
+    private void placeLight(Player player, Location location, int lightLevel, String operationId) {
         Block block = location.getBlock();
         block.setType(Material.LIGHT, false);
 
@@ -128,7 +132,15 @@ public class ItemLightsHandler {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                LightRegistry.addBlock(location, lightLevel, operationId);
+                // Registrar en CoreProtect usando el utilitario
+                CoreProtectUtils.logLightPlacement(plugin.getLogger(), coreProtectCompatibility, player, location);
+
+                // Validar y registrar en el LightRegistry
+                if (lightLevel >= 0 && lightLevel <= 15) {
+                    LightRegistry.addBlock(location, lightLevel, operationId);
+                } else {
+                    plugin.getLogger().warning("Invalid block data for operation: " + operationId + " at location: " + location);
+                }
             } catch (ClassCastException e) {
                 plugin.getLogger().warning(TranslationHandler.getFormatted("light.error.setting_level_torch", location, e.getMessage()));
             }
@@ -144,16 +156,27 @@ public class ItemLightsHandler {
         }
 
         Bukkit.getScheduler().runTask(plugin, () -> {
-            blocksToRemove.forEach(location -> {
-                Block block = location.getBlock();
-                if (block.getType() == Material.LIGHT) {
-                    block.setType(Material.AIR, false);
-                }
-            });
+            try {
+                blocksToRemove.forEach(location -> {
+                    Block block = location.getBlock();
+                    if (block.getType() == Material.LIGHT) {
+                        // Usar el utilitario para registrar en CoreProtect
+                        CoreProtectUtils.logLightRemoval(plugin.getLogger(), coreProtectCompatibility, player, location);
 
-            LightRegistry.removeBlocksByOperationId(operationId);
-            player.sendMessage(TranslationHandler.getFormatted("light.success.removed", operationId));
-            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.removed_lights", operationId));
+                        // Cambiar el bloque a aire
+                        block.setType(Material.AIR, false);
+                    }
+                });
+
+                // Eliminar los bloques del registro
+                LightRegistry.removeBlocksByOperationId(operationId);
+
+                // Mensajes de feedback
+                player.sendMessage(TranslationHandler.getFormatted("light.success.removed", operationId));
+                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.removed_lights", operationId));
+            } catch (Exception e) {
+                plugin.getLogger().severe("Error while removing lights for operation " + operationId + ": " + e.getMessage());
+            }
         });
     }
 

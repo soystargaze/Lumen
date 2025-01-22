@@ -1,5 +1,6 @@
 package com.erosmari.lumen.listeners;
 
+import com.erosmari.lumen.connections.CoreProtectCompatibility; // Importar la integración
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
@@ -25,15 +26,15 @@ public class TorchListener implements Listener {
     private final Plugin plugin;
     private final ItemLightsHandler lightsHandler;
     private final LumenItems lumenItems;
-
-    // Clave única para identificar ítems Lumen
+    private final CoreProtectCompatibility coreProtectCompatibility; // Referencia a CoreProtect
     private final NamespacedKey lumenIdKey;
 
-    public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler, LumenItems lumenItems) {
+    public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler, LumenItems lumenItems, CoreProtectCompatibility coreProtectCompatibility) {
         this.plugin = plugin;
         this.lightsHandler = lightsHandler;
         this.lumenItems = lumenItems;
-        this.lumenIdKey = new NamespacedKey(plugin, "lumen_id"); // Constante reutilizable
+        this.coreProtectCompatibility = coreProtectCompatibility; // Inicialización
+        this.lumenIdKey = new NamespacedKey(plugin, "lumen_id");
     }
 
     @EventHandler
@@ -54,7 +55,7 @@ public class TorchListener implements Listener {
                     // Transfiere el ID al bloque colocado si es compatible con TileState
                     if (placedBlock.getState() instanceof TileState tileState) {
                         transferPersistentData(itemContainer, tileState.getPersistentDataContainer());
-                        tileState.update(); // Aplica los cambios al bloque
+                        tileState.update();
                     }
 
                     // Lógica para el Lumen Torch (luz)
@@ -64,8 +65,12 @@ public class TorchListener implements Listener {
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "torch");
 
-                    plugin.getLogger().info(TranslationHandler.getFormatted(
-                            "torch.light_placed", placedLocation, operationId));
+                    // Registrar en CoreProtect
+                    if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
+                        coreProtectCompatibility.logLightPlacement(player, placedLocation);
+                    }
+
+                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_placed", placedLocation, operationId));
                 }
             }
         }
@@ -90,6 +95,11 @@ public class TorchListener implements Listener {
                         lightsHandler.cancelOperation(player, operationId);
                         lightsHandler.removeLights(player, operationId);
 
+                        // Registrar en CoreProtect
+                        if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
+                            coreProtectCompatibility.logLightRemoval(player, brokenBlock.getLocation());
+                        }
+
                         // Obtener el ítem original desde la instancia de lumenItems
                         ItemStack customItem = lumenItems.getLumenItem(id);
 
@@ -113,12 +123,6 @@ public class TorchListener implements Listener {
         }
     }
 
-    /**
-     * Transfiere los datos de un PersistentDataContainer fuente a otro destino.
-     *
-     * @param source El contenedor de datos fuente.
-     * @param target El contenedor de datos destino.
-     */
     private void transferPersistentData(PersistentDataContainer source, PersistentDataContainer target) {
         for (NamespacedKey key : source.getKeys()) {
             if (source.has(key, PersistentDataType.STRING)) {

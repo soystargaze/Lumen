@@ -205,6 +205,27 @@ public class LightRegistry {
         return blocks;
     }
 
+    public static List<Location> getAllBlocks() {
+        String query = "SELECT world, x, y, z FROM illuminated_blocks WHERE is_deleted = 0;";
+        List<Location> blocks = new ArrayList<>();
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                Location location = createLocationFromResultSet(resultSet);
+                if (location != null) {
+                    blocks.add(location);
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.fetch_all_blocks"), e);
+        }
+
+        return blocks;
+    }
+
     @SuppressWarnings("SqlWithoutWhere")
     public static void clearAllBlocks() {
         String querySelect = "SELECT world, x, y, z FROM illuminated_blocks WHERE is_deleted = 0;";

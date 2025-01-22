@@ -2,6 +2,7 @@ package com.erosmari.lumen;
 
 import com.erosmari.lumen.commands.LumenCommandManager;
 import com.erosmari.lumen.config.ConfigHandler;
+import com.erosmari.lumen.connections.CoreProtectCompatibility; // Importa la clase de integración
 import com.erosmari.lumen.database.DatabaseHandler;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
@@ -13,6 +14,7 @@ import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.logging.Level;
 
 public class Lumen extends JavaPlugin {
@@ -20,6 +22,7 @@ public class Lumen extends JavaPlugin {
     private static Lumen instance; // Instancia estática para obtener el plugin fácilmente
     private LumenCommandManager commandManager;
     private LumenItems lumenItems; // Nueva instancia de LumenItems
+    private CoreProtectCompatibility coreProtectCompatibility; // Instancia de integración con CoreProtect
 
     @Override
     public void onEnable() {
@@ -37,6 +40,7 @@ public class Lumen extends JavaPlugin {
             initializeDatabase();
             initializeSystems();
             registerComponents();
+            initializeCoreProtectIntegration(); // Inicializa CoreProtect
 
             ConsoleUtils.displaySuccessMessage(this);
         } catch (Exception e) {
@@ -55,8 +59,14 @@ public class Lumen extends JavaPlugin {
     public static Lumen getInstance() {
         return instance;
     }
-    public LumenItems getLumenItems() {return lumenItems;}
 
+    public LumenItems getLumenItems() {
+        return lumenItems;
+    }
+
+    public CoreProtectCompatibility getCoreProtectCompatibility() {
+        return Objects.requireNonNullElseGet(coreProtectCompatibility, () -> new CoreProtectCompatibility(this));
+    }
 
     private void loadConfigurations() {
         ConfigHandler.setup(this);
@@ -118,6 +128,19 @@ public class Lumen extends JavaPlugin {
         }
     }
 
+    private void initializeCoreProtectIntegration() {
+        try {
+            coreProtectCompatibility = new CoreProtectCompatibility(this);
+            if (coreProtectCompatibility.isEnabled()) {
+                getLogger().info("Integración con CoreProtect habilitada correctamente.");
+            } else {
+                getLogger().info("CoreProtect no está disponible. La integración será omitida.");
+            }
+        } catch (Exception e) {
+            getLogger().log(Level.SEVERE, "Error al inicializar la integración con CoreProtect.", e);
+        }
+    }
+
     private void registerComponents() {
         registerEvents();
     }
@@ -127,8 +150,8 @@ public class Lumen extends JavaPlugin {
             ItemLightsHandler lightsHandler = new ItemLightsHandler(this);
             ItemMobsHandler mobsHandler = new ItemMobsHandler(this);
 
-            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems), this);
-            getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler, lumenItems), this);
+            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems, coreProtectCompatibility), this);
+            getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler, lumenItems, coreProtectCompatibility), this);
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("events.register_error"), e);
         }

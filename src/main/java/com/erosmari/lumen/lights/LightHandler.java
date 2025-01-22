@@ -2,8 +2,10 @@ package com.erosmari.lumen.lights;
 
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
+import com.erosmari.lumen.connections.CoreProtectCompatibility; // Importar integración con CoreProtect
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.tasks.TaskManager;
+import com.erosmari.lumen.utils.CoreProtectUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,9 +24,11 @@ import java.util.Queue;
 public class LightHandler {
 
     private final Lumen plugin;
+    private final CoreProtectCompatibility coreProtectCompatibility;
 
     public LightHandler(Lumen plugin) {
         this.plugin = plugin;
+        this.coreProtectCompatibility = plugin.getCoreProtectCompatibility(); // Obtener integración de CoreProtect
     }
 
     public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight, String operationId) {
@@ -50,14 +54,12 @@ public class LightHandler {
             return positions;
         }
 
-        int maxDistance = lightLevel;
-
         for (int x = -areaBlocks; x <= areaBlocks; x++) {
             for (int y = -areaBlocks; y <= areaBlocks; y++) {
                 for (int z = -areaBlocks; z <= areaBlocks; z++) {
                     Location location = center.clone().add(x, y, z);
 
-                    if (isValidLightPosition(location, center, maxDistance, includeSkylight)) {
+                    if (isValidLightPosition(location, center, lightLevel, includeSkylight)) {
                         positions.add(location);
                     }
                 }
@@ -129,28 +131,32 @@ public class LightHandler {
         final BukkitTask[] taskHolder = new BukkitTask[1];
 
         taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            int processedCount = 0;
+            try {
+                int processedCount = 0;
 
-            while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
-                Location blockLocation = blockQueue.poll();
-                if (blockLocation != null) {
-                    processSingleBlock(blockLocation, lightLevel, operationId);
-                    processedCount++;
+                while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
+                    Location blockLocation = blockQueue.poll();
+                    if (blockLocation != null) {
+                        processSingleBlock(player, blockLocation, lightLevel, operationId);
+                        processedCount++;
+                    }
                 }
-            }
 
-            if (blockQueue.isEmpty()) {
-                player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
-                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
-                taskHolder[0].cancel();
-                TaskManager.cancelTask(player.getUniqueId());
+                if (blockQueue.isEmpty()) {
+                    player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
+                    plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
+                    taskHolder[0].cancel();
+                    TaskManager.cancelTask(player.getUniqueId());
+                }
+            } catch (Exception e) {
+                plugin.getLogger().severe("Error while processing blocks asynchronously: " + e.getMessage());
             }
         }, 0L, 1L);
 
         TaskManager.addTask(player.getUniqueId(), taskHolder[0]);
     }
 
-    private void processSingleBlock(Location blockLocation, int lightLevel, String operationId) {
+    private void processSingleBlock(Player player, Location blockLocation, int lightLevel, String operationId) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);
 
@@ -160,7 +166,14 @@ public class LightHandler {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                LightRegistry.addBlock(blockLocation, lightLevel, operationId);
+                // Registro en CoreProtect utilizando el utilitario
+                CoreProtectUtils.logLightPlacement(plugin.getLogger(), coreProtectCompatibility, player, blockLocation);
+
+                if (lightLevel >= 0 && lightLevel <= 15) {
+                    LightRegistry.addBlock(blockLocation, lightLevel, operationId);
+                } else {
+                    plugin.getLogger().warning("Invalid block data for operation: " + operationId);
+                }
             } catch (ClassCastException e) {
                 plugin.getLogger().warning(TranslationHandler.getFormatted("light.error.setting_level", blockLocation, e.getMessage()));
             }

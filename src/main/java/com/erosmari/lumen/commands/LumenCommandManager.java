@@ -11,9 +11,17 @@ import org.bukkit.plugin.Plugin;
 public class LumenCommandManager {
 
     private final Lumen plugin;
+    private final RemoveCommand removeCommand;
+    private final UndoCommand undoCommand;
+    private final ClearCommand clearCommand;
+    private final RedoCommand redoCommand;
 
     public LumenCommandManager(Lumen plugin) {
         this.plugin = plugin;
+        this.removeCommand = new RemoveCommand(plugin.getCoreProtectCompatibility(), org.bukkit.Bukkit.getLogger());
+        this.undoCommand = new UndoCommand(plugin.getCoreProtectCompatibility());
+        this.clearCommand = new ClearCommand(plugin.getCoreProtectCompatibility(), org.bukkit.Bukkit.getLogger());
+        this.redoCommand = new RedoCommand(plugin.getCoreProtectCompatibility());
     }
 
     /**
@@ -33,13 +41,13 @@ public class LumenCommandManager {
                                 source.getSender().sendMessage("Uso del comando /lumen:");
                                 return 1; // Comando ejecutado con éxito
                             })
-                            // Añadir subcomandos
+                            // Subcomandos
                             .then(LightCommand.register())
                             .then(CancelCommand.register())
-                            .then(UndoCommand.register())
-                            .then(RedoCommand.register())
-                            .then(ClearCommand.register())
-                            .then(RemoveCommand.register())
+                            .then(undoCommand.register())
+                            .then(redoCommand.register())
+                            .then(clearCommand.register())
+                            .then(removeCommand.register())
                             .then(GiveCommand.register())
                             .then(ReloadCommand.register(plugin))
                             .build()

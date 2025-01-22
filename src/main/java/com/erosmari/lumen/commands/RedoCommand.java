@@ -1,7 +1,9 @@
 package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.config.ConfigHandler;
+import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.utils.CoreProtectUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -17,19 +19,25 @@ import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 @SuppressWarnings("UnstableApiUsage")
 public class RedoCommand {
 
     private static final Logger logger = Logger.getLogger("Lumen-RedoCommand");
+    private final CoreProtectCompatibility coreProtectCompatibility;
+
+    public RedoCommand(CoreProtectCompatibility coreProtectCompatibility) {
+        this.coreProtectCompatibility = coreProtectCompatibility;
+    }
 
     /**
      * Registra el subcomando `/lumen redo` en el sistema nativo de Paper.
      *
      * @return Nodo literal del comando para registrarlo en el comando principal.
      */
-    public static LiteralArgumentBuilder<CommandSourceStack> register() {
+    public LiteralArgumentBuilder<CommandSourceStack> register() {
         return Commands.literal("redo")
                 .requires(source -> source.getSender().hasPermission("lumen.redo"))
                 .then(
@@ -49,50 +57,49 @@ public class RedoCommand {
      * @param operationId Identificador de la operación.
      * @return Código de éxito (1 para éxito, 0 para fallo).
      */
-    private static int handleRedoCommand(CommandSourceStack source, String operationId) {
+    private int handleRedoCommand(CommandSourceStack source, String operationId) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
             return 0;
         }
 
-        if (operationId.equals("last")) {
-            operationId = LightRegistry.getLastSoftDeletedOperationId();
-            if (operationId == null) {
-                player.sendMessage(Component.text(TranslationHandler.get("command.redo.no_previous_operations")).color(NamedTextColor.RED));
-                return 0;
-            }
-        }
+        final String finalOperationId = operationId.equals("last")
+                ? LightRegistry.getLastSoftDeletedOperationId()
+                : operationId;
 
-        Map<Location, Integer> blocksWithLightLevels = LightRegistry.getSoftDeletedBlocksWithLightLevelByOperationId(operationId);
-
-        if (blocksWithLightLevels.isEmpty()) {
-            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.no_blocks_found", operationId)).color(NamedTextColor.RED));
+        if (finalOperationId == null) {
+            player.sendMessage(Component.text(TranslationHandler.get("command.redo.no_previous_operations")).color(NamedTextColor.RED));
             return 0;
         }
 
-        logger.info(TranslationHandler.getFormatted("command.redo.restoring_blocks_log", operationId, blocksWithLightLevels.size()));
+        Map<Location, Integer> blocksWithLightLevels = LightRegistry.getSoftDeletedBlocksWithLightLevelByOperationId(finalOperationId);
 
-        // Encapsular blockQueue y operationId en un array para que sean efectivamente finales
+        if (blocksWithLightLevels.isEmpty()) {
+            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.no_blocks_found", finalOperationId)).color(NamedTextColor.RED));
+            return 0;
+        }
+
+        logger.info(TranslationHandler.getFormatted("command.redo.restoring_blocks_log", finalOperationId, blocksWithLightLevels.size()));
+
+        // Encapsular blockQueue en un wrapper mutable
         final Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
-        final String[] operationIdWrapper = {operationId};
+        final AtomicInteger processedCount = new AtomicInteger(0); // Contador mutable
         final int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
 
         Bukkit.getScheduler().runTaskTimer(
                 Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Lumen")),
                 task -> {
-                    int processedCount = 0;
-
-                    while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
+                    while (!blockQueue.isEmpty() && processedCount.get() < maxBlocksPerTick) {
                         Map.Entry<Location, Integer> entry = blockQueue.poll();
                         if (entry != null) {
-                            processBlock(entry.getKey(), entry.getValue(), operationIdWrapper[0]);
-                            processedCount++;
+                            processBlock(player, entry.getKey(), entry.getValue(), finalOperationId);
+                            processedCount.incrementAndGet();
                         }
                     }
 
                     if (blockQueue.isEmpty()) {
-                        logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", operationIdWrapper[0]));
-                        LightRegistry.restoreSoftDeletedBlocksByOperationId(operationIdWrapper[0]);
+                        logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", finalOperationId));
+                        LightRegistry.restoreSoftDeletedBlocksByOperationId(finalOperationId);
                         task.cancel();
                     }
                 },
@@ -107,11 +114,12 @@ public class RedoCommand {
     /**
      * Procesa un solo bloque en el mundo.
      *
+     * @param player       Jugador que ejecuta el comando.
      * @param blockLocation Ubicación del bloque.
      * @param lightLevel    Nivel de luz.
      * @param operationId   ID de la operación.
      */
-    private static void processBlock(Location blockLocation, int lightLevel, String operationId) {
+    private void processBlock(Player player, Location blockLocation, int lightLevel, String operationId) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);
 
@@ -120,6 +128,9 @@ public class RedoCommand {
                 Levelled lightData = (Levelled) block.getBlockData();
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
+
+                // Usar el utilitario para registrar en CoreProtect
+                CoreProtectUtils.logLightPlacement(logger, coreProtectCompatibility, player, blockLocation);
 
                 LightRegistry.addBlock(blockLocation, lightLevel, operationId);
             } catch (ClassCastException e) {
