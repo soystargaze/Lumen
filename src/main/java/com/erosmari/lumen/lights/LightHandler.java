@@ -120,8 +120,9 @@ public class LightHandler {
         for (int[] offset : offsets) {
             Location adjacent = location.clone().add(offset[0], offset[1], offset[2]);
             Block adjacentBlock = adjacent.getBlock();
+            Material type = adjacentBlock.getType();
 
-            if (!adjacentBlock.getType().isAir()) {
+            if (!type.isAir() || type == Material.WATER || type == Material.LAVA) {
                 return true;
             }
         }
