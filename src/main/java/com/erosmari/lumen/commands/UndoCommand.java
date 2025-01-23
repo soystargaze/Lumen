@@ -1,8 +1,6 @@
 package com.erosmari.lumen.commands;
 
-import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.LightRegistry;
-import com.erosmari.lumen.utils.CoreProtectUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -18,10 +16,7 @@ import java.util.List;
 @SuppressWarnings("UnstableApiUsage")
 public class UndoCommand {
 
-    private final CoreProtectCompatibility coreProtectCompatibility;
-
-    public UndoCommand(CoreProtectCompatibility coreProtectCompatibility) {
-        this.coreProtectCompatibility = coreProtectCompatibility;
+    public UndoCommand() {
     }
 
     /**
@@ -63,7 +58,7 @@ public class UndoCommand {
             }
         }
 
-        int removedBlocks = removeLightBlocksByOperation(player, operationId);
+        int removedBlocks = removeLightBlocksByOperation(operationId);
 
         if (removedBlocks > 0) {
             player.sendMessage(Component.text(TranslationHandler.getFormatted("command.undo.success", removedBlocks, operationId)).color(NamedTextColor.GREEN));
@@ -77,11 +72,10 @@ public class UndoCommand {
     /**
      * Elimina bloques de luz asociados a una operación.
      *
-     * @param player      Jugador que ejecuta el comando.
      * @param operationId Identificador de la operación.
      * @return Número de bloques eliminados.
      */
-    private int removeLightBlocksByOperation(Player player, String operationId) {
+    private int removeLightBlocksByOperation(String operationId) {
         List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
         if (blocks.isEmpty()) {
             return 0;
@@ -89,7 +83,7 @@ public class UndoCommand {
 
         int removedCount = 0;
         for (Location location : blocks) {
-            if (removeLightBlock(player, location)) {
+            if (removeLightBlock(location)) {
                 removedCount++;
             }
         }
@@ -101,14 +95,11 @@ public class UndoCommand {
     /**
      * Elimina un bloque de luz y lo registra en CoreProtect.
      *
-     * @param player   Jugador que ejecuta el comando.
      * @param location Ubicación del bloque.
      * @return True si el bloque fue eliminado, False en caso contrario.
      */
-    private boolean removeLightBlock(Player player, Location location) {
+    private boolean removeLightBlock(Location location) {
         if (location.getBlock().getType() == org.bukkit.Material.LIGHT) {
-            // Usar el utilitario para registrar la eliminación en CoreProtect
-            CoreProtectUtils.logLightRemoval(player.getServer().getLogger(), coreProtectCompatibility, player, location);
 
             // Eliminar el bloque
             location.getBlock().setType(org.bukkit.Material.AIR, false);

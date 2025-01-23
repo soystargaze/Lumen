@@ -1,9 +1,7 @@
 package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.config.ConfigHandler;
-import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.LightRegistry;
-import com.erosmari.lumen.utils.CoreProtectUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -26,10 +24,8 @@ import java.util.logging.Logger;
 public class RedoCommand {
 
     private static final Logger logger = Logger.getLogger("Lumen-RedoCommand");
-    private final CoreProtectCompatibility coreProtectCompatibility;
 
-    public RedoCommand(CoreProtectCompatibility coreProtectCompatibility) {
-        this.coreProtectCompatibility = coreProtectCompatibility;
+    public RedoCommand() {
     }
 
     /**
@@ -92,7 +88,7 @@ public class RedoCommand {
                     while (!blockQueue.isEmpty() && processedCount.get() < maxBlocksPerTick) {
                         Map.Entry<Location, Integer> entry = blockQueue.poll();
                         if (entry != null) {
-                            processBlock(player, entry.getKey(), entry.getValue(), finalOperationId);
+                            processBlock(entry.getKey(), entry.getValue(), finalOperationId);
                             processedCount.incrementAndGet();
                         }
                     }
@@ -114,12 +110,11 @@ public class RedoCommand {
     /**
      * Procesa un solo bloque en el mundo.
      *
-     * @param player       Jugador que ejecuta el comando.
      * @param blockLocation Ubicación del bloque.
      * @param lightLevel    Nivel de luz.
      * @param operationId   ID de la operación.
      */
-    private void processBlock(Player player, Location blockLocation, int lightLevel, String operationId) {
+    private void processBlock(Location blockLocation, int lightLevel, String operationId) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);
 
@@ -128,9 +123,6 @@ public class RedoCommand {
                 Levelled lightData = (Levelled) block.getBlockData();
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
-
-                // Usar el utilitario para registrar en CoreProtect
-                CoreProtectUtils.logLightPlacement(logger, coreProtectCompatibility, player, blockLocation);
 
                 LightRegistry.addBlock(blockLocation, lightLevel, operationId);
             } catch (ClassCastException e) {

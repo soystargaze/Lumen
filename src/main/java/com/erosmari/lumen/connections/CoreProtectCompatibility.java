@@ -38,6 +38,10 @@ public class CoreProtectCompatibility {
         return coreProtectAPI != null;
     }
 
+    public CoreProtectAPI getAPI() {
+        return coreProtectAPI;
+    }
+
     public void logLightPlacement(Player player, Location location) {
         if (isEnabled()) {
             coreProtectAPI.logPlacement(player.getName(), location, Material.LIGHT, location.getBlock().getBlockData());

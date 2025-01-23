@@ -1,6 +1,5 @@
 package com.erosmari.lumen.commands;
 
-import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.utils.RemoveLightUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
@@ -15,17 +14,11 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 @SuppressWarnings("UnstableApiUsage")
 public class RemoveCommand {
 
-    private final CoreProtectCompatibility coreProtectCompatibility;
-    private final Logger logger;
-
-    public RemoveCommand(CoreProtectCompatibility coreProtectCompatibility, Logger logger) {
-        this.coreProtectCompatibility = coreProtectCompatibility;
-        this.logger = logger;
+    public RemoveCommand() {
     }
 
     public LiteralArgumentBuilder<CommandSourceStack> register() {
@@ -62,7 +55,7 @@ public class RemoveCommand {
         Location playerLocation = player.getLocation();
         List<Location> blocks = LightRegistry.getBlocksInRange(playerLocation, range);
 
-        int removedCount = removeLightBlocks(player, blocks);
+        int removedCount = removeLightBlocks(blocks);
 
         if (removedCount > 0) {
             player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.success", removedCount, range)).color(NamedTextColor.GREEN));
@@ -86,7 +79,7 @@ public class RemoveCommand {
             return 0;
         }
 
-        int removedCount = removeLightBlocks(player, blocks);
+        int removedCount = removeLightBlocks(blocks);
 
         // Eliminar bloques del registro
         LightRegistry.removeBlocksByOperationId(operationId);
@@ -100,10 +93,10 @@ public class RemoveCommand {
         return 1;
     }
 
-    private int removeLightBlocks(Player player, List<Location> blocks) {
+    private int removeLightBlocks(List<Location> blocks) {
         int removedCount = 0;
         for (Location block : blocks) {
-            if (RemoveLightUtils.removeLightBlock(logger, player, block, coreProtectCompatibility)) {
+            if (RemoveLightUtils.removeLightBlock(block)) {
                 removedCount++;
             }
         }

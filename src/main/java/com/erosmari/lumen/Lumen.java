@@ -17,7 +17,6 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.Objects;
 import java.util.logging.Level;
 
 public class Lumen extends JavaPlugin implements Listener {
@@ -68,7 +67,7 @@ public class Lumen extends JavaPlugin implements Listener {
     }
 
     public CoreProtectCompatibility getCoreProtectCompatibility() {
-        return Objects.requireNonNullElseGet(coreProtectCompatibility, () -> new CoreProtectCompatibility(this));
+        return coreProtectCompatibility;
     }
 
     private void loadConfigurations() {
@@ -132,15 +131,14 @@ public class Lumen extends JavaPlugin implements Listener {
     }
 
     private void initializeCoreProtectIntegration() {
-        try {
+        if (coreProtectCompatibility == null) {
             coreProtectCompatibility = new CoreProtectCompatibility(this);
             if (coreProtectCompatibility.isEnabled()) {
                 getLogger().info(TranslationHandler.get("coreprotect.enabled"));
             } else {
-                getLogger().info(TranslationHandler.get("coreprotect.unavailable"));
+                getLogger().warning(TranslationHandler.get("coreprotect.unavailable"));
+                coreProtectCompatibility = null; // Limpiar si no está habilitado
             }
-        } catch (Exception e) {
-            getLogger().log(Level.SEVERE, TranslationHandler.get("coreprotect.init_error"), e);
         }
     }
 
@@ -167,6 +165,8 @@ public class Lumen extends JavaPlugin implements Listener {
     @EventHandler
     public void onServerLoad(ServerLoadEvent event) {
         getLogger().info(TranslationHandler.get("server.load_complete"));
+
+        // Inicializar CoreProtect durante ServerLoadEvent
         initializeCoreProtectIntegration();
     }
 }

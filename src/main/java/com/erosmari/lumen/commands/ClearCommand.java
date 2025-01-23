@@ -1,6 +1,5 @@
 package com.erosmari.lumen.commands;
 
-import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.utils.RemoveLightUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
@@ -16,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ClearCommand {
@@ -24,12 +22,7 @@ public class ClearCommand {
     private static final Map<UUID, Long> confirmationRequests = new HashMap<>();
     private static final long CONFIRMATION_TIMEOUT = 30_000; // 30 segundos
 
-    private final CoreProtectCompatibility coreProtectCompatibility;
-    private final Logger logger;
-
-    public ClearCommand(CoreProtectCompatibility coreProtectCompatibility, Logger logger) {
-        this.coreProtectCompatibility = coreProtectCompatibility;
-        this.logger = logger;
+    public ClearCommand() {
     }
 
     /**
@@ -97,7 +90,7 @@ public class ClearCommand {
 
         // Usar RemoveLightUtils para eliminar bloques y registrar en CoreProtect
         int removedCount = blocks.stream()
-                .mapToInt(location -> RemoveLightUtils.removeLightBlock(logger, player, location, coreProtectCompatibility) ? 1 : 0)
+                .mapToInt(location -> RemoveLightUtils.removeLightBlock(location) ? 1 : 0)
                 .sum();
 
         LightRegistry.clearAllBlocks();

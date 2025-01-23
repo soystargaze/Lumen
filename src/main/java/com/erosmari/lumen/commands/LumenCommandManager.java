@@ -18,10 +18,10 @@ public class LumenCommandManager {
 
     public LumenCommandManager(Lumen plugin) {
         this.plugin = plugin;
-        this.removeCommand = new RemoveCommand(plugin.getCoreProtectCompatibility(), org.bukkit.Bukkit.getLogger());
-        this.undoCommand = new UndoCommand(plugin.getCoreProtectCompatibility());
-        this.clearCommand = new ClearCommand(plugin.getCoreProtectCompatibility(), org.bukkit.Bukkit.getLogger());
-        this.redoCommand = new RedoCommand(plugin.getCoreProtectCompatibility());
+        this.removeCommand = new RemoveCommand();
+        this.undoCommand = new UndoCommand();
+        this.clearCommand = new ClearCommand();
+        this.redoCommand = new RedoCommand();
     }
 
     /**
