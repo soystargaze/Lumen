@@ -168,6 +168,8 @@ light_registry:
     all_blocks_removed: "Todos los bloques iluminados han sido eliminados del mundo y marcados como eliminados en la base de datos."
 
 coreprotect:
+  enabled: "CoreProtect habilitado y disponible."
+  unavailable: "CoreProtect no está disponible."
   disabled: "CoreProtect no está habilitado o no es compatible."
   api_null: "La API de CoreProtect es nula."
   placement:

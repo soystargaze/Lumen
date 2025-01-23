@@ -146,7 +146,7 @@ public class Lumen extends JavaPlugin implements Listener {
                 getLogger().info(TranslationHandler.get("coreprotect.enabled"));
             } else {
                 getLogger().warning(TranslationHandler.get("coreprotect.unavailable"));
-                coreProtectCompatibility = null; // Limpiar si no está habilitado
+                coreProtectCompatibility = null;
             }
         }
     }
@@ -173,9 +173,6 @@ public class Lumen extends JavaPlugin implements Listener {
 
     @EventHandler
     public void onServerLoad(ServerLoadEvent event) {
-        getLogger().info(TranslationHandler.get("server.load_complete"));
-
-        // Inicializar CoreProtect durante ServerLoadEvent
         initializeCoreProtectIntegration();
     }
 }
