@@ -1,5 +1,6 @@
 package com.erosmari.lumen.connections;
 
+import com.erosmari.lumen.utils.TranslationHandler;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
@@ -21,13 +22,13 @@ public class CoreProtectCompatibility {
         if (coreProtect != null && coreProtect.isEnabled()) {
             coreProtectAPI = coreProtect.getAPI();
             if (coreProtectAPI != null && coreProtectAPI.isEnabled()) {
-                plugin.getLogger().info("CoreProtect detectado e integrado correctamente.");
+                plugin.getLogger().info(TranslationHandler.get("coreprotect.integration.success"));
             } else {
                 coreProtectAPI = null;
-                plugin.getLogger().warning("La API de CoreProtect está deshabilitada. La integración no estará disponible.");
+                plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.api_disabled"));
             }
         } else {
-            plugin.getLogger().warning("CoreProtect no encontrado o está deshabilitado. La integración no estará disponible.");
+            plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.not_found"));
         }
     }
 

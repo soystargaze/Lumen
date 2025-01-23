@@ -178,3 +178,7 @@ coreprotect:
     error: "Error al registrar la eliminación de luz en {0}: {1}"
     success: "Se registraron {0} bloques eliminados en CoreProtect por {1}."
     none: "No se pudo registrar ninguna eliminación de luz para {0}."
+  integration:
+    success: "CoreProtect detectado e integrado correctamente."
+    api_disabled: "La API de CoreProtect está deshabilitada. La integración no estará disponible."
+    not_found: "CoreProtect no encontrado o está deshabilitado. La integración no estará disponible."
