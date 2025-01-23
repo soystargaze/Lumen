@@ -74,15 +74,11 @@ public class Lumen extends JavaPlugin implements Listener {
     }
 
     private void loadConfigurations() {
-        // Ejecutar carga de configuraciones asíncronamente
         CompletableFuture.runAsync(() -> {
             ConfigHandler.setup(this);
             setupTranslations();
             TranslationHandler.loadTranslations(this, ConfigHandler.getLanguage());
-        }, AsyncExecutor.getExecutor()).thenRun(() -> getLogger().info("Configuraciones cargadas correctamente.")).exceptionally(ex -> {
-            getLogger().severe("Error al cargar las configuraciones: " + ex.getMessage());
-            return null;
-        });
+        }, AsyncExecutor.getExecutor()).exceptionally(ex -> null);
     }
 
     private void setupTranslations() {
