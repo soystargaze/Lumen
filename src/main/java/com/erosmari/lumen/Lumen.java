@@ -46,7 +46,7 @@ public class Lumen extends JavaPlugin implements Listener {
             registerComponents();
             registerServerLoadListener();
 
-            ConsoleUtils.displaySuccessMessage(this, coreProtectCompatibility);
+            ConsoleUtils.displaySuccessMessage(this);
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("plugin.enable_error"), e);
             getServer().getPluginManager().disablePlugin(this);
@@ -138,6 +138,12 @@ public class Lumen extends JavaPlugin implements Listener {
     private void initializeCoreProtectIntegration() {
         if (coreProtectCompatibility == null) {
             coreProtectCompatibility = new CoreProtectCompatibility(this);
+            if (coreProtectCompatibility.isEnabled()) {
+                getLogger().info(TranslationHandler.get("coreprotect.enabled"));
+            } else {
+                getLogger().warning(TranslationHandler.get("coreprotect.unavailable"));
+                coreProtectCompatibility = null;
+            }
         }
     }
 
