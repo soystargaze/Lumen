@@ -1,6 +1,7 @@
 package com.erosmari.lumen.utils;
 
 import com.erosmari.lumen.config.ConfigHandler;
+import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import static com.erosmari.lumen.utils.TranslationHandler.loadedKeys;
@@ -30,7 +31,7 @@ public class ConsoleUtils {
      *
      * @param plugin El plugin que ejecuta el mensaje.
      * */
-    public static void displaySuccessMessage(JavaPlugin plugin) {
+    public static void displaySuccessMessage(JavaPlugin plugin, CoreProtectCompatibility coreProtectCompatibility) {
 
         plugin.getLogger().info("--------------------------------------------");
         plugin.getLogger().info(TranslationHandler.get("plugin.enabled"));
@@ -40,6 +41,11 @@ public class ConsoleUtils {
         plugin.getLogger().info(TranslationHandler.get("mobs.protected_areas_loaded"));
         plugin.getLogger().info(TranslationHandler.get("command.registered"));
         plugin.getLogger().info(TranslationHandler.get("events.registered"));
+        if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
+            plugin.getLogger().info(TranslationHandler.get("coreprotect.enabled"));
+        } else {
+            plugin.getLogger().warning(TranslationHandler.get("coreprotect.unavailable"));
+        }
         plugin.getLogger().info("--------------------------------------------");
     }
 }
