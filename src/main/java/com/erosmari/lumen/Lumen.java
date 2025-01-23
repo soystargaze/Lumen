@@ -9,6 +9,7 @@ import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.listeners.MobListener;
 import com.erosmari.lumen.listeners.TorchListener;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
+import com.erosmari.lumen.utils.AsyncExecutor;
 import com.erosmari.lumen.utils.ConsoleUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.event.EventHandler;
@@ -17,6 +18,7 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 public class Lumen extends JavaPlugin implements Listener {
@@ -42,7 +44,7 @@ public class Lumen extends JavaPlugin implements Listener {
             initializeDatabase();
             initializeSystems();
             registerComponents();
-            registerServerLoadListener(); // Registra el listener para ServerLoadEvent
+            registerServerLoadListener();
 
             ConsoleUtils.displaySuccessMessage(this);
         } catch (Exception e) {
@@ -53,6 +55,7 @@ public class Lumen extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
+        AsyncExecutor.shutdown(); // Apagar el ExecutorService centralizado
         DatabaseHandler.close();
         getLogger().info(TranslationHandler.get("plugin.disabled"));
         instance = null;
@@ -71,9 +74,15 @@ public class Lumen extends JavaPlugin implements Listener {
     }
 
     private void loadConfigurations() {
-        ConfigHandler.setup(this);
-        setupTranslations();
-        TranslationHandler.loadTranslations(this, ConfigHandler.getLanguage());
+        // Ejecutar carga de configuraciones asíncronamente
+        CompletableFuture.runAsync(() -> {
+            ConfigHandler.setup(this);
+            setupTranslations();
+            TranslationHandler.loadTranslations(this, ConfigHandler.getLanguage());
+        }, AsyncExecutor.getExecutor()).thenRun(() -> getLogger().info("Configuraciones cargadas correctamente.")).exceptionally(ex -> {
+            getLogger().severe("Error al cargar las configuraciones: " + ex.getMessage());
+            return null;
+        });
     }
 
     private void setupTranslations() {

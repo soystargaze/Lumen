@@ -18,3 +18,14 @@ settings:
   # Lumen Mob Torch settings
   mob_torch_radius: 35 # Radius of the mob torch
   mob_torch_search_range: 100 # Range of the mob torch search
+
+# Configuración de BossBar y ActionBar
+display:
+  bossbar:
+    enabled: true
+    message: "Progreso: {progress}% completado"
+    color: "GREEN"
+    style: "SOLID"
+  actionbar:
+    enabled: true
+    message: "Progreso: {progress}% completado"

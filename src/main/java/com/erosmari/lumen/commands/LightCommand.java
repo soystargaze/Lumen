@@ -18,7 +18,7 @@ public class LightCommand {
     public static LiteralArgumentBuilder<CommandSourceStack> register() {
         return Commands.literal("light")
                 .then(
-                        Commands.argument("area_blocks", IntegerArgumentType.integer(1, 100)) // Tamaño del área en bloques
+                        Commands.argument("area_blocks", IntegerArgumentType.integer(1, 150)) // Tamaño del área en bloques
                                 .then(
                                         Commands.argument("light_level", IntegerArgumentType.integer(0, 15)) // Nivel de luz
                                                 .then(

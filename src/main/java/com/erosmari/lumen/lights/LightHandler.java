@@ -2,10 +2,12 @@ package com.erosmari.lumen.lights;
 
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
-import com.erosmari.lumen.connections.CoreProtectCompatibility; // Importar integración con CoreProtect
+import com.erosmari.lumen.connections.CoreProtectCompatibility; // Integración con CoreProtect
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.tasks.TaskManager;
+import com.erosmari.lumen.utils.AsyncExecutor; // Clase para manejar tareas asíncronas
 import com.erosmari.lumen.utils.CoreProtectUtils;
+import com.erosmari.lumen.utils.DisplayUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
 
 public class LightHandler {
 
@@ -28,7 +31,7 @@ public class LightHandler {
 
     public LightHandler(Lumen plugin) {
         this.plugin = plugin;
-        this.coreProtectCompatibility = plugin.getCoreProtectCompatibility(); // Obtener integración de CoreProtect
+        this.coreProtectCompatibility = plugin.getCoreProtectCompatibility(); // Integración de CoreProtect
     }
 
     public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight, String operationId) {
@@ -40,10 +43,19 @@ public class LightHandler {
             return;
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            List<Location> blocksToLight = calculateLightPositions(center, areaBlocks, lightLevel, includeSkylight);
-            processBlocksAsync(player, blocksToLight, lightLevel, operationId);
-        });
+        // Usamos CompletableFuture para calcular posiciones asíncronamente
+        CompletableFuture.supplyAsync(() -> calculateLightPositions(center, areaBlocks, lightLevel, includeSkylight), AsyncExecutor.getExecutor())
+                .thenAccept(blocksToLight -> {
+                    if (blocksToLight.isEmpty()) {
+                        player.sendMessage(TranslationHandler.get("light.error.no_blocks_found"));
+                        return;
+                    }
+                    processBlocksAsync(player, blocksToLight, lightLevel, operationId);
+                })
+                .exceptionally(ex -> {
+                    plugin.getLogger().severe("Error al calcular posiciones: " + ex.getMessage());
+                    return null;
+                });
     }
 
     private List<Location> calculateLightPositions(Location center, int areaBlocks, int lightLevel, boolean includeSkylight) {
@@ -77,7 +89,6 @@ public class LightHandler {
         Block block = location.getBlock();
 
         if (!block.getType().isAir()) {
-            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.not_air", location, block.getType()));
             return false;
         }
 
@@ -85,21 +96,16 @@ public class LightHandler {
                 + Math.abs(location.getBlockY() - center.getBlockY())
                 + Math.abs(location.getBlockZ() - center.getBlockZ());
         if (taxicabDistance > maxDistance) {
-            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.out_of_range", location, taxicabDistance));
             return false;
         }
 
         if (!isAdjacentToSolidBlock(location)) {
-            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.no_adjacent_blocks", location));
             return false;
         }
 
         if (includeSkylight) {
             int highestY = world.getHighestBlockYAt(location);
-            if (location.getBlockY() < highestY) {
-                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.not_sky_light", location));
-                return false;
-            }
+            return location.getBlockY() >= highestY;
         }
 
         return true;
@@ -128,32 +134,35 @@ public class LightHandler {
         int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
         Queue<Location> blockQueue = new LinkedList<>(blocks);
 
-        final BukkitTask[] taskHolder = new BukkitTask[1];
+        BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+            int processedCount = 0;
+            int totalBlocks = blocks.size();
+            int remainingBlocks = blockQueue.size();
 
-        taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-            try {
-                int processedCount = 0;
-
-                while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
-                    Location blockLocation = blockQueue.poll();
-                    if (blockLocation != null) {
-                        processSingleBlock(player, blockLocation, lightLevel, operationId);
-                        processedCount++;
-                    }
+            while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
+                Location blockLocation = blockQueue.poll();
+                if (blockLocation != null) {
+                    processSingleBlock(player, blockLocation, lightLevel, operationId);
+                    processedCount++;
                 }
+            }
 
-                if (blockQueue.isEmpty()) {
-                    player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
-                    plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
-                    taskHolder[0].cancel();
-                    TaskManager.cancelTask(player.getUniqueId());
-                }
-            } catch (Exception e) {
-                plugin.getLogger().severe("Error while processing blocks asynchronously: " + e.getMessage());
+            // Calcula el progreso
+            double progress = (totalBlocks - remainingBlocks) / (double) totalBlocks;
+
+            // Actualiza BossBar y ActionBar
+            DisplayUtil.showBossBar(player, progress);
+            DisplayUtil.showActionBar(player, progress);
+
+            if (blockQueue.isEmpty()) {
+                player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
+                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
+                DisplayUtil.hideBossBar(player); // Oculta el BossBar al terminar
+                TaskManager.cancelTask(player.getUniqueId());
             }
         }, 0L, 1L);
 
-        TaskManager.addTask(player.getUniqueId(), taskHolder[0]);
+        TaskManager.addTask(player.getUniqueId(), task);
     }
 
     private void processSingleBlock(Player player, Location blockLocation, int lightLevel, String operationId) {
