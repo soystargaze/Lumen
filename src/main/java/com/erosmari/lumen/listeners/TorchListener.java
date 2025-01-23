@@ -97,7 +97,7 @@ public class TorchListener implements Listener {
 
                         // Registrar en CoreProtect
                         if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
-                            coreProtectCompatibility.logLightRemoval(player, brokenBlock.getLocation());
+                            coreProtectCompatibility.logRemoval(player, brokenBlock.getLocation());
                         }
 
                         // Obtener el ítem original desde la instancia de lumenItems

@@ -13,8 +13,10 @@ import io.papermc.paper.command.brigadier.Commands;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -60,7 +62,7 @@ public class RemoveCommand {
             logger.warning("CoreProtect is not enabled or available. Could not log block removals.");
         }
 
-        int removedCount = removeLightBlocks(blocks, player, coreProtectCompatibility);
+        int removedCount = removeAndLogBlocks(blocks, player, coreProtectCompatibility);
 
         if (removedCount > 0) {
             player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.success", removedCount, range)).color(NamedTextColor.GREEN));
@@ -73,17 +75,27 @@ public class RemoveCommand {
         return 1;
     }
 
-    private int removeLightBlocks(List<Location> blocks, Player player, CoreProtectCompatibility coreProtectCompatibility) {
+    private int removeAndLogBlocks(List<Location> blocks, Player player, CoreProtectCompatibility coreProtectCompatibility) {
         int removedCount = 0;
+
+        // Lista para bloques registrados en CoreProtect
+        List<Location> registeredBlocks = new ArrayList<>();
+
         for (Location block : blocks) {
             if (RemoveLightUtils.removeLightBlock(block)) {
-                // Registrar la eliminación en CoreProtect si está disponible
-                if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
-                    CoreProtectUtils.logLightRemoval(logger, coreProtectCompatibility, player.getName(), block);
-                }
                 removedCount++;
+                registeredBlocks.add(block); // Agrega la ubicación a la lista
             }
         }
+
+        // Registrar en CoreProtect si hay bloques eliminados
+        if (!registeredBlocks.isEmpty() && coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
+            for (Location location : registeredBlocks) {
+                // Forzar el registro como Material.LIGHT
+                CoreProtectUtils.logRemoval(logger, coreProtectCompatibility, player.getName(), List.of(location), Material.LIGHT);
+            }
+        }
+
         return removedCount;
     }
 }

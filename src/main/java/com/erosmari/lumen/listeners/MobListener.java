@@ -95,7 +95,7 @@ public class MobListener implements Listener {
 
                     // Registrar en CoreProtect
                     if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
-                        coreProtectCompatibility.logLightRemoval(player, brokenLocation);
+                        coreProtectCompatibility.logRemoval(player, brokenLocation);
                     }
 
                     // Obtener el ítem original desde LumenItems
