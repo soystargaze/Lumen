@@ -90,7 +90,8 @@ public class RedoCommand {
                 DisplayUtil.hideBossBar(player);
                 task.cancel();
             } else if (blockQueue.isEmpty()) {
-                logger.info("Reintentando bloques fallidos...");
+                logger.info(TranslationHandler.getFormatted("command.redo.retrying_failed_blocks"));
+
                 blockQueue.addAll(failedQueue);
                 failedQueue.clear();
             }

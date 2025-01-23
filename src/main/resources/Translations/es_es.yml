@@ -48,14 +48,16 @@ command:
     light_level_error: "Error al configurar el nivel de luz para el bloque en {0}: {1}"
     cannot_set_light: "No se pudo establecer el bloque como LIGHT en la ubicación: {0}"
     restoration_completed: "§aRestauración completada para la operación: {0}."
+    retrying_failed_blocks: "Reintentando bloques fallidos..."
   remove:
     only_players: "§cSolo los jugadores pueden usar este comando."
     area:
-      success: "§aSe han eliminado {0} bloques de luz en un rango de {1} bloques."
-      no_blocks: "§eNo se encontraron bloques de luz en un rango de {0} bloques."
-    operation:
-      success: "§aSe han eliminado {0} bloques de luz para la operación: §b{1}."
-      no_blocks: "§eNo se encontraron bloques para la operación: §b{0}."
+      success: "Se eliminaron {0} bloques de luz en un radio de {1} bloques."
+      success_log: "El jugador {0} eliminó {1} bloques de luz en un radio de {2} bloques."
+      no_blocks: "No se encontraron bloques de luz para eliminar en un radio de {0} bloques."
+      no_blocks_log: "El jugador {0} intentó eliminar bloques en un radio de {1} bloques, pero no se encontraron bloques."
+    coreprotect_not_available: "CoreProtect no está habilitado o disponible. No se puede registrar la eliminación de bloques."
+    coreprotect_disabled_log: "CoreProtect no está habilitado o disponible. No se pudieron registrar las eliminaciones de bloques."
   light:
     invalid_level: "§cEl nivel de luz debe estar entre 0 y 15."
     success: "§aSe han colocado luces con nivel de luz {0}. ID de operación: {1}."

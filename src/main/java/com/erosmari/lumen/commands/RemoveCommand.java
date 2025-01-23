@@ -59,17 +59,17 @@ public class RemoveCommand {
 
         if (coreProtectCompatibility == null || !coreProtectCompatibility.isEnabled()) {
             player.sendMessage(Component.text(TranslationHandler.get("command.remove.coreprotect_not_available")).color(NamedTextColor.RED));
-            logger.warning("CoreProtect is not enabled or available. Could not log block removals.");
+            logger.warning(TranslationHandler.get("command.remove.coreprotect_disabled_log"));
         }
 
         int removedCount = removeAndLogBlocks(blocks, player, coreProtectCompatibility);
 
         if (removedCount > 0) {
             player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.success", removedCount, range)).color(NamedTextColor.GREEN));
-            logger.info(String.format("Player %s removed %d light blocks in a %d block radius.", player.getName(), removedCount, range));
+            logger.info(TranslationHandler.getFormatted("command.remove.area.success_log", player.getName(), removedCount, range));
         } else {
             player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.no_blocks", range)).color(NamedTextColor.RED));
-            logger.info(String.format("Player %s attempted to remove blocks in a %d block radius, but no blocks were found.", player.getName(), range));
+            logger.info(TranslationHandler.getFormatted("command.remove.area.no_blocks_log", player.getName(), range));
         }
 
         return 1;
@@ -78,20 +78,17 @@ public class RemoveCommand {
     private int removeAndLogBlocks(List<Location> blocks, Player player, CoreProtectCompatibility coreProtectCompatibility) {
         int removedCount = 0;
 
-        // Lista para bloques registrados en CoreProtect
         List<Location> registeredBlocks = new ArrayList<>();
 
         for (Location block : blocks) {
             if (RemoveLightUtils.removeLightBlock(block)) {
                 removedCount++;
-                registeredBlocks.add(block); // Agrega la ubicación a la lista
+                registeredBlocks.add(block);
             }
         }
 
-        // Registrar en CoreProtect si hay bloques eliminados
         if (!registeredBlocks.isEmpty() && coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
             for (Location location : registeredBlocks) {
-                // Forzar el registro como Material.LIGHT
                 CoreProtectUtils.logRemoval(logger, coreProtectCompatibility, player.getName(), List.of(location), Material.LIGHT);
             }
         }
