@@ -2,7 +2,7 @@ package com.erosmari.lumen;
 
 import com.erosmari.lumen.commands.LumenCommandManager;
 import com.erosmari.lumen.config.ConfigHandler;
-import com.erosmari.lumen.connections.CoreProtectCompatibility; // Importa la clase de integración
+import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.DatabaseHandler;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
@@ -11,22 +11,25 @@ import com.erosmari.lumen.listeners.TorchListener;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
 import com.erosmari.lumen.utils.ConsoleUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.Objects;
 import java.util.logging.Level;
 
-public class Lumen extends JavaPlugin {
+public class Lumen extends JavaPlugin implements Listener {
 
-    private static Lumen instance; // Instancia estática para obtener el plugin fácilmente
+    private static Lumen instance;
     private LumenCommandManager commandManager;
-    private LumenItems lumenItems; // Nueva instancia de LumenItems
-    private CoreProtectCompatibility coreProtectCompatibility; // Instancia de integración con CoreProtect
+    private LumenItems lumenItems;
+    private CoreProtectCompatibility coreProtectCompatibility;
 
     @Override
     public void onEnable() {
-        instance = this; // Inicializa la instancia estática
+        instance = this;
 
         ConsoleUtils.displayAsciiArt(this);
         getLogger().info("--------------------------------------------");
@@ -40,7 +43,7 @@ public class Lumen extends JavaPlugin {
             initializeDatabase();
             initializeSystems();
             registerComponents();
-            initializeCoreProtectIntegration(); // Inicializa CoreProtect
+            registerServerLoadListener(); // Registra el listener para ServerLoadEvent
 
             ConsoleUtils.displaySuccessMessage(this);
         } catch (Exception e) {
@@ -132,12 +135,12 @@ public class Lumen extends JavaPlugin {
         try {
             coreProtectCompatibility = new CoreProtectCompatibility(this);
             if (coreProtectCompatibility.isEnabled()) {
-                getLogger().info("Integración con CoreProtect habilitada correctamente.");
+                getLogger().info(TranslationHandler.get("coreprotect.enabled"));
             } else {
-                getLogger().info("CoreProtect no está disponible. La integración será omitida.");
+                getLogger().info(TranslationHandler.get("coreprotect.unavailable"));
             }
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, "Error al inicializar la integración con CoreProtect.", e);
+            getLogger().log(Level.SEVERE, TranslationHandler.get("coreprotect.init_error"), e);
         }
     }
 
@@ -155,5 +158,15 @@ public class Lumen extends JavaPlugin {
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("events.register_error"), e);
         }
+    }
+
+    private void registerServerLoadListener() {
+        getServer().getPluginManager().registerEvents(this, this);
+    }
+
+    @EventHandler
+    public void onServerLoad(ServerLoadEvent event) {
+        getLogger().info(TranslationHandler.get("server.load_complete"));
+        initializeCoreProtectIntegration();
     }
 }
