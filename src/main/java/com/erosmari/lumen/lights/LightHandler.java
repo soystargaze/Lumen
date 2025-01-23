@@ -104,9 +104,7 @@ public class LightHandler {
         }
 
         if (includeSkylight) {
-            int highestY = world.getHighestBlockYAt(location);
-            return location.getBlockY() >= highestY;
-        }
+            return block.getLightFromSky() > 0 && world.getHighestBlockYAt(location) <= location.getY();        }
 
         return true;
     }
