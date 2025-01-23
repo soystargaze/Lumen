@@ -24,7 +24,7 @@ display:
   bossbar:
     enabled: true
     message: "Progreso: {progress}% completado"
-    color: "GREEN"
+    color: "YELLOW"
     style: "SOLID"
   actionbar:
     enabled: true

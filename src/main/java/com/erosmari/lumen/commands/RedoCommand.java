@@ -2,6 +2,7 @@ package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.utils.DisplayUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -79,24 +80,51 @@ public class RedoCommand {
 
         // Encapsular blockQueue en un wrapper mutable
         final Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
+        final Queue<Map.Entry<Location, Integer>> failedQueue = new LinkedList<>();
         final AtomicInteger processedCount = new AtomicInteger(0); // Contador mutable
         final int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
+        final int totalBlocks = blockQueue.size();
+
+        // Mostrar BossBar al jugador
+        DisplayUtil.showBossBar(player, 0.0);
 
         Bukkit.getScheduler().runTaskTimer(
                 Objects.requireNonNull(Bukkit.getPluginManager().getPlugin("Lumen")),
                 task -> {
+                    processedCount.set(0);
                     while (!blockQueue.isEmpty() && processedCount.get() < maxBlocksPerTick) {
                         Map.Entry<Location, Integer> entry = blockQueue.poll();
                         if (entry != null) {
-                            processBlock(entry.getKey(), entry.getValue(), finalOperationId);
+                            boolean success = processBlock(entry.getKey(), entry.getValue(), finalOperationId);
+                            if (!success) {
+                                failedQueue.add(entry); // Agrega bloques fallidos a la cola
+                            }
                             processedCount.incrementAndGet();
+
+                            // Calcular progreso
+                            int remainingBlocks = blockQueue.size() + failedQueue.size();
+                            double progress = 1.0 - (double) remainingBlocks / totalBlocks;
+
+                            // Actualizar BossBar y ActionBar
+                            DisplayUtil.showBossBar(player, progress);
+                            DisplayUtil.showActionBar(player, progress);
                         }
                     }
 
+                    // Si blockQueue está vacía, verificar la cola de fallos
                     if (blockQueue.isEmpty()) {
-                        logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", finalOperationId));
-                        LightRegistry.restoreSoftDeletedBlocksByOperationId(finalOperationId);
-                        task.cancel();
+                        if (!failedQueue.isEmpty()) {
+                            logger.info("Reintentando bloques fallidos...");
+                            blockQueue.addAll(failedQueue);
+                            failedQueue.clear();
+                        } else {
+                            logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", finalOperationId));
+                            LightRegistry.restoreSoftDeletedBlocksByOperationId(finalOperationId);
+                            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.restoration_completed", finalOperationId))
+                                    .color(NamedTextColor.GREEN));
+                            DisplayUtil.hideBossBar(player); // Ocultar BossBar
+                            task.cancel();
+                        }
                     }
                 },
                 0L, 1L
@@ -113,8 +141,9 @@ public class RedoCommand {
      * @param blockLocation Ubicación del bloque.
      * @param lightLevel    Nivel de luz.
      * @param operationId   ID de la operación.
+     * @return true si el bloque fue procesado exitosamente, false en caso contrario.
      */
-    private void processBlock(Location blockLocation, int lightLevel, String operationId) {
+    private boolean processBlock(Location blockLocation, int lightLevel, String operationId) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);
 
@@ -125,11 +154,14 @@ public class RedoCommand {
                 block.setBlockData(lightData, false);
 
                 LightRegistry.addBlock(blockLocation, lightLevel, operationId);
+                return true;
             } catch (ClassCastException e) {
                 logger.warning(TranslationHandler.getFormatted("command.redo.light_level_error", blockLocation, e.getMessage()));
+                return false;
             }
         } else {
             logger.warning(TranslationHandler.getFormatted("command.redo.cannot_set_light", blockLocation));
+            return false;
         }
     }
 }
