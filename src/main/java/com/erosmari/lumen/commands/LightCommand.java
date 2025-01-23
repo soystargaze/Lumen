@@ -17,6 +17,7 @@ public class LightCommand {
 
     public static LiteralArgumentBuilder<CommandSourceStack> register() {
         return Commands.literal("light")
+                .requires(source -> source.getSender().hasPermission("lumen.light"))
                 .then(
                         Commands.argument("area_blocks", IntegerArgumentType.integer(1, 150)) // Tamaño del área en bloques
                                 .then(
@@ -25,21 +26,21 @@ public class LightCommand {
                                                         Commands.argument("include_skylight", BoolArgumentType.bool()) // Luz natural opcional
                                                                 .executes(ctx -> handleLightCommand(
                                                                         ctx.getSource(),
-                                                                        ctx.getArgument("area_blocks", Integer.class),
+                                                                        ctx.getArgument("range", Integer.class),
                                                                         ctx.getArgument("light_level", Integer.class),
                                                                         ctx.getArgument("include_skylight", Boolean.class)
                                                                 ))
                                                 )
                                                 .executes(ctx -> handleLightCommand(
                                                         ctx.getSource(),
-                                                        ctx.getArgument("area_blocks", Integer.class),
+                                                        ctx.getArgument("range", Integer.class),
                                                         ctx.getArgument("light_level", Integer.class),
                                                         false // Valor predeterminado
                                                 ))
                                 )
                 )
                 .executes(ctx -> {
-                    ctx.getSource().getSender().sendMessage(Component.text("Uso: /lumen light <area_blocks> <light_level> [include_skylight]")
+                    ctx.getSource().getSender().sendMessage(Component.text("Uso: /lumen light <range> <light_level> [include_skylight]")
                             .color(NamedTextColor.RED));
                     return 0;
                 });
@@ -48,6 +49,12 @@ public class LightCommand {
     private static int handleLightCommand(CommandSourceStack source, int areaBlocks, int lightLevel, boolean includeSkylight) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
+            return 0;
+        }
+
+        // Verificar si el jugador tiene permiso
+        if (!player.hasPermission("lumen.light")) {
+            player.sendMessage(Component.text(TranslationHandler.get("command.no_permission")).color(NamedTextColor.RED));
             return 0;
         }
 

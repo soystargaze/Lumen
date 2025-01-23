@@ -66,10 +66,13 @@ public class LightHandler {
             return positions;
         }
 
+        int minY = Math.max(center.getBlockY() - areaBlocks, world.getMinHeight());
+        int maxY = Math.min(center.getBlockY() + areaBlocks, world.getMaxHeight());
+
         for (int x = -areaBlocks; x <= areaBlocks; x++) {
-            for (int y = -areaBlocks; y <= areaBlocks; y++) {
+            for (int y = minY; y <= maxY; y++) {
                 for (int z = -areaBlocks; z <= areaBlocks; z++) {
-                    Location location = center.clone().add(x, y, z);
+                    Location location = new Location(world, center.getX() + x, y, center.getZ() + z);
 
                     if (isValidLightPosition(location, center, lightLevel, includeSkylight)) {
                         positions.add(location);
@@ -92,10 +95,9 @@ public class LightHandler {
             return false;
         }
 
-        double taxicabDistance = Math.abs(location.getBlockX() - center.getBlockX())
-                + Math.abs(location.getBlockY() - center.getBlockY())
-                + Math.abs(location.getBlockZ() - center.getBlockZ());
-        if (taxicabDistance > maxDistance) {
+        if (Math.abs(location.getBlockX() - center.getBlockX()) > maxDistance
+                || Math.abs(location.getBlockY() - center.getBlockY()) > maxDistance
+                || Math.abs(location.getBlockZ() - center.getBlockZ()) > maxDistance) {
             return false;
         }
 
@@ -156,7 +158,7 @@ public class LightHandler {
             if (blockQueue.isEmpty()) {
                 player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
                 plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
-                DisplayUtil.hideBossBar(player); // Oculta el BossBar al terminar
+                DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
             }
         }, 0L, 1L);
