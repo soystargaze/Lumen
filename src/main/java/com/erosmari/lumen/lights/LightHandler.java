@@ -4,6 +4,7 @@ import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.connections.CoreProtectCompatibility; // Integración con CoreProtect
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.lights.integrations.FAWEHandler;
 import com.erosmari.lumen.tasks.TaskManager;
 import com.erosmari.lumen.utils.AsyncExecutor; // Clase para manejar tareas asíncronas
 import com.erosmari.lumen.utils.CoreProtectUtils;
@@ -138,6 +139,22 @@ public class LightHandler {
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, String operationId) {
         int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
         Queue<Location> blockQueue = new LinkedList<>(blocks);
+
+        // Si FAWE está disponible, manejar bloques en masa
+        if (FAWEHandler.isFAWEAvailable()) {
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+                try {
+                    FAWEHandler.placeLightBlocks(blocks, lightLevel);
+                    blocks.forEach(location -> LightRegistry.addBlock(location, lightLevel, operationId));
+                    plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
+                    player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
+                } catch (Exception e) {
+                    plugin.getLogger().severe(TranslationHandler.getFormatted("light.error.fawe_placement", e.getMessage()));
+                    player.sendMessage(TranslationHandler.get("light.error.fawe_failed"));
+                }
+            });
+            return;
+        }
 
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             int processedCount = 0;
