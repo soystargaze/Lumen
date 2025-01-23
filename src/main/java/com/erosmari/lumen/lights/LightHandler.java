@@ -181,8 +181,7 @@ public class LightHandler {
                 block.setBlockData(lightData, false);
 
                 // Registro en CoreProtect utilizando el utilitario
-                CoreProtectUtils.logLightPlacement(plugin.getLogger(), coreProtectCompatibility, player.getName(), blockLocation);
-
+                CoreProtectUtils.logLightPlacement(plugin.getLogger(), coreProtectCompatibility, player.getName(), List.of(blockLocation));
                 if (lightLevel >= 0 && lightLevel <= 15) {
                     LightRegistry.addBlock(blockLocation, lightLevel, operationId);
                 } else {

@@ -111,7 +111,7 @@ public class RedoCommand {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                CoreProtectUtils.logLightPlacement(logger, plugin.getCoreProtectCompatibility(), player.getName(), blockLocation);
+                CoreProtectUtils.logLightPlacement(logger, plugin.getCoreProtectCompatibility(), player.getName(), List.of(blockLocation));
                 LightRegistry.addBlock(blockLocation, lightLevel, operationId);
                 return true;
             } catch (ClassCastException e) {

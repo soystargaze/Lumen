@@ -165,3 +165,14 @@ light_registry:
     blocks_removed: "Bloques eliminados del mundo para la operación {0}."
     all_blocks_removed: "Todos los bloques iluminados han sido eliminados del mundo y marcados como eliminados en la base de datos."
 
+coreprotect:
+  disabled: "CoreProtect no está habilitado o no es compatible."
+  api_null: "La API de CoreProtect es nula."
+  placement:
+    error: "Error al registrar la colocación de luz en {0}: {1}"
+    success: "Se registraron {0} bloques colocados en CoreProtect por {1}."
+    none: "No se pudo registrar ninguna colocación de luz para {0}."
+  removal:
+    error: "Error al registrar la eliminación de luz en {0}: {1}"
+    success: "Se registraron {0} bloques eliminados en CoreProtect por {1}."
+    none: "No se pudo registrar ninguna eliminación de luz para {0}."
