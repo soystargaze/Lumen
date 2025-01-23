@@ -19,7 +19,7 @@ public class LightCommand {
         return Commands.literal("light")
                 .requires(source -> source.getSender().hasPermission("lumen.light"))
                 .then(
-                        Commands.argument("area_blocks", IntegerArgumentType.integer(1, 150)) // Tamaño del área en bloques
+                        Commands.argument("range", IntegerArgumentType.integer(1, 150)) // Tamaño del área en bloques
                                 .then(
                                         Commands.argument("light_level", IntegerArgumentType.integer(0, 15)) // Nivel de luz
                                                 .then(

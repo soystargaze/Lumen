@@ -44,7 +44,7 @@ public class LightHandler {
         }
 
         // Usamos CompletableFuture para calcular posiciones asíncronamente
-        CompletableFuture.supplyAsync(() -> calculateLightPositions(center, areaBlocks, lightLevel, includeSkylight), AsyncExecutor.getExecutor())
+        CompletableFuture.supplyAsync(() -> calculateLightPositions(center, areaBlocks, includeSkylight), AsyncExecutor.getExecutor())
                 .thenAccept(blocksToLight -> {
                     if (blocksToLight.isEmpty()) {
                         player.sendMessage(TranslationHandler.get("light.error.no_blocks_found"));
@@ -58,7 +58,7 @@ public class LightHandler {
                 });
     }
 
-    private List<Location> calculateLightPositions(Location center, int areaBlocks, int lightLevel, boolean includeSkylight) {
+    private List<Location> calculateLightPositions(Location center, int areaBlocks, boolean includeSkylight) {
         List<Location> positions = new ArrayList<>();
         World world = center.getWorld();
         if (world == null) {
@@ -66,15 +66,15 @@ public class LightHandler {
             return positions;
         }
 
-        int minY = Math.max(center.getBlockY() - areaBlocks, world.getMinHeight());
-        int maxY = Math.min(center.getBlockY() + areaBlocks, world.getMaxHeight());
-
         for (int x = -areaBlocks; x <= areaBlocks; x++) {
-            for (int y = minY; y <= maxY; y++) {
+            for (int y = Math.max(center.getBlockY() - areaBlocks, world.getMinHeight());
+                 y <= Math.min(center.getBlockY() + areaBlocks, world.getMaxHeight());
+                 y++) {
                 for (int z = -areaBlocks; z <= areaBlocks; z++) {
-                    Location location = new Location(world, center.getX() + x, y, center.getZ() + z);
+                    Location location = new Location(world, center.getBlockX() + x, y, center.getBlockZ() + z);
 
-                    if (isValidLightPosition(location, center, lightLevel, includeSkylight)) {
+                    // Verificar si la posición es válida
+                    if (isValidLightPosition(location, center, areaBlocks, includeSkylight)) {
                         positions.add(location);
                     }
                 }
@@ -95,9 +95,13 @@ public class LightHandler {
             return false;
         }
 
-        if (Math.abs(location.getBlockX() - center.getBlockX()) > maxDistance
-                || Math.abs(location.getBlockY() - center.getBlockY()) > maxDistance
-                || Math.abs(location.getBlockZ() - center.getBlockZ()) > maxDistance) {
+        // Respetar el rango cúbico definido por "maxDistance"
+        if (location.getBlockX() < center.getBlockX() - maxDistance
+                || location.getBlockX() > center.getBlockX() + maxDistance
+                || location.getBlockY() < center.getBlockY() - maxDistance
+                || location.getBlockY() > center.getBlockY() + maxDistance
+                || location.getBlockZ() < center.getBlockZ() - maxDistance
+                || location.getBlockZ() > center.getBlockZ() + maxDistance) {
             return false;
         }
 
