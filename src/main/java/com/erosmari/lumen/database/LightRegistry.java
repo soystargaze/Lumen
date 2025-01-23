@@ -226,6 +226,27 @@ public class LightRegistry {
         return blocks;
     }
 
+    public static List<String> getLastOperations(int count) {
+        String query = "SELECT DISTINCT operation_id FROM illuminated_blocks WHERE is_deleted = 0 ORDER BY id DESC LIMIT ?;";
+        List<String> operations = new ArrayList<>();
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)) {
+
+            statement.setInt(1, count);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    operations.add(resultSet.getString("operation_id"));
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, TranslationHandler.getFormatted("light_registry.error.fetch_last_operations", count), e);
+        }
+
+        return operations;
+    }
+
     @SuppressWarnings("SqlWithoutWhere")
     public static void clearAllBlocks() {
         String querySelect = "SELECT world, x, y, z FROM illuminated_blocks WHERE is_deleted = 0;";
