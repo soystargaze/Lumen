@@ -1,6 +1,5 @@
 package com.erosmari.lumen.listeners;
 
-import com.erosmari.lumen.connections.CoreProtectCompatibility; // Importar la integración
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
@@ -26,14 +25,12 @@ public class TorchListener implements Listener {
     private final Plugin plugin;
     private final ItemLightsHandler lightsHandler;
     private final LumenItems lumenItems;
-    private final CoreProtectCompatibility coreProtectCompatibility; // Referencia a CoreProtect
     private final NamespacedKey lumenIdKey;
 
-    public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler, LumenItems lumenItems, CoreProtectCompatibility coreProtectCompatibility) {
+    public TorchListener(Plugin plugin, ItemLightsHandler lightsHandler, LumenItems lumenItems) {
         this.plugin = plugin;
         this.lightsHandler = lightsHandler;
         this.lumenItems = lumenItems;
-        this.coreProtectCompatibility = coreProtectCompatibility; // Inicialización
         this.lumenIdKey = new NamespacedKey(plugin, "lumen_id");
     }
 
@@ -65,11 +62,6 @@ public class TorchListener implements Listener {
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "torch");
 
-                    // Registrar en CoreProtect
-                    if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
-                        coreProtectCompatibility.logLightPlacement(player, placedLocation);
-                    }
-
                     plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_placed", placedLocation, operationId));
                 }
             }
@@ -94,11 +86,6 @@ public class TorchListener implements Listener {
                         // Cancela operaciones de luz asociadas con la antorcha
                         lightsHandler.cancelOperation(player, operationId);
                         lightsHandler.removeLights(player, operationId);
-
-                        // Registrar en CoreProtect
-                        if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
-                            coreProtectCompatibility.logRemoval(player, brokenBlock.getLocation());
-                        }
 
                         // Obtener el ítem original desde la instancia de lumenItems
                         ItemStack customItem = lumenItems.getLumenItem(id);

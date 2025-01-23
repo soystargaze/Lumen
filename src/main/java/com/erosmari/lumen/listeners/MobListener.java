@@ -1,6 +1,5 @@
 package com.erosmari.lumen.listeners;
 
-import com.erosmari.lumen.connections.CoreProtectCompatibility; // Importar la integración
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
@@ -26,14 +25,12 @@ public class MobListener implements Listener {
     private final Plugin plugin;
     private final ItemMobsHandler mobsHandler;
     private final LumenItems lumenItems;
-    private final CoreProtectCompatibility coreProtectCompatibility; // Referencia a CoreProtect
     private final NamespacedKey lumenIdKey;
 
-    public MobListener(Plugin plugin, ItemMobsHandler mobsHandler, LumenItems lumenItems, CoreProtectCompatibility coreProtectCompatibility) {
+    public MobListener(Plugin plugin, ItemMobsHandler mobsHandler, LumenItems lumenItems) {
         this.plugin = plugin;
         this.mobsHandler = mobsHandler;
         this.lumenItems = lumenItems;
-        this.coreProtectCompatibility = coreProtectCompatibility; // Inicializar CoreProtect
         this.lumenIdKey = new NamespacedKey(plugin, "lumen_id");
     }
 
@@ -64,11 +61,6 @@ public class MobListener implements Listener {
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "mob_torch");
 
-                    // Registrar en CoreProtect
-                    if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
-                        coreProtectCompatibility.logLightPlacement(player, placedLocation);
-                    }
-
                     plugin.getLogger().info(TranslationHandler.getFormatted(
                             "torch.mob_torch_placed", placedLocation));
                 }
@@ -88,15 +80,9 @@ public class MobListener implements Listener {
 
                 if ("anti_mob".equals(id)) {
                     Location brokenLocation = brokenBlock.getLocation();
-                    Player player = event.getPlayer();
 
                     // Elimina el área protegida
                     mobsHandler.unregisterAntiMobArea(brokenLocation);
-
-                    // Registrar en CoreProtect
-                    if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
-                        coreProtectCompatibility.logRemoval(player, brokenLocation);
-                    }
 
                     // Obtener el ítem original desde LumenItems
                     ItemStack customItem = lumenItems.getLumenItem(id);

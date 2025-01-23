@@ -160,8 +160,8 @@ public class Lumen extends JavaPlugin implements Listener {
             ItemLightsHandler lightsHandler = new ItemLightsHandler(this);
             ItemMobsHandler mobsHandler = new ItemMobsHandler(this);
 
-            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems, coreProtectCompatibility), this);
-            getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler, lumenItems, coreProtectCompatibility), this);
+            getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems), this);
+            getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler, lumenItems), this);
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, TranslationHandler.get("events.register_error"), e);
         }
