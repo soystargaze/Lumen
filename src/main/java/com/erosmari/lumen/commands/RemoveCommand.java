@@ -21,11 +21,11 @@ import java.util.logging.Logger;
 @SuppressWarnings("UnstableApiUsage")
 public class RemoveCommand {
 
-    private final CoreProtectCompatibility coreProtectCompatibility;
+    private final Lumen plugin;
     private final Logger logger;
 
-    public RemoveCommand(Lumen plugin, CoreProtectCompatibility coreProtectCompatibility) {
-        this.coreProtectCompatibility = coreProtectCompatibility;
+    public RemoveCommand(Lumen plugin) {
+        this.plugin = plugin;
         this.logger = plugin.getLogger();
     }
 
@@ -53,13 +53,14 @@ public class RemoveCommand {
         Location playerLocation = player.getLocation();
         List<Location> blocks = LightRegistry.getBlocksInRange(playerLocation, range);
 
-        if (!coreProtectCompatibility.isEnabled()) {
+        CoreProtectCompatibility coreProtectCompatibility = plugin.getCoreProtectCompatibility();
+
+        if (coreProtectCompatibility == null || !coreProtectCompatibility.isEnabled()) {
             player.sendMessage(Component.text(TranslationHandler.get("command.remove.coreprotect_not_available")).color(NamedTextColor.RED));
-            logger.warning("CoreProtect is not enabled. Could not log block removals.");
-            return 0;
+            logger.warning("CoreProtect is not enabled or available. Could not log block removals.");
         }
 
-        int removedCount = removeLightBlocks(blocks, player);
+        int removedCount = removeLightBlocks(blocks, player, coreProtectCompatibility);
 
         if (removedCount > 0) {
             player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.success", removedCount, range)).color(NamedTextColor.GREEN));
@@ -72,12 +73,14 @@ public class RemoveCommand {
         return 1;
     }
 
-    private int removeLightBlocks(List<Location> blocks, Player player) {
+    private int removeLightBlocks(List<Location> blocks, Player player, CoreProtectCompatibility coreProtectCompatibility) {
         int removedCount = 0;
         for (Location block : blocks) {
             if (RemoveLightUtils.removeLightBlock(block)) {
-                // Registrar la eliminación en CoreProtect
-                CoreProtectUtils.logLightRemoval(logger, coreProtectCompatibility, player.getName(), block);
+                // Registrar la eliminación en CoreProtect si está disponible
+                if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
+                    CoreProtectUtils.logLightRemoval(logger, coreProtectCompatibility, player.getName(), block);
+                }
                 removedCount++;
             }
         }

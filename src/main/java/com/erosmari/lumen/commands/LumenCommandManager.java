@@ -18,7 +18,7 @@ public class LumenCommandManager {
 
     public LumenCommandManager(Lumen plugin) {
         this.plugin = plugin;
-        this.removeCommand = new RemoveCommand(plugin, plugin.getCoreProtectCompatibility());
+        this.removeCommand = new RemoveCommand(plugin);
         this.undoCommand = new UndoCommand();
         this.clearCommand = new ClearCommand();
         this.redoCommand = new RedoCommand();
