@@ -62,7 +62,6 @@ public class CoreProtectUtils {
             try {
                 // Forzar el registro del material especificado
                 coreProtect.getAPI().logRemoval(playerName, location, forcedMaterial, location.getBlock().getBlockData());
-                logger.info(String.format("Registrada la eliminación de %s por %s en %s.", forcedMaterial, playerName, location));
                 successCount++;
             } catch (Exception e) {
                 logger.warning(String.format("Error al registrar la eliminación en %s: %s", location, e.getMessage()));
