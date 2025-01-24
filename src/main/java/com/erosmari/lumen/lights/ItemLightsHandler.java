@@ -3,6 +3,7 @@ package com.erosmari.lumen.lights;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.lights.integrations.ItemFAWEHandler;
 import com.erosmari.lumen.tasks.TaskManager;
 import com.erosmari.lumen.utils.DisplayUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
@@ -103,10 +104,28 @@ public class ItemLightsHandler {
         return false;
     }
 
-    private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, String operationId) {
-        Queue<Location> blockQueue = new LinkedList<>(blocks);
+    public void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, String operationId) {
+        // Si FAWE está disponible, delegar la colocación de bloques al manejador de FAWE
+        if (isFAWEAvailable()) {
+            plugin.getLogger().info("FAWE detected. Delegating block placement to FAWE.");
+            CompletableFuture.runAsync(() -> ItemFAWEHandler.placeLightsWithFAWE(plugin, player, blocks, lightLevel, operationId), executor)
+                    .thenRun(() -> {
+                        player.sendMessage(TranslationHandler.getFormatted("light.success.placed", operationId));
+                        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
+                        DisplayUtil.hideBossBar(player);
+                        TaskManager.cancelTask(player.getUniqueId());
+                    })
+                    .exceptionally(ex -> {
+                        player.sendMessage(TranslationHandler.getFormatted("light.error", ex.getMessage()));
+                        plugin.getLogger().severe("Error during FAWE block placement: " + ex.getMessage());
+                        return null;
+                    });
+            return;
+        }
 
-        // Usar un arreglo para almacenar la referencia de la tarea
+        // Lógica original si FAWE no está disponible
+        plugin.getLogger().info("FAWE not detected. Using default block placement method.");
+        Queue<Location> blockQueue = new LinkedList<>(blocks);
         final BukkitTask[] taskHolder = new BukkitTask[1];
 
         taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
@@ -114,7 +133,7 @@ public class ItemLightsHandler {
                 plugin.getLogger().info(TranslationHandler.getFormatted("light.info.operation_cancelled", operationId));
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
-                taskHolder[0].cancel(); // Cancelar la tarea
+                taskHolder[0].cancel();
                 return;
             }
 
@@ -132,7 +151,6 @@ public class ItemLightsHandler {
             int completed = totalBlocks - blockQueue.size();
             double progress = (double) completed / totalBlocks;
 
-            // Actualizar BossBar y ActionBar
             DisplayUtil.showBossBar(player, progress);
             DisplayUtil.showActionBar(player, progress);
 
@@ -141,12 +159,15 @@ public class ItemLightsHandler {
                 DisplayUtil.hideBossBar(player);
                 plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 TaskManager.cancelTask(player.getUniqueId());
-                taskHolder[0].cancel(); // Cancelar la tarea
+                taskHolder[0].cancel();
             }
         }, 0L, tickInterval);
 
-        // Registrar correctamente la tarea
         TaskManager.addTask(player.getUniqueId(), taskHolder[0]);
+    }
+
+    private boolean isFAWEAvailable() {
+        return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
     private void placeLight(Location location, int lightLevel, String operationId) {
