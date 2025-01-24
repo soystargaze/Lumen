@@ -5,7 +5,7 @@ import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.lights.integrations.RedoFAWEHandler;
 import com.erosmari.lumen.utils.BatchProcessor;
-import com.erosmari.lumen.utils.CoreProtectUtils;
+import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.utils.DisplayUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -31,6 +31,10 @@ public class RedoCommand {
 
     public RedoCommand(Lumen plugin) {
         this.plugin = plugin;
+    }
+
+    private CoreProtectHandler getCoreProtectHandler() {
+        return plugin.getCoreProtectHandler();
     }
 
     public LiteralArgumentBuilder<CommandSourceStack> register() {
@@ -122,7 +126,12 @@ public class RedoCommand {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                CoreProtectUtils.logLightPlacement(logger, plugin.getCoreProtectCompatibility(), player.getName(), List.of(blockLocation), Material.LIGHT);
+                CoreProtectHandler coreProtectHandler = getCoreProtectHandler();
+                if (coreProtectHandler != null) {
+                    coreProtectHandler.logLightPlacement(logger, player.getName(), List.of(blockLocation), Material.LIGHT);
+                } else {
+                    logger.warning("CoreProtectHandler no está inicializado. Registro omitido.");
+                }
                 // Registro en lote en la base de datos
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
                 return true;

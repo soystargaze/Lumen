@@ -168,6 +168,7 @@ light_registry:
     blocks_removed: "Se eliminaron los bloques de la operación {0}."
     blocks_added: "Se añadieron {0} bloques de luz asociados a la operación {1}."
     all_blocks_removed: "Se han eliminado todos los bloques registrados."
+    batch_processed: "Se procesaron {0} bloques en la operación '{1}'."
 
 coreprotect:
   enabled: "CoreProtect habilitado y disponible."

@@ -1,9 +1,8 @@
 package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.Lumen;
-import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.LightRegistry;
-import com.erosmari.lumen.utils.CoreProtectUtils;
+import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.utils.RemoveLightUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -55,14 +54,14 @@ public class RemoveCommand {
         Location playerLocation = player.getLocation();
         List<Location> blocks = LightRegistry.getBlocksInRange(playerLocation, range);
 
-        CoreProtectCompatibility coreProtectCompatibility = plugin.getCoreProtectCompatibility();
+        CoreProtectHandler coreProtectHandler = plugin.getCoreProtectHandler();
 
-        if (coreProtectCompatibility == null || !coreProtectCompatibility.isEnabled()) {
+        if (coreProtectHandler == null || !coreProtectHandler.isEnabled()) {
             player.sendMessage(Component.text(TranslationHandler.get("command.remove.coreprotect_not_available")).color(NamedTextColor.RED));
             logger.warning(TranslationHandler.get("command.remove.coreprotect_disabled_log"));
         }
 
-        int removedCount = removeAndLogBlocks(blocks, player, coreProtectCompatibility);
+        int removedCount = removeAndLogBlocks(blocks, player, coreProtectHandler);
 
         if (removedCount > 0) {
             player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.success", removedCount, range)).color(NamedTextColor.GREEN));
@@ -75,7 +74,7 @@ public class RemoveCommand {
         return 1;
     }
 
-    private int removeAndLogBlocks(List<Location> blocks, Player player, CoreProtectCompatibility coreProtectCompatibility) {
+    private int removeAndLogBlocks(List<Location> blocks, Player player, CoreProtectHandler coreProtectHandler) {
         int removedCount = 0;
 
         List<Location> registeredBlocks = new ArrayList<>();
@@ -87,9 +86,9 @@ public class RemoveCommand {
             }
         }
 
-        if (!registeredBlocks.isEmpty() && coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
+        if (!registeredBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
             for (Location location : registeredBlocks) {
-                CoreProtectUtils.logRemoval(logger, coreProtectCompatibility, player.getName(), List.of(location), Material.LIGHT);
+                coreProtectHandler.logRemoval(logger, player.getName(), List.of(location), Material.LIGHT);
             }
         }
 

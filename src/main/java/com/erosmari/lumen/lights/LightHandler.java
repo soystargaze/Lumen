@@ -2,7 +2,7 @@ package com.erosmari.lumen.lights;
 
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
-import com.erosmari.lumen.connections.CoreProtectCompatibility;
+import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.lights.integrations.FAWEHandler;
 import com.erosmari.lumen.tasks.TaskManager;
@@ -25,11 +25,11 @@ import java.util.concurrent.CompletableFuture;
 public class LightHandler {
 
     private final Lumen plugin;
-    private final CoreProtectCompatibility coreProtectCompatibility;
+    private final CoreProtectHandler coreProtectHandler;
 
     public LightHandler(Lumen plugin) {
         this.plugin = plugin;
-        this.coreProtectCompatibility = plugin.getCoreProtectCompatibility();
+        this.coreProtectHandler = plugin.getCoreProtectHandler();
     }
 
     public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight, String operationId) {
@@ -140,7 +140,7 @@ public class LightHandler {
             plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_found"));
             CompletableFuture.runAsync(() -> {
                 try {
-                    FAWEHandler.placeLightBlocks(blocks, lightLevel, player, plugin, coreProtectCompatibility);
+                    FAWEHandler.placeLightBlocks(blocks, lightLevel, player, plugin, coreProtectHandler);
                     LightRegistry.addBlocksAsync(blocks, lightLevel, operationId);
                 } catch (Exception e) {
                     throw new RuntimeException("Error during FAWE block placement: " + e.getMessage(), e);
@@ -203,9 +203,8 @@ public class LightHandler {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                CoreProtectUtils.logLightPlacement(
+                coreProtectHandler.logLightPlacement(
                         plugin.getLogger(),
-                        coreProtectCompatibility,
                         player.getName(),
                         List.of(blockLocation),
                         Material.LIGHT

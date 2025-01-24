@@ -1,6 +1,6 @@
 package com.erosmari.lumen.lights.integrations;
 
-import com.erosmari.lumen.utils.CoreProtectUtils;
+import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.fastasyncworldedit.bukkit.FaweBukkitWorld;
 import com.sk89q.worldedit.EditSession;
@@ -25,7 +25,7 @@ public class FAWEHandler {
      *
      * @param locations List of locations where blocks should be placed.
      */
-    public static void placeLightBlocks(List<Location> locations, int lightLevel, Player player, JavaPlugin plugin, Object coreProtectCompatibility) {
+    public static void placeLightBlocks(List<Location> locations, int lightLevel, Player player, JavaPlugin plugin, CoreProtectHandler coreProtectHandler) {
         if (locations == null || locations.isEmpty()) {
             throw new IllegalArgumentException("Locations list is empty or null.");
         }
@@ -59,9 +59,9 @@ public class FAWEHandler {
             List<Location> placedLocations = processLocations(editSession, locations, customLightState);
 
             // Registrar todas las ubicaciones colocadas en CoreProtect
-            if (coreProtectCompatibility instanceof com.erosmari.lumen.connections.CoreProtectCompatibility compatibility) {
+            if (coreProtectHandler != null) {
                 try {
-                    CoreProtectUtils.logLightPlacement(plugin.getLogger(), compatibility, player.getName(), placedLocations, Material.LIGHT);
+                    coreProtectHandler.logLightPlacement(plugin.getLogger(), player.getName(), placedLocations, Material.LIGHT);
                     plugin.getLogger().info("Logged " + placedLocations.size() + " light blocks in CoreProtect.");
                 } catch (Exception ex) {
                     plugin.getLogger().severe("Error while logging light placement in CoreProtect: " + ex.getMessage());

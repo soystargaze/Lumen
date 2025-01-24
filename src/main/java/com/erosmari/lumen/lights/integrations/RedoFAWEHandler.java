@@ -22,7 +22,7 @@ public class RedoFAWEHandler {
                 lightLevel,
                 player,
                 plugin,
-                plugin.getCoreProtectCompatibility()
+                plugin.getCoreProtectHandler()
         );
 
         // Actualizar el registro de LightRegistry después de completar la colocación

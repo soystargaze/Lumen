@@ -1,9 +1,8 @@
 package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.Lumen;
-import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.LightRegistry;
-import com.erosmari.lumen.utils.CoreProtectUtils;
+import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -92,15 +91,15 @@ public class UndoCommand {
             return 0;
         }
 
-        CoreProtectCompatibility coreProtectCompatibility = plugin.getCoreProtectCompatibility();
+        CoreProtectHandler coreProtectHandler = plugin.getCoreProtectHandler();
         int removedCount = 0;
 
         for (Location location : blocks) {
             if (removeLightBlock(location)) {
                 removedCount++;
                 // Registrar cada bloque eliminado en CoreProtect
-                if (coreProtectCompatibility != null && coreProtectCompatibility.isEnabled()) {
-                    CoreProtectUtils.logRemoval(plugin.getLogger(), coreProtectCompatibility, player.getName(), List.of(location), Material.LIGHT);
+                if (coreProtectHandler != null && coreProtectHandler.isEnabled()) {
+                    coreProtectHandler.logRemoval(plugin.getLogger(), player.getName(), List.of(location), Material.LIGHT);
                 }
             }
         }

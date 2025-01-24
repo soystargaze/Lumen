@@ -2,8 +2,8 @@ package com.erosmari.lumen;
 
 import com.erosmari.lumen.commands.LumenCommandManager;
 import com.erosmari.lumen.config.ConfigHandler;
-import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.DatabaseHandler;
+import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.listeners.MobListener;
@@ -26,7 +26,7 @@ public class Lumen extends JavaPlugin implements Listener {
     private static Lumen instance;
     private LumenCommandManager commandManager;
     private LumenItems lumenItems;
-    private CoreProtectCompatibility coreProtectCompatibility;
+    private CoreProtectHandler coreProtectHandler;
 
     @Override
     public void onEnable() {
@@ -69,8 +69,8 @@ public class Lumen extends JavaPlugin implements Listener {
         return lumenItems;
     }
 
-    public CoreProtectCompatibility getCoreProtectCompatibility() {
-        return coreProtectCompatibility;
+    public CoreProtectHandler getCoreProtectHandler() {
+        return coreProtectHandler;
     }
 
     private void loadConfigurations() {
@@ -136,13 +136,14 @@ public class Lumen extends JavaPlugin implements Listener {
     }
 
     private void initializeCoreProtectIntegration() {
-        if (coreProtectCompatibility == null) {
-            coreProtectCompatibility = new CoreProtectCompatibility(this);
-            if (coreProtectCompatibility.isEnabled()) {
+        if (coreProtectHandler == null) {
+            coreProtectHandler = new CoreProtectHandler(this);
+
+            if (coreProtectHandler.isEnabled()) {
                 getLogger().info(TranslationHandler.get("coreprotect.enabled"));
             } else {
                 getLogger().warning(TranslationHandler.get("coreprotect.unavailable"));
-                coreProtectCompatibility = null;
+                coreProtectHandler = null;
             }
         }
     }

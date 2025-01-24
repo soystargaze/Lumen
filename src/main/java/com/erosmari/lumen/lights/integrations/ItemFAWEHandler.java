@@ -2,7 +2,7 @@ package com.erosmari.lumen.lights.integrations;
 
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.database.LightRegistry;
-import com.erosmari.lumen.utils.CoreProtectUtils;
+import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.fastasyncworldedit.bukkit.FaweBukkitWorld;
 import com.sk89q.worldedit.EditSession;
@@ -18,6 +18,12 @@ import org.bukkit.entity.Player;
 import java.util.List;
 
 public class ItemFAWEHandler {
+
+    private static CoreProtectHandler coreProtectHandler;
+
+    public ItemFAWEHandler(Lumen plugin) {
+        coreProtectHandler = new CoreProtectHandler(plugin);
+    }
 
     /**
      * Coloca bloques de luz usando FAWE.
@@ -72,10 +78,9 @@ public class ItemFAWEHandler {
             LightRegistry.addBlocksAsync(placedLocations, lightLevel, operationId);
 
             // Registrar todas las ubicaciones colocadas en CoreProtect
-            if (plugin.getCoreProtectCompatibility() != null) {
-                CoreProtectUtils.logLightPlacement(
+            if (plugin.getCoreProtectHandler() != null) {
+                coreProtectHandler.logLightPlacement(
                         plugin.getLogger(),
-                        plugin.getCoreProtectCompatibility(),
                         player.getName(),
                         placedLocations,
                         Material.LIGHT
