@@ -7,7 +7,6 @@ import com.erosmari.lumen.utils.TranslationHandler;
 import com.fastasyncworldedit.bukkit.FaweBukkitWorld;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
-import com.sk89q.worldedit.math.BlockVector3;
 import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
@@ -16,7 +15,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ItemFAWEHandler {
@@ -71,14 +69,7 @@ public class ItemFAWEHandler {
             }
 
             // Establecer bloques usando FAWE
-            List<Location> placedLocations = new ArrayList<>();
-            for (Location loc : locations) {
-                if (loc == null) continue;
-                BlockVector3 position = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-
-                editSession.smartSetBlock(position, lightState);
-                placedLocations.add(loc);
-            }
+            List<Location> placedLocations = FAWEHandler.processLocations(editSession, locations, lightState);
 
             // Registrar bloques en la base de datos
             LightRegistry.addBlocksAsync(placedLocations, lightLevel, operationId);

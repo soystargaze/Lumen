@@ -69,15 +69,8 @@ public class FAWEHandler {
             Property<Integer> levelProperty = lightType.getProperty("level");
             BlockState customLightState = lightState.with(levelProperty, lightLevel);
 
-            // Establecer bloques
-            List<Location> placedLocations = new ArrayList<>();
-            for (Location loc : locations) {
-                if (loc == null) continue;
-                BlockVector3 position = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
-
-                editSession.smartSetBlock(position, customLightState);
-                placedLocations.add(loc);
-            }
+            // Usar el nuevo metodo para procesar las ubicaciones
+            List<Location> placedLocations = processLocations(editSession, locations, customLightState);
 
             // Registrar todas las ubicaciones colocadas en CoreProtect
             if (coreProtectCompatibility instanceof com.erosmari.lumen.connections.CoreProtectCompatibility compatibility) {
@@ -100,5 +93,24 @@ public class FAWEHandler {
         } catch (Exception e) {
             player.sendMessage(TranslationHandler.getFormatted("light.error", e.getMessage()));
         }
+    }
+    /**
+     * Procesa una lista de ubicaciones y coloca bloques usando FAWE.
+     *
+     * @param editSession    La sesión de edición de WorldEdit.
+     * @param locations      Lista de ubicaciones donde se colocarán los bloques.
+     * @param customLightState Estado personalizado del bloque a colocar.
+     * @return Lista de ubicaciones donde se colocaron bloques.
+     */
+    public static List<Location> processLocations(EditSession editSession, List<Location> locations, BlockState customLightState) {
+        List<Location> placedLocations = new ArrayList<>();
+        for (Location loc : locations) {
+            if (loc == null) continue;
+            BlockVector3 position = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+
+            editSession.smartSetBlock(position, customLightState);
+            placedLocations.add(loc);
+        }
+        return placedLocations;
     }
 }
