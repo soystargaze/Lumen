@@ -67,7 +67,6 @@ public class FAWEHandler {
                     plugin.getLogger().severe("Error while logging light placement in CoreProtect: " + ex.getMessage());
                 }
             } else {
-                plugin.getLogger().warning("CoreProtectCompatibility is not available or invalid.");
                 plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.not_found"));
             }
 
