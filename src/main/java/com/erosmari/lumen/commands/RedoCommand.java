@@ -3,6 +3,7 @@ package com.erosmari.lumen.commands;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.utils.BatchProcessor;
 import com.erosmari.lumen.utils.CoreProtectUtils;
 import com.erosmari.lumen.utils.DisplayUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
@@ -113,7 +114,8 @@ public class RedoCommand {
                 block.setBlockData(lightData, false);
 
                 CoreProtectUtils.logLightPlacement(logger, plugin.getCoreProtectCompatibility(), player.getName(), List.of(blockLocation), Material.LIGHT);
-                LightRegistry.addBlock(blockLocation, lightLevel, operationId);
+                // Registro en lote en la base de datos
+                BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
                 return true;
             } catch (ClassCastException e) {
                 logger.warning(TranslationHandler.getFormatted("command.redo.light_level_error", blockLocation, e.getMessage()));
