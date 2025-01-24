@@ -79,6 +79,7 @@ public class RemoveCommand {
 
         List<Location> registeredBlocks = new ArrayList<>();
 
+        // Eliminar bloques y acumular los procesados
         for (Location block : blocks) {
             if (RemoveLightUtils.removeLightBlock(block)) {
                 removedCount++;
@@ -86,10 +87,9 @@ public class RemoveCommand {
             }
         }
 
+        // Registrar los bloques eliminados en lotes
         if (!registeredBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
-            for (Location location : registeredBlocks) {
-                coreProtectHandler.logRemoval(player.getName(), List.of(location), Material.LIGHT);
-            }
+            coreProtectHandler.logRemoval(player.getName(), registeredBlocks, Material.LIGHT);
         }
 
         return removedCount;
