@@ -64,12 +64,12 @@ public class FAWEHandler {
                 throw new IllegalStateException("BlockType LIGHT is not supported.");
             }
 
-            // Crear un BlockState con el nivel de luz personalizado
+            // Create a BlockState with the custom light level
             BlockState lightState = lightType.getDefaultState();
             Property<Integer> levelProperty = lightType.getProperty("level");
             BlockState customLightState = lightState.with(levelProperty, lightLevel);
 
-            // Usar el nuevo methods para procesar las ubicaciones
+            // Use the new method to process the locations
             List<Location> placedLocations = processLocations(editSession, locations, customLightState);
 
             // Registrar todas las ubicaciones colocadas en CoreProtect
