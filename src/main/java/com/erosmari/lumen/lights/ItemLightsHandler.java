@@ -105,7 +105,7 @@ public class ItemLightsHandler {
     }
 
     public void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, String operationId) {
-        // Si FAWE está disponible, delegar la colocación de bloques al manejador de FAWE
+        // Si FAWE está disponible, delegar la colocación de bloques al manejado de FAWE
         if (isFAWEAvailable()) {
             plugin.getLogger().info("FAWE detected. Delegating block placement to FAWE.");
             CompletableFuture.runAsync(() -> ItemFAWEHandler.placeLightsWithFAWE(plugin, player, blocks, lightLevel, operationId), executor)
