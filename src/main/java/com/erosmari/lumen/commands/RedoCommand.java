@@ -3,6 +3,8 @@ package com.erosmari.lumen.commands;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.lights.integrations.RedoFAWEHandler;
+import com.erosmari.lumen.lights.integrations.FAWEHandler;
 import com.erosmari.lumen.utils.BatchProcessor;
 import com.erosmari.lumen.utils.CoreProtectUtils;
 import com.erosmari.lumen.utils.DisplayUtil;
@@ -56,49 +58,53 @@ public class RedoCommand {
             return 0;
         }
 
-        logger.info(TranslationHandler.getFormatted("command.redo.restoring_blocks_log", operationId, blocksWithLightLevels.size()));
+        // Si FAWE está disponible, usar RedoFAWEHandler
+        if (FAWEHandler.isFAWEAvailable()) {
+            RedoFAWEHandler.handleRedoWithFAWE(plugin, player, blocksWithLightLevels, operationId);
+        } else {
+            // Si FAWE no está disponible, usar processBlock
+            Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
+            Queue<Map.Entry<Location, Integer>> failedQueue = new LinkedList<>();
+            int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
+            int totalBlocks = blockQueue.size();
 
-        final Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
-        final Queue<Map.Entry<Location, Integer>> failedQueue = new LinkedList<>();
-        final int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
-        final int totalBlocks = blockQueue.size();
+            DisplayUtil.showBossBar(player, 0.0);
 
-        DisplayUtil.showBossBar(player, 0.0);
-
-        Bukkit.getScheduler().runTaskTimer(plugin, task -> {
-            int processedCount = 0;
-            while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
-                Map.Entry<Location, Integer> entry = blockQueue.poll();
-                if (entry != null) {
-                    boolean success = processBlock(player, entry.getKey(), entry.getValue(), operationId);
-                    if (!success) {
-                        failedQueue.add(entry);
+            Bukkit.getScheduler().runTaskTimer(plugin, task -> {
+                int processedCount = 0;
+                while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
+                    Map.Entry<Location, Integer> entry = blockQueue.poll();
+                    if (entry != null) {
+                        boolean success = processBlock(player, entry.getKey(), entry.getValue(), operationId);
+                        if (!success) {
+                            failedQueue.add(entry);
+                        }
+                        processedCount++;
                     }
-                    processedCount++;
                 }
-            }
 
-            int remainingBlocks = blockQueue.size() + failedQueue.size();
-            double progress = 1.0 - (double) remainingBlocks / totalBlocks;
-            DisplayUtil.showBossBar(player, progress);
-            DisplayUtil.showActionBar(player, progress);
+                int remainingBlocks = blockQueue.size() + failedQueue.size();
+                double progress = 1.0 - (double) remainingBlocks / totalBlocks;
+                DisplayUtil.showBossBar(player, progress);
+                DisplayUtil.showActionBar(player, progress);
 
-            if (blockQueue.isEmpty() && failedQueue.isEmpty()) {
-                logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", operationId));
-                LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
-                player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.restoration_completed", operationId))
-                        .color(NamedTextColor.GREEN));
-                DisplayUtil.hideBossBar(player);
-                task.cancel();
-            } else if (blockQueue.isEmpty()) {
-                logger.info(TranslationHandler.getFormatted("command.redo.retrying_failed_blocks"));
+                if (blockQueue.isEmpty() && failedQueue.isEmpty()) {
+                    logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", operationId));
+                    LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
+                    player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.restoration_completed", operationId))
+                            .color(NamedTextColor.GREEN));
+                    DisplayUtil.hideBossBar(player);
+                    task.cancel();
+                } else if (blockQueue.isEmpty()) {
+                    logger.info(TranslationHandler.getFormatted("command.redo.retrying_failed_blocks"));
 
-                blockQueue.addAll(failedQueue);
-                failedQueue.clear();
-            }
-        }, 0L, 1L);
+                    blockQueue.addAll(failedQueue);
+                    failedQueue.clear();
+                }
+            }, 0L, 1L);
+        }
 
-        player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.restoration_started", blocksWithLightLevels.size(), maxBlocksPerTick))
+        player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.restoration_started", blocksWithLightLevels.size()))
                 .color(NamedTextColor.GREEN));
         return 1;
     }
