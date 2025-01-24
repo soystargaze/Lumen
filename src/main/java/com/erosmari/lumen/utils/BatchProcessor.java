@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 public class BatchProcessor {
     private static final BlockingQueue<BatchEntry> batchQueue = new LinkedBlockingQueue<>();
-    private static final int BATCH_SIZE = 150;
+    private static final int BATCH_SIZE = 1000;
     private static final long BATCH_DELAY_MS = 500;
     private static final Logger logger = Logger.getLogger(BatchProcessor.class.getName());
     private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();

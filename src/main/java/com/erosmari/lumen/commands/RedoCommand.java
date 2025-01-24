@@ -132,6 +132,7 @@ public class RedoCommand {
                 } else {
                     logger.warning("CoreProtectHandler no está inicializado. Registro omitido.");
                 }
+
                 // Registro en lote en la base de datos
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
                 return true;
