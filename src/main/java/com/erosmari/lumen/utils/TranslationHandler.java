@@ -23,14 +23,12 @@ public class TranslationHandler {
 
         File langFile = new File(translationsFolder, language + ".yml");
 
-        // Create default file if it doesn't exist
         if (!langFile.exists()) {
             createDefaultTranslationFile(plugin, langFile, language);
         }
 
-        // Load translations from the file
         FileConfiguration langConfig = YamlConfiguration.loadConfiguration(langFile);
-        loadedKeys = 0; // Reinicia el contador antes de cargar nuevas traducciones
+        loadedKeys = 0;
 
         for (String key : langConfig.getKeys(true)) {
             if (langConfig.isString(key)) {
