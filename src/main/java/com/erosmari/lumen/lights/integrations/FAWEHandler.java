@@ -69,7 +69,7 @@ public class FAWEHandler {
             Property<Integer> levelProperty = lightType.getProperty("level");
             BlockState customLightState = lightState.with(levelProperty, lightLevel);
 
-            // Usar el nuevo metodo para procesar las ubicaciones
+            // Usar el nuevo methods para procesar las ubicaciones
             List<Location> placedLocations = processLocations(editSession, locations, customLightState);
 
             // Registrar todas las ubicaciones colocadas en CoreProtect
