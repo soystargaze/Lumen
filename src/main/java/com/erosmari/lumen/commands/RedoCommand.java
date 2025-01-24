@@ -68,6 +68,7 @@ public class RedoCommand {
             // Si FAWE no está disponible, usar processBlock
             Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
             Queue<Map.Entry<Location, Integer>> failedQueue = new LinkedList<>();
+            List<Location> processedBlocks = new ArrayList<>(); // Acumula bloques procesados
             int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
             int totalBlocks = blockQueue.size();
 
@@ -78,7 +79,7 @@ public class RedoCommand {
                 while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
                     Map.Entry<Location, Integer> entry = blockQueue.poll();
                     if (entry != null) {
-                        boolean success = processBlock(player, entry.getKey(), entry.getValue(), operationId);
+                        boolean success = processBlock(entry.getKey(), entry.getValue(), operationId, processedBlocks);
                         if (!success) {
                             failedQueue.add(entry);
                         }
@@ -92,6 +93,12 @@ public class RedoCommand {
                 DisplayUtil.showActionBar(player, progress);
 
                 if (blockQueue.isEmpty() && failedQueue.isEmpty()) {
+                    // Registrar todos los bloques procesados en CoreProtect al final
+                    CoreProtectHandler coreProtectHandler = getCoreProtectHandler();
+                    if (!processedBlocks.isEmpty() && coreProtectHandler != null) {
+                        coreProtectHandler.logLightPlacement(player.getName(), processedBlocks, Material.LIGHT);
+                    }
+
                     logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", operationId));
                     LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
                     player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.restoration_completed", operationId))
@@ -100,7 +107,6 @@ public class RedoCommand {
                     task.cancel();
                 } else if (blockQueue.isEmpty()) {
                     logger.info(TranslationHandler.getFormatted("command.redo.retrying_failed_blocks"));
-
                     blockQueue.addAll(failedQueue);
                     failedQueue.clear();
                 }
@@ -116,7 +122,7 @@ public class RedoCommand {
         return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
-    private boolean processBlock(Player player, Location blockLocation, int lightLevel, String operationId) {
+    private boolean processBlock(Location blockLocation, int lightLevel, String operationId, List<Location> processedBlocks) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);
 
@@ -126,14 +132,10 @@ public class RedoCommand {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                CoreProtectHandler coreProtectHandler = getCoreProtectHandler();
-                if (coreProtectHandler != null) {
-                    coreProtectHandler.logLightPlacement(player.getName(), List.of(blockLocation), Material.LIGHT);
-                } else {
-                    logger.warning("CoreProtectHandler no está inicializado. Registro omitido.");
-                }
+                // Agregar bloque procesado a la lista
+                processedBlocks.add(blockLocation);
 
-                // Registro en lote en la base de datos
+                // Registrar en la base de datos
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
                 return true;
             } catch (ClassCastException e) {
