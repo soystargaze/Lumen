@@ -11,6 +11,7 @@ import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -80,8 +81,14 @@ public class FAWEHandler {
 
             // Registrar todas las ubicaciones colocadas en CoreProtect
             if (coreProtectCompatibility instanceof com.erosmari.lumen.connections.CoreProtectCompatibility compatibility) {
-                CoreProtectUtils.logLightPlacement(plugin.getLogger(), compatibility, player.getName(), placedLocations);
+                try {
+                    CoreProtectUtils.logLightPlacement(plugin.getLogger(), compatibility, player.getName(), placedLocations, Material.LIGHT);
+                    plugin.getLogger().info("Logged " + placedLocations.size() + " light blocks in CoreProtect.");
+                } catch (Exception ex) {
+                    plugin.getLogger().severe("Error while logging light placement in CoreProtect: " + ex.getMessage());
+                }
             } else {
+                plugin.getLogger().warning("CoreProtectCompatibility is not available or invalid.");
                 plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.not_found"));
             }
 

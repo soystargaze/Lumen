@@ -17,7 +17,7 @@ public class CoreProtectUtils {
      * @param playerName  Nombre del jugador que colocó los bloques.
      * @param locations   Lista de ubicaciones de bloques colocados.
      */
-    public static void logLightPlacement(Logger logger, CoreProtectCompatibility coreProtect, String playerName, List<Location> locations) {
+    public static void logLightPlacement(Logger logger, CoreProtectCompatibility coreProtect, String playerName, List<Location> locations, Material material) {
         // Validar CoreProtect antes de continuar
         if (validateCoreProtect(logger, coreProtect)) {
             int successCount = 0;
@@ -25,8 +25,8 @@ public class CoreProtectUtils {
             // Procesar cada ubicación de bloque
             for (Location location : locations) {
                 try {
-                    Material blockMaterial = location.getBlock().getType();
-                    coreProtect.getAPI().logPlacement(playerName, location, blockMaterial, location.getBlock().getBlockData());
+                    // Usar el material proporcionado (en lugar de obtenerlo del mundo)
+                    coreProtect.getAPI().logPlacement(playerName, location, material, null); // BlockData es opcional aquí
                     successCount++;
                 } catch (Exception e) {
                     logger.warning(TranslationHandler.getFormatted(

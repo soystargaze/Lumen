@@ -199,8 +199,14 @@ public class LightHandler {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                // Registro en CoreProtect utilizando el utilitario
-                CoreProtectUtils.logLightPlacement(plugin.getLogger(), coreProtectCompatibility, player.getName(), List.of(blockLocation));
+                // Registro en CoreProtect utilizando directamente el material LIGHT
+                CoreProtectUtils.logLightPlacement(
+                        plugin.getLogger(),
+                        coreProtectCompatibility,
+                        player.getName(),
+                        List.of(blockLocation),
+                        Material.LIGHT
+                );
 
                 // Registro en lote en la base de datos
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
