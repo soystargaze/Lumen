@@ -67,7 +67,7 @@ public class LightCommand {
         LightHandler lightHandler = new LightHandler(Lumen.getInstance());
         lightHandler.placeLights(player, areaBlocks, lightLevel, includeSkylight, operationId);
 
-        player.sendMessage(Component.text(TranslationHandler.getFormatted("command.light.success", lightLevel, operationId)).color(NamedTextColor.GREEN));
+        player.sendMessage(Component.text(TranslationHandler.getFormatted("command.light.success", lightLevel, operationId)));
         return 1;
     }
 }
