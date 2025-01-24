@@ -4,6 +4,7 @@ import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.tasks.TaskManager;
+import com.erosmari.lumen.utils.DisplayUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -14,10 +15,14 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class ItemLightsHandler {
 
     private final Lumen plugin;
+    private final Executor executor = Executors.newFixedThreadPool(4);
 
     public ItemLightsHandler(Lumen plugin) {
         this.plugin = plugin;
@@ -36,11 +41,23 @@ public class ItemLightsHandler {
         int lightsPerTick = ConfigHandler.getInt("settings.torch_lights_per_tick", 10);
         int tickInterval = ConfigHandler.getInt("settings.torch_tick_interval", 10);
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            List<Location> blocksToLight = calculateLightPositions(center, radius);
+        // Registrar tarea en TaskManager antes de iniciar
+        TaskManager.addTask(player.getUniqueId(), null);
 
-            processBlocksAsync(player, blocksToLight, lightLevel, lightsPerTick, tickInterval, operationId);
-        });
+        // Calcular posiciones de bloques de luz de manera asíncrona
+        CompletableFuture.supplyAsync(() -> calculateLightPositions(center, radius), executor)
+                .thenAcceptAsync(blocksToLight -> {
+                    // Mostrar BossBar inicial
+                    DisplayUtil.showBossBar(player, 0);
+                    DisplayUtil.showActionBar(player, 0);
+
+                    // Registrar correctamente la tarea
+                    processBlocksAsync(player, blocksToLight, lightLevel, lightsPerTick, tickInterval, operationId);
+                }, runnable -> Bukkit.getScheduler().runTask(plugin, runnable))
+                .exceptionally(ex -> {
+                    plugin.getLogger().severe("Error durante el cálculo de posiciones: " + ex.getMessage());
+                    return null;
+                });
     }
 
     private List<Location> calculateLightPositions(Location center, int radius) {
@@ -88,16 +105,21 @@ public class ItemLightsHandler {
 
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, String operationId) {
         Queue<Location> blockQueue = new LinkedList<>(blocks);
+
+        // Usar un arreglo para almacenar la referencia de la tarea
         final BukkitTask[] taskHolder = new BukkitTask[1];
 
         taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (!TaskManager.hasActiveTask(player.getUniqueId())) {
                 plugin.getLogger().info(TranslationHandler.getFormatted("light.info.operation_cancelled", operationId));
-                taskHolder[0].cancel();
+                DisplayUtil.hideBossBar(player);
+                TaskManager.cancelTask(player.getUniqueId());
+                taskHolder[0].cancel(); // Cancelar la tarea
                 return;
             }
 
             int processed = 0;
+            int totalBlocks = blocks.size();
 
             while (!blockQueue.isEmpty() && processed < lightsPerTick) {
                 Location blockLocation = blockQueue.poll();
@@ -107,14 +129,23 @@ public class ItemLightsHandler {
                 }
             }
 
+            int completed = totalBlocks - blockQueue.size();
+            double progress = (double) completed / totalBlocks;
+
+            // Actualizar BossBar y ActionBar
+            DisplayUtil.showBossBar(player, progress);
+            DisplayUtil.showActionBar(player, progress);
+
             if (blockQueue.isEmpty()) {
                 player.sendMessage(TranslationHandler.getFormatted("light.success.placed", operationId));
+                DisplayUtil.hideBossBar(player);
                 plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
-                taskHolder[0].cancel();
                 TaskManager.cancelTask(player.getUniqueId());
+                taskHolder[0].cancel(); // Cancelar la tarea
             }
         }, 0L, tickInterval);
 
+        // Registrar correctamente la tarea
         TaskManager.addTask(player.getUniqueId(), taskHolder[0]);
     }
 
@@ -128,7 +159,6 @@ public class ItemLightsHandler {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                // Validar y registrar en el LightRegistry
                 if (lightLevel >= 0 && lightLevel <= 15) {
                     LightRegistry.addBlock(location, lightLevel, operationId);
                 } else {
@@ -141,39 +171,39 @@ public class ItemLightsHandler {
     }
 
     public void removeLights(Player player, String operationId) {
-        List<Location> blocksToRemove = LightRegistry.getBlocksByOperationId(operationId);
+        CompletableFuture.supplyAsync(() -> LightRegistry.getBlocksByOperationId(operationId), executor)
+                .thenAcceptAsync(blocksToRemove -> {
+                    if (blocksToRemove.isEmpty()) {
+                        player.sendMessage(TranslationHandler.getFormatted("light.error.no_lights_to_remove", operationId));
+                        return;
+                    }
 
-        if (blocksToRemove.isEmpty()) {
-            player.sendMessage(TranslationHandler.getFormatted("light.error.no_lights_to_remove", operationId));
-            return;
+                    Bukkit.getScheduler().runTask(plugin, () -> {
+                        blocksToRemove.forEach(location -> {
+                            Block block = location.getBlock();
+                            if (block.getType() == Material.LIGHT) {
+                                block.setType(Material.AIR, false);
+                            }
+                        });
+
+                        LightRegistry.removeBlocksByOperationId(operationId);
+                        player.sendMessage(TranslationHandler.getFormatted("light.success.removed", operationId));
+                        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.removed_lights", operationId));
+                    });
+                });
+    }
+    public void cancelOperation(Player player, String operationId) {
+        // Cancelar la tarea activa (si existe)
+        if (TaskManager.hasActiveTask(player.getUniqueId())) {
+            TaskManager.cancelTask(player.getUniqueId());
         }
 
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            try {
-                blocksToRemove.forEach(location -> {
-                    Block block = location.getBlock();
-                    if (block.getType() == Material.LIGHT) {
-
-                        // Cambiar el bloque a aire
-                        block.setType(Material.AIR, false);
-                    }
-                });
-
-                // Eliminar los bloques del registro
-                LightRegistry.removeBlocksByOperationId(operationId);
-
-                // Mensajes de feedback
-                player.sendMessage(TranslationHandler.getFormatted("light.success.removed", operationId));
-                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.removed_lights", operationId));
-            } catch (Exception e) {
-                plugin.getLogger().severe("Error while removing lights for operation " + operationId + ": " + e.getMessage());
-            }
-        });
-    }
-
-    public void cancelOperation(Player player, String operationId) {
-        TaskManager.cancelTask(player.getUniqueId());
+        // Eliminar luces asociadas a la operación
         removeLights(player, operationId);
+
+        // Mensajes de feedback
+        DisplayUtil.hideBossBar(player);
+        player.sendMessage(TranslationHandler.getFormatted("light.info.cancelled_and_removed", operationId));
         plugin.getLogger().info(TranslationHandler.getFormatted("light.info.cancelled_and_removed", operationId));
     }
 }
