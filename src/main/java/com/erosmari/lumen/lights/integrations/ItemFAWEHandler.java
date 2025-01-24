@@ -19,9 +19,6 @@ import java.util.List;
 
 public class ItemFAWEHandler {
 
-    public ItemFAWEHandler() {
-    }
-
     /**
      * Coloca bloques de luz usando FAWE.
      *
