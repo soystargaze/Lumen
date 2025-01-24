@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -298,5 +299,39 @@ public class LightRegistry {
         statement.setInt(5, center.getBlockY() + range);
         statement.setInt(6, center.getBlockZ() - range);
         statement.setInt(7, center.getBlockZ() + range);
+    }
+
+    public static void addBlocksAsync(List<Location> locations, int lightLevel, String operationId) {
+        CompletableFuture.runAsync(() -> {
+            String query = "INSERT INTO illuminated_blocks (world, x, y, z, light_level, operation_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0);";
+
+            try (Connection connection = DatabaseHandler.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(query)) {
+
+                connection.setAutoCommit(false); // Inicia la transacción
+
+                for (Location location : locations) {
+                    if (lightLevel <= 0 || lightLevel > 15) {
+                        logger.warning(TranslationHandler.getFormatted("light_registry.error.invalid_light_level", lightLevel, location));
+                        continue; // Salta la ubicación con nivel de luz no válido
+                    }
+
+                    statement.setString(1, location.getWorld().getName());
+                    statement.setInt(2, location.getBlockX());
+                    statement.setInt(3, location.getBlockY());
+                    statement.setInt(4, location.getBlockZ());
+                    statement.setInt(5, lightLevel);
+                    statement.setString(6, operationId);
+                    statement.addBatch(); // Agrega al lote
+                }
+
+                statement.executeBatch(); // Ejecuta el lote
+                connection.commit(); // Confirma la transacción
+
+                logger.info(TranslationHandler.getFormatted("light_registry.info.blocks_added", locations.size(), operationId));
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.add_blocks"), e);
+            }
+        });
     }
 }

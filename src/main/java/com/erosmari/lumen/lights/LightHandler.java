@@ -144,8 +144,13 @@ public class LightHandler {
         if (FAWEHandler.isFAWEAvailable()) {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 try {
-                    FAWEHandler.placeLightBlocks(blocks, lightLevel);
-                    blocks.forEach(location -> LightRegistry.addBlock(location, lightLevel, operationId));
+                    // Delegar la colocación de bloques a FAWE
+                    FAWEHandler.placeLightBlocks(blocks, lightLevel, player);
+
+                    // Registrar bloques en lote
+                    LightRegistry.addBlocksAsync(blocks, lightLevel, operationId);
+
+                    // Mensajes y log
                     plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                     player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
                 } catch (Exception e) {
