@@ -4,7 +4,6 @@ import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.lights.integrations.RedoFAWEHandler;
-import com.erosmari.lumen.lights.integrations.FAWEHandler;
 import com.erosmari.lumen.utils.BatchProcessor;
 import com.erosmari.lumen.utils.CoreProtectUtils;
 import com.erosmari.lumen.utils.DisplayUtil;
@@ -59,7 +58,7 @@ public class RedoCommand {
         }
 
         // Si FAWE está disponible, usar RedoFAWEHandler
-        if (FAWEHandler.isFAWEAvailable()) {
+        if (isFAWEAvailable()) {
             RedoFAWEHandler.handleRedoWithFAWE(plugin, player, blocksWithLightLevels, operationId);
         } else {
             // Si FAWE no está disponible, usar processBlock
@@ -107,6 +106,10 @@ public class RedoCommand {
         player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.restoration_started", blocksWithLightLevels.size()))
                 .color(NamedTextColor.GREEN));
         return 1;
+    }
+
+    private boolean isFAWEAvailable() {
+        return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
     private boolean processBlock(Player player, Location blockLocation, int lightLevel, String operationId) {

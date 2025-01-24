@@ -108,7 +108,8 @@ public class LightHandler {
         }
 
         if (includeSkylight) {
-            return block.getLightFromSky() > 0 && world.getHighestBlockYAt(location) <= location.getY();        }
+            return block.getLightFromSky() > 0 && world.getHighestBlockYAt(location) <= location.getY();
+        }
 
         return true;
     }
@@ -134,34 +135,36 @@ public class LightHandler {
     }
 
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, String operationId) {
-        int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
-        Queue<Location> blockQueue = new LinkedList<>(blocks);
-
         // Si FAWE está disponible, delegar la colocación de bloques a FAWE
-        if (FAWEHandler.isFAWEAvailable()) {
-            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        if (isFAWEAvailable()) {
+            plugin.getLogger().info("FAWE detected. Delegating block placement to FAWE.");
+            CompletableFuture.runAsync(() -> {
                 try {
-                    // Delegar la colocación de bloques a FAWE
                     FAWEHandler.placeLightBlocks(blocks, lightLevel, player, plugin, coreProtectCompatibility);
-
-                    // Registrar bloques en lote
                     LightRegistry.addBlocksAsync(blocks, lightLevel, operationId);
-
-                    // Mensajes y log
-                    plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
-                    player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
                 } catch (Exception e) {
-                    plugin.getLogger().severe(TranslationHandler.getFormatted("light.error.fawe_placement", e.getMessage()));
-                    player.sendMessage(TranslationHandler.get("light.error.fawe_failed"));
+                    throw new RuntimeException("Error during FAWE block placement: " + e.getMessage(), e);
                 }
+            }).thenRun(() -> {
+                player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
+                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
+                DisplayUtil.hideBossBar(player);
+                TaskManager.cancelTask(player.getUniqueId());
+            }).exceptionally(ex -> {
+                plugin.getLogger().severe(ex.getMessage());
+                player.sendMessage(TranslationHandler.get("light.error.fawe_failed"));
+                return null;
             });
             return;
         }
 
+        plugin.getLogger().info("FAWE not detected. Using default block placement method.");
+        int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
+        Queue<Location> blockQueue = new LinkedList<>(blocks);
+
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             int processedCount = 0;
             int totalBlocks = blocks.size();
-            int remainingBlocks = blockQueue.size();
 
             while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
                 Location blockLocation = blockQueue.poll();
@@ -171,10 +174,7 @@ public class LightHandler {
                 }
             }
 
-            // Calcula el progreso
-            double progress = (totalBlocks - remainingBlocks) / (double) totalBlocks;
-
-            // Actualiza BossBar y ActionBar
+            double progress = (double) (totalBlocks - blockQueue.size()) / totalBlocks;
             DisplayUtil.showBossBar(player, progress);
             DisplayUtil.showActionBar(player, progress);
 
@@ -189,6 +189,10 @@ public class LightHandler {
         TaskManager.addTask(player.getUniqueId(), task);
     }
 
+    private boolean isFAWEAvailable() {
+        return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
+    }
+
     private void processSingleBlock(Player player, Location blockLocation, int lightLevel, String operationId) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);
@@ -199,7 +203,6 @@ public class LightHandler {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                // Registro en CoreProtect utilizando directamente el material LIGHT
                 CoreProtectUtils.logLightPlacement(
                         plugin.getLogger(),
                         coreProtectCompatibility,
@@ -208,7 +211,6 @@ public class LightHandler {
                         Material.LIGHT
                 );
 
-                // Registro en lote en la base de datos
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
             } catch (ClassCastException e) {
                 plugin.getLogger().warning(TranslationHandler.getFormatted("light.error.setting_level", blockLocation, e.getMessage()));

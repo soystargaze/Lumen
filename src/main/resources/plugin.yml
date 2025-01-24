@@ -7,3 +7,4 @@ authors: [ Eros Marí ]
 website: https://erosmari.com
 softdepend:
   - CoreProtect
+  - FastAsyncWorldEdit
