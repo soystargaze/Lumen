@@ -128,7 +128,7 @@ public class RedoCommand {
 
                 CoreProtectHandler coreProtectHandler = getCoreProtectHandler();
                 if (coreProtectHandler != null) {
-                    coreProtectHandler.logLightPlacement(logger, player.getName(), List.of(blockLocation), Material.LIGHT);
+                    coreProtectHandler.logLightPlacement(player.getName(), List.of(blockLocation), Material.LIGHT);
                 } else {
                     logger.warning("CoreProtectHandler no está inicializado. Registro omitido.");
                 }

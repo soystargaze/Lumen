@@ -161,6 +161,7 @@ public class LightHandler {
         plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_not_found"));
         int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
         Queue<Location> blockQueue = new LinkedList<>(blocks);
+        List<Location> processedBlocks = new ArrayList<>(); // Lista para almacenar bloques procesados
 
         BukkitTask task = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             int processedCount = 0;
@@ -169,7 +170,10 @@ public class LightHandler {
             while (!blockQueue.isEmpty() && processedCount < maxBlocksPerTick) {
                 Location blockLocation = blockQueue.poll();
                 if (blockLocation != null) {
-                    processSingleBlock(player, blockLocation, lightLevel, operationId);
+                    boolean success = processSingleBlock(blockLocation, lightLevel, operationId);
+                    if (success) {
+                        processedBlocks.add(blockLocation); // Agregar bloque procesado
+                    }
                     processedCount++;
                 }
             }
@@ -179,6 +183,18 @@ public class LightHandler {
             DisplayUtil.showActionBar(player, progress);
 
             if (blockQueue.isEmpty()) {
+                // Solo registrar si hay bloques procesados
+                if (!processedBlocks.isEmpty()) {
+                    coreProtectHandler.logLightPlacement(
+                            player.getName(),
+                            processedBlocks,
+                            Material.LIGHT
+                    );
+                    plugin.getLogger().info(TranslationHandler.getFormatted("light.info.blocks_registered", processedBlocks.size()));
+                } else {
+                    plugin.getLogger().warning(TranslationHandler.getFormatted("light.warning.no_blocks_registered", operationId));
+                }
+
                 player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
                 plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 DisplayUtil.hideBossBar(player);
@@ -193,7 +209,7 @@ public class LightHandler {
         return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
-    private void processSingleBlock(Player player, Location blockLocation, int lightLevel, String operationId) {
+    private boolean processSingleBlock(Location blockLocation, int lightLevel, String operationId) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);
 
@@ -203,17 +219,12 @@ public class LightHandler {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                coreProtectHandler.logLightPlacement(
-                        plugin.getLogger(),
-                        player.getName(),
-                        List.of(blockLocation),
-                        Material.LIGHT
-                );
-
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
+                return true;
             } catch (ClassCastException e) {
                 plugin.getLogger().warning(TranslationHandler.getFormatted("light.error.setting_level", blockLocation, e.getMessage()));
             }
         }
+        return false;
     }
 }

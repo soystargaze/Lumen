@@ -9,29 +9,26 @@ import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 public class CoreProtectHandler {
 
+    private final Plugin plugin;
     private CoreProtectAPI coreProtectAPI;
 
     public CoreProtectHandler(Plugin plugin) {
-        setupCoreProtect(plugin);
+        this.plugin = plugin;
+        setupCoreProtect();
     }
 
-    public void setupCoreProtect(Plugin plugin) {
+    public void setupCoreProtect() {
         CoreProtect coreProtect = (CoreProtect) Bukkit.getPluginManager().getPlugin("CoreProtect");
 
-        if (coreProtect != null && coreProtect.isEnabled()) {
+        if (coreProtect != null && coreProtect.isEnabled() && coreProtect.getAPI().isEnabled()) {
             coreProtectAPI = coreProtect.getAPI();
-            if (coreProtectAPI != null && coreProtectAPI.isEnabled()) {
-                plugin.getLogger().info(TranslationHandler.get("coreprotect.integration.success"));
-            } else {
-                coreProtectAPI = null;
-                plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.api_disabled"));
-            }
+            plugin.getLogger().info(TranslationHandler.get("coreprotect.integration.success"));
         } else {
-            plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.not_found"));
+            coreProtectAPI = null;
+            plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.not_found_or_disabled"));
         }
     }
 
@@ -39,71 +36,70 @@ public class CoreProtectHandler {
         return coreProtectAPI != null && coreProtectAPI.isEnabled();
     }
 
-    public void logLightPlacement(Logger logger, String playerName, List<Location> locations, Material material) {
-        if (isEnabled()) {
-            int successCount = 0;
+    public void logLightPlacement(String playerName, List<Location> locations, Material material) {
+        if (locations == null || locations.isEmpty()) {
+            plugin.getLogger().warning(TranslationHandler.get("coreprotect.no_locations_provided"));
+            return;
+        }
 
-            for (Location location : locations) {
-                try {
-                    coreProtectAPI.logPlacement(playerName, location, material, null);
-                    successCount++;
-                } catch (Exception e) {
-                    logger.warning(TranslationHandler.getFormatted(
-                            "coreprotect.placement.error",
-                            location,
-                            e.getMessage()
-                    ));
-                }
-            }
+        int successCount = processLocations(playerName, locations, material, true);
 
-            if (successCount > 0) {
-                logger.info(TranslationHandler.getFormatted(
-                        "coreprotect.placement.success",
-                        successCount,
-                        playerName
-                ));
-            } else {
-                logger.warning(TranslationHandler.getFormatted(
-                        "coreprotect.placement.none",
-                        playerName
-                ));
-            }
+        if (successCount > 0) {
+            plugin.getLogger().info(TranslationHandler.getFormatted(
+                    "coreprotect.placement.success",
+                    successCount,
+                    playerName
+            ));
         } else {
-            logger.warning(TranslationHandler.get("coreprotect.disabled"));
+            plugin.getLogger().warning(TranslationHandler.getFormatted(
+                    "coreprotect.placement.none",
+                    playerName
+            ));
         }
     }
 
-    public void logRemoval(Logger logger, String playerName, List<Location> locations, Material forcedMaterial) {
-        if (isEnabled()) {
-            int successCount = 0;
-
-            for (Location location : locations) {
-                try {
-                    coreProtectAPI.logRemoval(playerName, location, forcedMaterial, location.getBlock().getBlockData());
-                    successCount++;
-                } catch (Exception e) {
-                    logger.warning(TranslationHandler.getFormatted(
-                            "coreprotect.removal.error",
-                            location,
-                            e.getMessage()
-                    ));
-                }
-            }
-
-            if (successCount > 0) {
-                logger.info(TranslationHandler.getFormatted(
-                        "coreprotect.removal.success",
-                        successCount,
-                        playerName
-                ));
-            } else {
-                logger.warning(TranslationHandler.getFormatted(
-                        "coreprotect.removal.none",
-                        playerName
-                ));
-            }
-        } else {
-            logger.warning(TranslationHandler.get("coreprotect.disabled"));
+    public void logRemoval(String playerName, List<Location> locations, Material forcedMaterial) {
+        if (locations == null || locations.isEmpty()) {
+            plugin.getLogger().warning(TranslationHandler.get("coreprotect.no_locations_provided"));
+            return;
         }
+
+        int successCount = processLocations(playerName, locations, forcedMaterial, false);
+
+        if (successCount > 0) {
+            plugin.getLogger().info(TranslationHandler.getFormatted(
+                    "coreprotect.removal.success",
+                    successCount,
+                    playerName
+            ));
+        } else {
+            plugin.getLogger().warning(TranslationHandler.getFormatted(
+                    "coreprotect.removal.none",
+                    playerName
+            ));
+        }
+    }
+
+    private int processLocations(String playerName, List<Location> locations, Material material, boolean isPlacement) {
+        int successCount = 0;
+
+        for (Location location : locations) {
+            try {
+                if (isPlacement) {
+                    coreProtectAPI.logPlacement(playerName, location, material, null);
+                } else {
+                    coreProtectAPI.logRemoval(playerName, location, material, location.getBlock().getBlockData());
+                }
+                successCount++;
+            } catch (Exception e) {
+                plugin.getLogger().warning(TranslationHandler.getFormatted(
+                        isPlacement ? "coreprotect.placement.error" : "coreprotect.removal.error",
+                        location,
+                        e.getMessage()
+                ));
+            }
+        }
+
+        return successCount;
     }
 }

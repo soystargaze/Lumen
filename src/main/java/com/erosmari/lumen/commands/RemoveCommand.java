@@ -88,7 +88,7 @@ public class RemoveCommand {
 
         if (!registeredBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
             for (Location location : registeredBlocks) {
-                coreProtectHandler.logRemoval(logger, player.getName(), List.of(location), Material.LIGHT);
+                coreProtectHandler.logRemoval(player.getName(), List.of(location), Material.LIGHT);
             }
         }
 

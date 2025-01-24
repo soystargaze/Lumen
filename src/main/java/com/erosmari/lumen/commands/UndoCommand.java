@@ -99,7 +99,7 @@ public class UndoCommand {
                 removedCount++;
                 // Registrar cada bloque eliminado en CoreProtect
                 if (coreProtectHandler != null && coreProtectHandler.isEnabled()) {
-                    coreProtectHandler.logRemoval(plugin.getLogger(), player.getName(), List.of(location), Material.LIGHT);
+                    coreProtectHandler.logRemoval(player.getName(), List.of(location), Material.LIGHT);
                 }
             }
         }

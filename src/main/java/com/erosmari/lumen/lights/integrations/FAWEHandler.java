@@ -61,7 +61,7 @@ public class FAWEHandler {
             // Registrar todas las ubicaciones colocadas en CoreProtect
             if (coreProtectHandler != null) {
                 try {
-                    coreProtectHandler.logLightPlacement(plugin.getLogger(), player.getName(), placedLocations, Material.LIGHT);
+                    coreProtectHandler.logLightPlacement(player.getName(), placedLocations, Material.LIGHT);
                     plugin.getLogger().info("Logged " + placedLocations.size() + " light blocks in CoreProtect.");
                 } catch (Exception ex) {
                     plugin.getLogger().severe("Error while logging light placement in CoreProtect: " + ex.getMessage());

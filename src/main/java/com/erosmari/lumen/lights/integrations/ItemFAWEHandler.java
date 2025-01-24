@@ -80,7 +80,6 @@ public class ItemFAWEHandler {
             // Registrar todas las ubicaciones colocadas en CoreProtect
             if (plugin.getCoreProtectHandler() != null) {
                 coreProtectHandler.logLightPlacement(
-                        plugin.getLogger(),
                         player.getName(),
                         placedLocations,
                         Material.LIGHT
