@@ -127,6 +127,7 @@ light:
     placed: "Se colocaron con éxito todas las luces de la operación '{0}'."
     removed: "Se eliminaron todas las luces de la operación '{0}'."
   info:
+    blocks_registered: "Se han registrado {0} bloques de luz para la operación '{1}'."
     batch_processed: "Se procesaron {0} bloques en la operación '{1}'."
     calculated_blocks: "Se calcularon {0} bloques para iluminar."
     fawe_found: "Se detectó FastAsyncWorldEdit (FAWE). Utilizando integración avanzada."
