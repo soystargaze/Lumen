@@ -22,22 +22,26 @@ public class LightRegistry {
 
     private static final Logger logger = Logger.getLogger("Lumen-LightRegistry");
 
-    public static void addBlock(Location location, int lightLevel, String operationId) {
-        if (lightLevel <= 0 || lightLevel > 15) {
-            logger.warning(TranslationHandler.getFormatted("light_registry.error.invalid_light_level", lightLevel, location));
-            return;
-        }
+    public static void addBlockAsync(Location location, int lightLevel, String operationId) {
+        CompletableFuture.runAsync(() -> {
+            if (lightLevel <= 0 || lightLevel > 15) {
+                logger.warning(TranslationHandler.getFormatted("light_registry.error.invalid_light_level", lightLevel, location));
+                return;
+            }
 
-        String query = "INSERT INTO illuminated_blocks (world, x, y, z, light_level, operation_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0);";
+            String query = "INSERT INTO illuminated_blocks (world, x, y, z, light_level, operation_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0);";
 
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query)) {
+            try (Connection connection = DatabaseHandler.getConnection();
+                 PreparedStatement statement = connection.prepareStatement(query)) {
 
-            setBlockStatementParameters(statement, location, lightLevel, operationId);
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.add_block"), e);
-        }
+                setBlockStatementParameters(statement, location, lightLevel, operationId);
+                statement.executeUpdate();
+
+                logger.info(TranslationHandler.getFormatted("light_registry.info.block_added", location, lightLevel, operationId));
+            } catch (SQLException e) {
+                logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.add_block"), e);
+            }
+        });
     }
 
     public static void softDeleteBlocksByOperationId(String operationId) {

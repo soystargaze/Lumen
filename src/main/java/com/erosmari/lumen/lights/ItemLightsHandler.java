@@ -181,7 +181,7 @@ public class ItemLightsHandler {
                 block.setBlockData(lightData, false);
 
                 if (lightLevel >= 0 && lightLevel <= 15) {
-                    LightRegistry.addBlock(location, lightLevel, operationId);
+                    LightRegistry.addBlockAsync(location, lightLevel, operationId);
                 } else {
                     plugin.getLogger().warning("Invalid block data for operation: " + operationId + " at location: " + location);
                 }
