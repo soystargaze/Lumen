@@ -33,13 +33,7 @@ public class LightRegistry {
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, location.getWorld().getName());
-            statement.setInt(2, location.getBlockX());
-            statement.setInt(3, location.getBlockY());
-            statement.setInt(4, location.getBlockZ());
-            statement.setInt(5, lightLevel);
-            statement.setString(6, operationId);
-
+            setBlockStatementParameters(statement, location, lightLevel, operationId);
             statement.executeUpdate();
         } catch (SQLException e) {
             logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.add_block"), e);
@@ -163,23 +157,6 @@ public class LightRegistry {
         } catch (SQLException e) {
             logger.log(Level.SEVERE, TranslationHandler.getFormatted("light_registry.error.remove_blocks", operationId), e);
         }
-    }
-
-    public static String getLastOperationId() {
-        String query = "SELECT operation_id FROM illuminated_blocks WHERE is_deleted = 0 ORDER BY id DESC LIMIT 1;";
-
-        try (Connection connection = DatabaseHandler.getConnection();
-             PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            if (resultSet.next()) {
-                return resultSet.getString("operation_id");
-            }
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.fetch_last_operation"), e);
-        }
-
-        return null;
     }
 
     public static List<Location> getBlocksInRange(Location center, int range) {
@@ -316,12 +293,7 @@ public class LightRegistry {
                         continue; // Salta la ubicación con nivel de luz no válido
                     }
 
-                    statement.setString(1, location.getWorld().getName());
-                    statement.setInt(2, location.getBlockX());
-                    statement.setInt(3, location.getBlockY());
-                    statement.setInt(4, location.getBlockZ());
-                    statement.setInt(5, lightLevel);
-                    statement.setString(6, operationId);
+                    setBlockStatementParameters(statement, location, lightLevel, operationId);
                     statement.addBatch(); // Agrega al lote
                 }
 
@@ -333,5 +305,14 @@ public class LightRegistry {
                 logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.add_blocks"), e);
             }
         });
+    }
+
+    private static void setBlockStatementParameters(PreparedStatement statement, Location location, int lightLevel, String operationId) throws SQLException {
+        statement.setString(1, location.getWorld().getName());
+        statement.setInt(2, location.getBlockX());
+        statement.setInt(3, location.getBlockY());
+        statement.setInt(4, location.getBlockZ());
+        statement.setInt(5, lightLevel);
+        statement.setString(6, operationId);
     }
 }
