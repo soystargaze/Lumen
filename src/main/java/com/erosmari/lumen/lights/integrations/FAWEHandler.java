@@ -21,20 +21,6 @@ import java.util.List;
 public class FAWEHandler {
 
     /**
-     * Verifies if FAWE is available.
-     *
-     * @return true if FAWE is available, false otherwise.
-     */
-    public static boolean isFAWEAvailable() {
-        try {
-            Class.forName("com.fastasyncworldedit.core.FaweAPI");
-            return true;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
-    /**
      * Places light blocks using FAWE.
      *
      * @param locations List of locations where blocks should be placed.
