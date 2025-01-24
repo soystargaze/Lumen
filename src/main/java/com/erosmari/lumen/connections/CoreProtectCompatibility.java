@@ -16,7 +16,6 @@ public class CoreProtectCompatibility {
     }
 
     private void setupCoreProtect() {
-        // Intenta obtener el plugin CoreProtect
         CoreProtect coreProtect = (CoreProtect) Bukkit.getPluginManager().getPlugin("CoreProtect");
 
         if (coreProtect != null && coreProtect.isEnabled()) {

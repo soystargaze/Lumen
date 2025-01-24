@@ -176,10 +176,12 @@ coreprotect:
   api_null: "El API de CoreProtect no está disponible. No se puede registrar la acción."
   placement:
     error: "Error al registrar la colocación del bloque en {0}: {1}."
+    errors: "Hubo {0} errores al registrar bloques en CoreProtect por {1}."
     success: "Se registraron con éxito {0} bloques colocados por {1} en CoreProtect."
     none: "No se registraron bloques colocados para {0} en CoreProtect."
   removal:
     error: "Error al registrar la eliminación del bloque en {0}: {1}."
+    errors: "Hubo {0} errores al eliminar bloques en CoreProtect por {1}."
     success: "Se registraron con éxito {0} bloques eliminados por {1} en CoreProtect."
     none: "No se registraron bloques eliminados para {0} en CoreProtect."
   integration:
