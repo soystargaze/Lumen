@@ -56,7 +56,7 @@ public class ItemLightsHandler {
                     processBlocksAsync(player, blocksToLight, lightLevel, lightsPerTick, tickInterval, operationId);
                 }, runnable -> Bukkit.getScheduler().runTask(plugin, runnable))
                 .exceptionally(ex -> {
-                    plugin.getLogger().severe("Error durante el cálculo de posiciones: " + ex.getMessage());
+                    plugin.getLogger().severe("Error calculating positions: " + ex.getMessage());
                     return null;
                 });
     }
@@ -107,7 +107,7 @@ public class ItemLightsHandler {
     public void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, String operationId) {
         // Si FAWE está disponible, delegar la colocación de bloques al manejado de FAWE
         if (isFAWEAvailable()) {
-            plugin.getLogger().info("FAWE detected. Delegating block placement to FAWE.");
+            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_found"));
             CompletableFuture.runAsync(() -> ItemFAWEHandler.placeLightsWithFAWE(plugin, player, blocks, lightLevel, operationId), executor)
                     .thenRun(() -> {
                         player.sendMessage(TranslationHandler.getFormatted("light.success.placed", operationId));
@@ -124,7 +124,7 @@ public class ItemLightsHandler {
         }
 
         // Lógica original si FAWE no está disponible
-        plugin.getLogger().info("FAWE not detected. Using default block placement method.");
+        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_not_found"));
         Queue<Location> blockQueue = new LinkedList<>(blocks);
         final BukkitTask[] taskHolder = new BukkitTask[1];
 

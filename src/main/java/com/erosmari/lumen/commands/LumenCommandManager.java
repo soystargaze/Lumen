@@ -1,10 +1,12 @@
 package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.Lumen;
+import com.erosmari.lumen.utils.TranslationHandler;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.Plugin;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -38,7 +40,7 @@ public class LumenCommandManager {
                     Commands.literal("lumen")
                             .executes(ctx -> {
                                 CommandSourceStack source = ctx.getSource();
-                                source.getSender().sendMessage("Uso del comando /lumen:");
+                                source.getSender().sendMessage(Component.text(TranslationHandler.get("command.usage")));
                                 return 1; // Comando ejecutado con éxito
                             })
                             // Subcomandos

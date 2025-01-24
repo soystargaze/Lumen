@@ -40,8 +40,7 @@ public class LightCommand {
                                 )
                 )
                 .executes(ctx -> {
-                    ctx.getSource().getSender().sendMessage(Component.text("Uso: /lumen light <range> <light_level> [include_skylight]")
-                            .color(NamedTextColor.RED));
+                    ctx.getSource().getSender().sendMessage(Component.text(TranslationHandler.get("command.light.usage")).color(NamedTextColor.RED));
                     return 0;
                 });
     }

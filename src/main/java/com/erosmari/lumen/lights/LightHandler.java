@@ -2,7 +2,7 @@ package com.erosmari.lumen.lights;
 
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
-import com.erosmari.lumen.connections.CoreProtectCompatibility; // Integración con CoreProtect
+import com.erosmari.lumen.connections.CoreProtectCompatibility;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.lights.integrations.FAWEHandler;
 import com.erosmari.lumen.tasks.TaskManager;
@@ -29,7 +29,7 @@ public class LightHandler {
 
     public LightHandler(Lumen plugin) {
         this.plugin = plugin;
-        this.coreProtectCompatibility = plugin.getCoreProtectCompatibility(); // Integración de CoreProtect
+        this.coreProtectCompatibility = plugin.getCoreProtectCompatibility();
     }
 
     public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight, String operationId) {
@@ -51,7 +51,7 @@ public class LightHandler {
                     processBlocksAsync(player, blocksToLight, lightLevel, operationId);
                 })
                 .exceptionally(ex -> {
-                    plugin.getLogger().severe("Error al calcular posiciones: " + ex.getMessage());
+                    plugin.getLogger().severe("Error calculating positions: " + ex.getMessage());
                     return null;
                 });
     }
@@ -137,7 +137,7 @@ public class LightHandler {
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, String operationId) {
         // Si FAWE está disponible, delegar la colocación de bloques a FAWE
         if (isFAWEAvailable()) {
-            plugin.getLogger().info("FAWE detected. Delegating block placement to FAWE.");
+            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_found"));
             CompletableFuture.runAsync(() -> {
                 try {
                     FAWEHandler.placeLightBlocks(blocks, lightLevel, player, plugin, coreProtectCompatibility);
@@ -158,7 +158,7 @@ public class LightHandler {
             return;
         }
 
-        plugin.getLogger().info("FAWE not detected. Using default block placement method.");
+        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_not_found"));
         int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
         Queue<Location> blockQueue = new LinkedList<>(blocks);
 

@@ -23,7 +23,7 @@ public class ReloadCommand {
         return Commands.literal("reload")
                 .requires(source -> {
                     if (!source.getSender().hasPermission("lumen.reload")) {
-                        source.getSender().sendMessage(Component.text("No tienes permiso para ejecutar este comando.").color(NamedTextColor.RED));
+                        source.getSender().sendMessage(Component.text(TranslationHandler.get("command.no_permission")).color(NamedTextColor.RED));
                         return false;
                     }
                     return true;
