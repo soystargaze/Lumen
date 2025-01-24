@@ -98,7 +98,7 @@ public class CoreProtectUtils {
     }
 
     /**
-     * Valida si CoreProtect está habilitado y disponible antes de procesar las acciones.
+     * Validar si CoreProtect está habilitado y disponible antes de procesar las acciones.
      *
      * @param logger      Logger del plugin para registrar errores y advertencias.
      * @param coreProtect Instancia de CoreProtectCompatibility.
