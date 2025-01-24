@@ -142,7 +142,7 @@ public class LightHandler {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 try {
                     // Delegar la colocación de bloques a FAWE
-                    FAWEHandler.placeLightBlocks(blocks, lightLevel, player);
+                    FAWEHandler.placeLightBlocks(blocks, lightLevel, player, plugin, coreProtectCompatibility);
 
                     // Registrar bloques en lote
                     LightRegistry.addBlocksAsync(blocks, lightLevel, operationId);

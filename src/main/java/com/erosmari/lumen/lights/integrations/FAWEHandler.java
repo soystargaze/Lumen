@@ -1,5 +1,6 @@
 package com.erosmari.lumen.lights.integrations;
 
+import com.erosmari.lumen.utils.CoreProtectUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.fastasyncworldedit.bukkit.FaweBukkitWorld;
 import com.sk89q.worldedit.EditSession;
@@ -11,7 +12,9 @@ import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FAWEHandler {
@@ -35,7 +38,7 @@ public class FAWEHandler {
      *
      * @param locations List of locations where blocks should be placed.
      */
-    public static void placeLightBlocks(List<Location> locations, int lightLevel, Player player) {
+    public static void placeLightBlocks(List<Location> locations, int lightLevel, Player player, JavaPlugin plugin, Object coreProtectCompatibility) {
         if (locations == null || locations.isEmpty()) {
             throw new IllegalArgumentException("Locations list is empty or null.");
         }
@@ -66,10 +69,20 @@ public class FAWEHandler {
             BlockState customLightState = lightState.with(levelProperty, lightLevel);
 
             // Establecer bloques
+            List<Location> placedLocations = new ArrayList<>();
             for (Location loc : locations) {
                 if (loc == null) continue;
                 BlockVector3 position = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+
                 editSession.smartSetBlock(position, customLightState);
+                placedLocations.add(loc);
+            }
+
+            // Registrar todas las ubicaciones colocadas en CoreProtect
+            if (coreProtectCompatibility instanceof com.erosmari.lumen.connections.CoreProtectCompatibility compatibility) {
+                CoreProtectUtils.logLightPlacement(plugin.getLogger(), compatibility, player.getName(), placedLocations);
+            } else {
+                plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.not_found"));
             }
 
             // Finalizar operaciones
