@@ -6,10 +6,7 @@ import com.erosmari.lumen.connections.CoreProtectCompatibility; // Integración 
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.lights.integrations.FAWEHandler;
 import com.erosmari.lumen.tasks.TaskManager;
-import com.erosmari.lumen.utils.AsyncExecutor; // Clase para manejar tareas asíncronas
-import com.erosmari.lumen.utils.CoreProtectUtils;
-import com.erosmari.lumen.utils.DisplayUtil;
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -140,7 +137,7 @@ public class LightHandler {
         int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
         Queue<Location> blockQueue = new LinkedList<>(blocks);
 
-        // Si FAWE está disponible, manejar bloques en masa
+        // Si FAWE está disponible, delegar la colocación de bloques a FAWE
         if (FAWEHandler.isFAWEAvailable()) {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                 try {
@@ -204,11 +201,9 @@ public class LightHandler {
 
                 // Registro en CoreProtect utilizando el utilitario
                 CoreProtectUtils.logLightPlacement(plugin.getLogger(), coreProtectCompatibility, player.getName(), List.of(blockLocation));
-                if (lightLevel >= 0 && lightLevel <= 15) {
-                    LightRegistry.addBlock(blockLocation, lightLevel, operationId);
-                } else {
-                    plugin.getLogger().warning("Invalid block data for operation: " + operationId);
-                }
+
+                // Registro en lote en la base de datos
+                BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
             } catch (ClassCastException e) {
                 plugin.getLogger().warning(TranslationHandler.getFormatted("light.error.setting_level", blockLocation, e.getMessage()));
             }
