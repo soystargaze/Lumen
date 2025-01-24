@@ -60,7 +60,7 @@ command:
   light:
     usage: "§aUso: /lumen light <rango> <nivel> <incluir skylight>"
     invalid_level: "§cEl nivel de luz debe estar entre 0 y 15."
-    success: "§aSe han colocado luces con nivel de luz {0}. ID de operación: {1}."
+    success: "&fSe han colocado luces con nivel de luz &a{0}&f. ID de operación: &a{1}&f."
   cancel:
     success: "§aTu tarea de iluminación ha sido cancelada."
     no_task: "§eNo tienes ninguna tarea activa para cancelar."
