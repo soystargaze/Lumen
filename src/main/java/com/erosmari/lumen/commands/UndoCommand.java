@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -25,11 +26,6 @@ public class UndoCommand {
         this.plugin = plugin;
     }
 
-    /**
-     * Registra el subcomando `/lumen undo` en el sistema nativo de Paper.
-     *
-     * @return Nodo literal del comando para registrarlo en el comando principal.
-     */
     public LiteralArgumentBuilder<CommandSourceStack> register() {
         return Commands.literal("undo")
                 .requires(source -> source.getSender().hasPermission("lumen.undo"))
@@ -43,13 +39,6 @@ public class UndoCommand {
                 .executes(ctx -> handleUndoCommand(ctx.getSource(), 1)); // Por defecto deshace una operación
     }
 
-    /**
-     * Maneja el comando `/lumen undo`.
-     *
-     * @param source Fuente del comando.
-     * @param count  Número de operaciones a deshacer.
-     * @return Código de éxito (1 para éxito, 0 para fallo).
-     */
     private int handleUndoCommand(CommandSourceStack source, int count) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(Component.text(TranslationHandler.get("command.undo.only_players")).color(NamedTextColor.RED));
@@ -63,11 +52,7 @@ public class UndoCommand {
             return 0;
         }
 
-        int totalRemovedBlocks = 0;
-
-        for (String operationId : lastOperations) {
-            totalRemovedBlocks += removeLightBlocksByOperation(operationId, player);
-        }
+        int totalRemovedBlocks = removeLightBlocksByOperations(lastOperations, player);
 
         if (totalRemovedBlocks > 0) {
             player.sendMessage(Component.text(TranslationHandler.getFormatted("command.undo.success", totalRemovedBlocks, count)).color(NamedTextColor.GREEN));
@@ -78,46 +63,34 @@ public class UndoCommand {
         }
     }
 
-    /**
-     * Elimina bloques de luz asociados a una operación y los registra en CoreProtect.
-     *
-     * @param operationId Identificador de la operación.
-     * @param player      Jugador que ejecutó el comando.
-     * @return Número de bloques eliminados.
-     */
-    private int removeLightBlocksByOperation(String operationId, Player player) {
-        List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
-        if (blocks.isEmpty()) {
-            return 0;
-        }
-
+    private int removeLightBlocksByOperations(List<String> operationIds, Player player) {
         CoreProtectHandler coreProtectHandler = plugin.getCoreProtectHandler();
-        int removedCount = 0;
+        List<Location> allRemovedBlocks = new ArrayList<>();
 
-        for (Location location : blocks) {
-            if (removeLightBlock(location)) {
-                removedCount++;
-                // Registrar cada bloque eliminado en CoreProtect
-                if (coreProtectHandler != null && coreProtectHandler.isEnabled()) {
-                    coreProtectHandler.logRemoval(player.getName(), List.of(location), Material.LIGHT);
+        for (String operationId : operationIds) {
+            List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
+            if (!blocks.isEmpty()) {
+                for (Location location : blocks) {
+                    if (removeLightBlock(location)) {
+                        allRemovedBlocks.add(location); // Acumula las ubicaciones de los bloques eliminados
+                    }
                 }
+                // Marca la operación como eliminada en el registro
+                LightRegistry.softDeleteBlocksByOperationId(operationId);
             }
         }
 
-        LightRegistry.softDeleteBlocksByOperationId(operationId);
-        return removedCount;
+        // Registrar los bloques eliminados en CoreProtect en un único lote
+        if (!allRemovedBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
+            coreProtectHandler.logRemoval(player.getName(), allRemovedBlocks, Material.LIGHT);
+        }
+
+        return allRemovedBlocks.size(); // Retorna el número total de bloques eliminados
     }
 
-    /**
-     * Elimina un bloque de luz.
-     *
-     * @param location Ubicación del bloque.
-     * @return True si el bloque fue eliminado, False en caso contrario.
-     */
     private boolean removeLightBlock(Location location) {
-        if (location.getBlock().getType() == org.bukkit.Material.LIGHT) {
-            // Eliminar el bloque
-            location.getBlock().setType(org.bukkit.Material.AIR, false);
+        if (location.getBlock().getType() == Material.LIGHT) {
+            location.getBlock().setType(Material.AIR, false);
             return true;
         }
         return false;
