@@ -36,7 +36,8 @@ public class BatchProcessor {
     public static void addBlockToBatch(Location location, int lightLevel, String operationId) {
         boolean success = batchQueue.offer(new BatchEntry(location, lightLevel, operationId));
         if (!success) {
-            logger.warning("Failed to add block to batch: " + location + ", operationId: " + operationId);
+            logger.warning(TranslationHandler.getFormatted("light_registry.error.add_block_failed", location, operationId));
+
         }
     }
 

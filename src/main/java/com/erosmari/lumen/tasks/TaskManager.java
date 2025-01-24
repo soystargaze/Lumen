@@ -16,7 +16,7 @@ public class TaskManager {
      * @param task     La tarea programada.
      */
     public static void addTask(UUID playerId, BukkitTask task) {
-        cancelTask(playerId); // Cancelar cualquier tarea previa antes de añadir una nueva.
+        cancelTask(playerId);
         playerTasks.put(playerId, task);
     }
 

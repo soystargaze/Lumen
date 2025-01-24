@@ -14,12 +14,6 @@ public class TranslationHandler {
     private static final Map<String, String> translations = new HashMap<>();
     public static int loadedKeys = 0;
 
-    /**
-     * Loads translations from the specified language file.
-     *
-     * @param plugin   Plugin instance for accessing the logger.
-     * @param language The language to load (e.g., en_us, es_es).
-     */
     public static void loadTranslations(JavaPlugin plugin, String language) {
         File translationsFolder = new File(plugin.getDataFolder(), "Translations");
         if (!translationsFolder.exists() && !translationsFolder.mkdirs()) {
@@ -46,13 +40,6 @@ public class TranslationHandler {
         }
     }
 
-    /**
-     * Creates the default translation file if it doesn't exist.
-     *
-     * @param plugin   Plugin instance for accessing the resource.
-     * @param langFile Translation file to create.
-     * @param language The language being created.
-     */
     private static void createDefaultTranslationFile(JavaPlugin plugin, File langFile, String language) {
         try {
             if (langFile.createNewFile()) {
@@ -70,23 +57,10 @@ public class TranslationHandler {
         }
     }
 
-    /**
-     * Retrieves a translation by key.
-     *
-     * @param key The translation key.
-     * @return The translated text, or an error message if not found.
-     */
     public static String get(String key) {
         return translations.getOrDefault(key, "Translation not found: " + key + "!");
     }
 
-    /**
-     * Retrieves a formatted translation with dynamic placeholders.
-     *
-     * @param key  The translation key.
-     * @param args The dynamic values to insert into the translation.
-     * @return The translated text with placeholders replaced.
-     */
     public static String getFormatted(String key, Object... args) {
         String template = translations.getOrDefault(key, "Translation not found: " + key + "!");
         for (int i = 0; i < args.length; i++) {
@@ -95,18 +69,10 @@ public class TranslationHandler {
         return template;
     }
 
-    /**
-     * Clears all loaded translations (useful for reloading).
-     */
     public static void clearTranslations() {
         translations.clear();
     }
 
-    /**
-     * Displays the total number of loaded translations.
-     *
-     * @return The number of loaded translations.
-     */
     public static int getLoadedTranslationsCount() {
         return translations.size();
     }

@@ -118,6 +118,7 @@ light:
     setting_level: "Error al establecer el nivel de luz en {0}: {1}."
     setting_level_torch: "Error al configurar el nivel de luz en {0}: {1}."
     no_lights_to_remove: "No se encontraron luces para eliminar en la operación: {0}."
+    add_block_failed: "No se pudo agregar el bloque en {0} a la operación '{1}'."
   warning:
     invalid_block_data: "Datos de bloque inválidos para la operación {0} en la ubicación {1}."
     no_world: "El mundo '{0}' no se encontró. Verifica que el mundo esté cargado correctamente."
@@ -126,6 +127,7 @@ light:
     placed: "Se colocaron con éxito todas las luces de la operación '{0}'."
     removed: "Se eliminaron todas las luces de la operación '{0}'."
   info:
+    batch_processed: "Se procesaron {0} bloques en la operación '{1}'."
     calculated_blocks: "Se calcularon {0} bloques para iluminar."
     fawe_found: "Se detectó FastAsyncWorldEdit (FAWE). Utilizando integración avanzada."
     fawe_not_found: "FAWE no está disponible. Usando el sistema predeterminado para colocar bloques."
@@ -170,16 +172,16 @@ light_registry:
 coreprotect:
   enabled: "CoreProtect habilitado y disponible."
   unavailable: "CoreProtect no está disponible."
-  disabled: "CoreProtect no está habilitado o no es compatible."
-  api_null: "La API de CoreProtect es nula."
+  disabled: "CoreProtect no está habilitado. No se puede registrar la acción."
+  api_null: "El API de CoreProtect no está disponible. No se puede registrar la acción."
   placement:
-    error: "Error al registrar la colocación de luz en {0}: {1}"
-    success: "Se registraron {0} bloques colocados en CoreProtect por {1}."
-    none: "No se pudo registrar ninguna colocación de luz para {0}."
+    error: "Error al registrar la colocación del bloque en {0}: {1}."
+    success: "Se registraron con éxito {0} bloques colocados por {1} en CoreProtect."
+    none: "No se registraron bloques colocados para {0} en CoreProtect."
   removal:
-    error: "Error al registrar la eliminación de luz en {0}: {1}"
-    success: "Se registraron {0} bloques eliminados en CoreProtect por {1}."
-    none: "No se pudo registrar ninguna eliminación de luz para {0}."
+    error: "Error al registrar la eliminación del bloque en {0}: {1}."
+    success: "Se registraron con éxito {0} bloques eliminados por {1} en CoreProtect."
+    none: "No se registraron bloques eliminados para {0} en CoreProtect."
   integration:
     success: "¡Integración con CoreProtect exitosa!"
     api_disabled: "El API de CoreProtect está deshabilitado. La integración no puede completarse."
