@@ -196,7 +196,6 @@ public class LightHandler {
                 }
 
                 player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
-                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
             }
