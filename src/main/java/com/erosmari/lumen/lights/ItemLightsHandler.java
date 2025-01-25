@@ -209,7 +209,6 @@ public class ItemLightsHandler {
 
                         LightRegistry.removeBlocksByOperationId(operationId);
                         player.sendMessage(TranslationHandler.getFormatted("light.success.removed", operationId));
-                        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.removed_lights", operationId));
                     });
                 });
     }
@@ -225,6 +224,5 @@ public class ItemLightsHandler {
         // Mensajes de feedback
         DisplayUtil.hideBossBar(player);
         player.sendMessage(TranslationHandler.getFormatted("light.info.cancelled_and_removed", operationId));
-        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.cancelled_and_removed", operationId));
     }
 }

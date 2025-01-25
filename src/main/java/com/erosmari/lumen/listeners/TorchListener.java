@@ -97,7 +97,7 @@ public class TorchListener implements Listener {
                             // Evitar el drop predeterminado
                             event.setDropItems(false);
 
-                            plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_broken", operationId));
+                            player.sendMessage(TranslationHandler.getFormatted("torch.light_broken", operationId));
                         }
                     } catch (Exception e) {
                         plugin.getLogger().severe(String.format(

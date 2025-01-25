@@ -7,8 +7,6 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -71,10 +69,6 @@ public class LumenItems {
 
         if (meta != null) {
             meta.displayName(Component.text(name)); // Asignar el nombre traducido al objeto
-
-            // Agregar el efecto de brillo
-            meta.addEnchant(Enchantment.INFINITY, 1, true); // Añade brillo
-            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS); // Oculta el texto del encantami
 
             // Agregar el identificador al PersistentDataContainer
             NamespacedKey key = new NamespacedKey(plugin, "lumen_id");
