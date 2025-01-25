@@ -37,7 +37,6 @@ public class LightRegistry {
                 setBlockStatementParameters(statement, location, lightLevel, operationId);
                 statement.executeUpdate();
 
-                logger.info(TranslationHandler.getFormatted("light_registry.info.block_added", location, lightLevel, operationId));
             } catch (SQLException e) {
                 logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.add_block"), e);
             }
