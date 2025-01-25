@@ -16,8 +16,6 @@ import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
