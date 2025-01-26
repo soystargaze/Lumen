@@ -53,7 +53,7 @@ command:
     coreprotect_not_available: "La funcionalidad de CoreProtect no está disponible o no está habilitada."
     coreprotect_disabled_log: "CoreProtect no está habilitado o disponible, no se registrarán las eliminaciones de bloques."
     area:
-      success: "Se han eliminado con éxito {0} bloques de luz dentro de un rango de {1} bloques."
+      success: "Se han eliminado {0} bloques de luz dentro de un rango de {1} bloques."
       success_log: "El jugador {0} eliminó {1} bloques de luz dentro de un rango de {2} bloques."
       no_blocks: "No se encontraron bloques de luz para eliminar dentro de un rango de {0} bloques."
       no_blocks_log: "El jugador {0} intentó eliminar bloques de luz dentro de un rango de {1} bloques, pero no se encontraron bloques."
@@ -124,6 +124,7 @@ light:
     no_world: "El mundo '{0}' no se encontró. Verifica que el mundo esté cargado correctamente."
   success:
     completed: "Se completó la colocación de {0} bloques de luz con la operación '{1}'."
+    fawe: "Se colocaron con éxito {0} bloques de luz con FAWE."
     placed: "Se colocaron con éxito todas las luces de la operación '{0}'."
     removed: "Se eliminaron todas las luces de la operación '{0}'."
   info:
@@ -179,12 +180,12 @@ coreprotect:
   placement:
     error: "Error al registrar la colocación del bloque en {0}: {1}."
     errors: "Hubo {0} errores al registrar bloques en CoreProtect por {1}."
-    success: "Se registraron con éxito {0} bloques colocados por {1} en CoreProtect."
+    success: "Se registraron {0} bloques colocados por {1} en CoreProtect."
     none: "No se registraron bloques colocados para {0} en CoreProtect."
   removal:
     error: "Error al registrar la eliminación del bloque en {0}: {1}."
     errors: "Hubo {0} errores al eliminar bloques en CoreProtect por {1}."
-    success: "Se registraron con éxito {0} bloques eliminados por {1} en CoreProtect."
+    success: "Se registraron {0} bloques eliminados por {1} en CoreProtect."
     none: "No se registraron bloques eliminados para {0} en CoreProtect."
   integration:
     success: "¡Integración con CoreProtect exitosa!"

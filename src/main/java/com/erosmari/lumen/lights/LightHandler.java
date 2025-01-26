@@ -146,7 +146,7 @@ public class LightHandler {
                     throw new RuntimeException("Error during FAWE block placement: " + e.getMessage(), e);
                 }
             }).thenRun(() -> {
-                player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
+                player.sendMessage(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
@@ -195,7 +195,7 @@ public class LightHandler {
                     plugin.getLogger().warning(TranslationHandler.getFormatted("light.warning.no_blocks_registered", operationId));
                 }
 
-                player.sendMessage(TranslationHandler.getFormatted("light.success.completed", lightLevel, operationId));
+                player.sendMessage(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
             }

@@ -62,7 +62,8 @@ public class FAWEHandler {
             if (coreProtectHandler != null) {
                 try {
                     coreProtectHandler.logLightPlacement(player.getName(), placedLocations, Material.LIGHT);
-                    plugin.getLogger().info("Logged " + placedLocations.size() + " light blocks in CoreProtect.");
+                    // Enviar el mensaje al jugador
+                    player.sendMessage(TranslationHandler.getFormatted("light.success.fawe", placedLocations.size()));
                 } catch (Exception ex) {
                     plugin.getLogger().severe("Error while logging light placement in CoreProtect: " + ex.getMessage());
                 }
@@ -73,10 +74,8 @@ public class FAWEHandler {
             // Finalizar operaciones
             editSession.flushQueue();
 
-            // Enviar el mensaje al jugador
-            player.sendMessage(TranslationHandler.get("light.success.completed"));
         } catch (Exception e) {
-            player.sendMessage(TranslationHandler.getFormatted("light.error", e.getMessage()));
+            player.sendMessage(TranslationHandler.getFormatted("light.error.fawe_failed", e.getMessage()));
         }
     }
     /**
