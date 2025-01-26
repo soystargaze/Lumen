@@ -4,7 +4,14 @@
 # | |__| |_| | | | | | |  __/ | | |
 # |_____\__,_|_| |_| |_|\___|_| |_|
 
-language: "es_es" # Language of the plugin
+
+# Support: https://erosmari.com/discord
+# Documentation: https://github.com/soystargaze/Lumen-Public
+# Version: 1.0.0
+
+# Plugin settings
+# Language of the plugin
+language: "es_es"
 
 settings:
   # Lumen Command settings
@@ -19,13 +26,13 @@ settings:
   mob_torch_radius: 35 # Radius of the mob torch
   mob_torch_search_range: 100 # Range of the mob torch search
 
-# Configuración de BossBar y ActionBar
+# Lumen Bossbar and Actionbar settings
 display:
   bossbar:
     enabled: true
-    message: "Progreso: {progress}% completado"
+    message: "Progress: {progress}% completed"
     color: "YELLOW"
     style: "SOLID"
   actionbar:
     enabled: true
-    message: "Progreso: {progress}% completado"
+    message: "Progress: {progress}% completed"
