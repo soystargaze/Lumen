@@ -91,10 +91,16 @@ public class Lumen extends JavaPlugin implements Listener {
             return;
         }
 
-        File defaultTranslationFile = new File(translationsFolder, "es_es.yml");
-        if (!defaultTranslationFile.exists()) {
+        // Carga solo el idioma seleccionado en la configuración
+        String language = ConfigHandler.getLanguage();
+        saveDefaultTranslation(language + ".yml");
+    }
+
+    private void saveDefaultTranslation(String fileName) {
+        File translationFile = new File(getDataFolder(), "Translations/" + fileName);
+        if (!translationFile.exists()) {
             try {
-                saveResource("Translations/es_es.yml", false);
+                saveResource("Translations/" + fileName, false);
             } catch (Exception e) {
                 getLogger().severe(TranslationHandler.get("translations.file_error") + ": " + e.getMessage());
             }

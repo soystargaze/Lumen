@@ -97,9 +97,9 @@ items:
   registered: "Objetos personalizáo registrao como debe ser."
   init_error: "¡Ojú! Error inicializando loh objeto personalizáo."
   torch:
-    name: "<amarillo><negrita>Antorcha Lumen</amarillo>"
+    name: "<yellow><bold>Antorcha Lumen</yellow>"
   guard:
-    name: "<azul><negrita>Guardia Lumen</azul>"
+    name: "<blue><bold>Guardia Lumen</blue>"
   recipe_registered: "Receta registra: {0}. ¡Arsa!"
 
 events:
