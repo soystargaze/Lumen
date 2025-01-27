@@ -1,0 +1,202 @@
+#     _              _       _   __  _
+#    / \   _ __   __| | __ _| |_/_/_| |__
+#   / _ \ | '_ \ / _` |/ _` | | | | | '_ \
+#  / ___ \| | | | (_| | (_| | | |_| | | | |
+# /_/   \_\_| |_|\__,_|\__,_|_|\__,_|_| |_|
+
+# Puedes usá MiniMessage, (&6, &a...) y (§b, §c...) pa’ los estilos y los colóres en las traduccioneh.
+
+plugin:
+  prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
+  dynamic_color: "<color:#21FFCE>" # El colóh que se le pone a {0}, {1}, etc. en lah traduccioneh
+  enabled: "El Lumen se ha encendío de arte."
+  disabled: "El Lumen se ha apagao. Ay, qué penita."
+  enable_error: "Ojú, que el plugin no se ha podío encendé. Mira la consola, mi arma."
+  language_loaded: "¡Ole! Idioma cargao: {0}.yml ({1} traduccioneh)"
+
+translations:
+  folder_error: "Ojú, no se pudo creá la carpeta de las traduccioneh."
+  file_error: "Ay, no se pudo creá el archívo de traducción."
+
+database:
+  init_error: "¡Pisha! Error inicializando la base de dato."
+  init_fatal_error: "Esto ha sido un desastre: la base de dato no pudo inicializáh. Plugin apagao."
+  initialized: "Base de dato inicializá con arte."
+  init:
+    already_initialized: "La base de dato ya está inicializá, ¿pa qué te meteh otra vé?"
+    error: "Ojú, un error inicializando la base de dato."
+    failed: "No se pudo inicializá la base de dato, picha. Mira loh registroh."
+    sqlite:
+      error_directory: "Ay, no se pudo creá el direhtorio pa’ SQLite: {0}."
+  tables:
+    error: "Error, shur, creando las tabla de la base de dato."
+    connection:
+      uninitialized: "El pool de conexiones no tá inicializao. ¡Primero inicializa la base de dato, picha!"
+    close:
+      success: "El pool de conexiones de la base de dato se ha cerrao como Dios manda."
+
+commandmanager:
+  init_error: "Ojú, un error inicializando el CommandManager: {0}"
+  init_failure: "El CommandManager se ha partío por la mitad."
+
+command:
+  no_permission: "¡Quillo! No tieneh permiso pa usá este comando."
+  registered: "Comandoh registrao con arte."
+  usage: "Mira, mi arma: /lumen <subcomando>"
+  only_players: "Solo loh jugadoreh pueden usá este comando, picha."
+  register_error: "Ojú, un error registrando comandoh. El plugin se ha desactivao."
+  undo:
+    only_players: "¡Esto ná má lo pueden usá loh jugadoreh, quillo!"
+    no_previous_operations: "No hay na pa deshací, picha."
+    no_blocks: "No seh encontraron bloques pa’ deshací en lah últimah {0} operaciones."
+    success: "¡Ole! Seh han deshecho {0} bloques de luz de lah últimah {1} operaciones."
+  redo:
+    no_previous_operations: "No hay na pa restaurá, picha."
+    no_blocks_found: "No seh encontraron bloques relacionaos con la operación: {0}."
+    restoration_started: "Se ha empezado a restaurá {0} bloques... ¡Mano a la obra!"
+    restoration_completed: "¡Toma ya! Se completó la restauración de la operación {0}."
+    restoration_completed_log: "¡Arsa! Restauración terminá pa’ la operación {0}."
+    retrying_failed_blocks: "Vamos a intentá arreglá loh bloques que fallaron..."
+    cannot_set_light: "Ojú, no se pudo poné un bloque de luz en {0}."
+    light_level_error: "Error configurando el nivel de luz en {0}: {1}."
+  remove:
+    coreprotect_not_available: "Quillo, el CoreProtect no está disponible o no se ha encendío."
+    coreprotect_disabled_log: "CoreProtect apagao, picha. No se registrarán las eliminaciones de bloques."
+    area:
+      success: "Se eliminaron {0} bloques de luz en un rango de {1} bloques. ¡De lujo!"
+      success_log: "El jugador {0} quitó {1} bloques de luz en un rango de {2} bloques. ¡Qué máquina!"
+      no_blocks: "No seh encontraron bloques de luz pa’ eliminá en un rango de {0} bloques."
+      no_blocks_log: "El jugador {0} intentó quitá bloques de luz en un rango de {1} bloques, pero no había na. Mala suerte."
+  light:
+    usage: "Usa esto así, mi arma: /lumen light <rango> <nivel> <incluir skylight>"
+    invalid_level: "El nivel de luz tiene que sé entre 0 y 15, picha."
+    success: "Luces colocás con nivel {0}. Operación con ID: {1}. ¡Arsa!"
+  cancel:
+    success: "Tu tarea de iluminá se ha cancelao, mi arma."
+    no_task: "No tieneh ninguna tarea activa pa’ cancela."
+  clear:
+    request: "¿De verdá quiereh eliminá to’ loh bloques ilumináo? Escribe /lumen clear confirm pa’ confirmá. Tieneh 30 segundoh."
+    no_request: "No tieneh ninguna confirmación activa, picha."
+    expired: "Tu confirmación se ha caducao. Se te fue el tiempo."
+    success: "¡To’ loh bloques iluminá se han eliminao! ¡Qué maravilla!"
+  reload:
+    no_permission: "No tieneh permiso pa recargá el plugin."
+    success: "¡Configuraó recargá con éxito! Traducciones cargás: {0}."
+    error: "Ocurrió un error al recargá la configuración, picha."
+    success_log: "El comando /reload fue ejecutao por {0} y se cargaron {1} traducciones."
+    error_log: "El comando /reload no se pudo ejecutá. ¿Qué hiciste, {0}?"
+  give:
+    invalid_amount: "¡La cantidá tiene que sé mayor que 0, picha!"
+    invalid_torch: "¡Tipo de antorcha no válido! Usa 'torch' o 'guard', quillo."
+    invalid_player: "No seh encontró el jugador o tá desconectao."
+    success_one: "Le diste {1} antorcha/s tipo '{2}' a {0}. ¡Qué arte!"
+    success_all: "Le diste {0} antorcha/s tipo '{1}' a to’ loh jugadoreh."
+    received: "Recibiste {0} antorcha/s tipo '{1}'. ¡Qué regalo!"
+
+items:
+  registered: "Objetos personalizáo registrao como debe ser."
+  init_error: "¡Ojú! Error inicializando loh objeto personalizáo."
+  torch:
+    name: "<amarillo><negrita>Antorcha Lumen</amarillo>"
+  guard:
+    name: "<azul><negrita>Guardia Lumen</azul>"
+  recipe_registered: "Receta registra: {0}. ¡Arsa!"
+
+events:
+  registered: "Evento registrao sin problemas."
+  register_error: "Error al registrá loh evento. Ojú, cuidao con esto."
+
+mobs:
+  protected_areas_loaded: "Áreah protegías cargás desde la base de dato."
+  area_created: "Área protehía contra mobs hostiles creaíta en: {0} con un radio de {1}."
+  area_removed: "Área protehía contra mobs hostiles eliminaíta en: {0}."
+  spawn_cancelled: "Spawn de mob hostil cancelao en: {0}."
+  area_created_by_player: "Área protehía contra mobs hostiles creaíta en: {0} por {1}."
+
+torch:
+  light_placed: "Antorcha Lumen colocá en: {0} con ID de operación: {1}."
+  guard_placed: "Guardia Lumen colocá en: {0}."
+  light_broken: "Antorcha Lumen rota. Luceh elimináh: {0}."
+  guard_broken: "Guardia Lumen rota. Área de protección eliminá en: {0}."
+
+light:
+  error:
+    no_world: "El mundo no seh encontró, picha. Asegúrate de que esté cargao."
+    no_blocks_found: "No seh encontraron bloqueh válidos pa’ iluminá en el área indicaíta."
+    calculating_positions: "Ocurrió un problema calculando las posiciones de loh bloqueh de luz: {0}."
+    fawe_failed: "Algo no funcionó al colocá bloqueh con FAWE."
+    setting_level: "Error configurando el nivel de luz en {0}: {1}."
+    setting_level_torch: "Error configurando el nivel de luz en la antorcha en {0}: {1}."
+    no_lights_to_remove: "No seh encontraron luceh pa’ eliminá en la operación: {0}."
+    add_block_failed: "No seh pudo añadí el bloque en {0} a la operación '{1}'."
+  warning:
+    invalid_block_data: "Dato de bloque no válidos pa’ la operación {0} en la ubicación {1}."
+    no_world: "El mundo '{0}' no tá cargao. Mira a ver si está bien configurao."
+  success:
+    completed: "Se completó la colocación de {0} bloqueh de luz con la operación '{1}'. ¡Vamoh allá!"
+    fawe: "Se colocaron {0} bloqueh de luz con éxito usando FAWE."
+    placed: "To’ loh bloqueh de luz de la operación '{0}' se colocaron."
+    removed: "To’ loh bloqueh de luz de la operación '{0}' se eliminaron."
+  info:
+    blocks_registered: "Se registraron {0} bloqueh de luz pa’ la operación '{1}'. ¡Dale!"
+    batch_processed: "Procesamos {0} bloqueh en la operación '{1}'. ¡Qué máquina!"
+    calculated_blocks: "Calculamos {0} bloqueh pa’ iluminá."
+    fawe_found: "FAWE está listo pa’ usarse. ¡Al lío!"
+    fawe_not_found: "FAWE no tá disponible. Vamoh con el sistema normal, picha."
+    completed_operation: "La operación '{0}' se completó con éxito."
+    removed_lights: "To’ loh bloqueh de luz de la operación '{0}' se quitaron."
+    operation_cancelled: "La operación '{0}' se cancelao, quillo."
+
+mob_registry:
+  protected_area_added: "Área protehía añadía en {0} con un radio de {1} bloqueh. ¡Ole tú!"
+  protected_area_removed: "Área protehía eliminá en {0}. ¡Adió!"
+  error:
+    adding_area: "Ocurrió un error añadiendo un área protehía en {0}."
+    removing_area: "Ocurrió un error eliminando un área protehía en {0}."
+    fetching_areas: "No pudimo obté lah áreah protehíah. Algo fue mal."
+  warning:
+    world_not_found: "El mundo '{0}' no tá cargao. Verifica si lo metiste bien."
+
+light_registry:
+  error:
+    invalid_light_level: "Nivel de luz no válido: {0} en {1}. Tieneh que sé entre 1 y 15, picha."
+    add_block: "No se pudo añadí el bloque a la base de dato. Mala suerte."
+    soft_delete: "No pudimo marcá como elimináo loh bloqueh de la operación {0}."
+    restore: "Problemah restaurando loh bloqueh de la operación {0}."
+    fetch_soft_deleted: "Error al obtené loh bloqueh eliminaos suavemente de la operación {0}."
+    fetch_last_soft_deleted: "No pudimo obté la última operación eliminaíta. Algo falló."
+    fetch_blocks_by_operation: "Error obteniendo loh bloqueh de la operación {0}."
+    remove_blocks: "Algo fue mal al eliminá loh bloqueh de la operación {0}."
+    fetch_blocks_in_range: "No se pudieron sacá loh bloqueh en el rango especificao."
+    fetch_all_blocks: "Error obteniendo to’ loh bloqueh."
+    fetch_last_operations: "Error al obtené lah últimah {0} operaciones."
+    clear_all_blocks: "No pudimo borrá to’ loh bloqueh. Algo no salió bien."
+  warning:
+    world_not_found: "El mundo '{0}' no tá cargao. Mira a ver si tah bien puesto."
+  info:
+    blocks_soft_deleted: "Se marcó como elimináo loh bloqueh de la operación {0}."
+    blocks_restored: "Se restauraron loh bloqueh de la operación {0}."
+    blocks_removed: "To’ loh bloqueh de la operación {0} se eliminaron. ¡Perfecto!"
+    blocks_added: "Añadímo {0} bloqueh de luz pa’ la operación '{1}'."
+    all_blocks_removed: "To’ loh bloqueh registrao se han quitao. ¡Alegría!"
+    batch_processed: "Procesamos {0} bloqueh en la operación '{1}'. ¡Qué maravilla!"
+
+coreprotect:
+  enabled: "¡CoreProtect activao y funcionando de arte!"
+  unavailable: "CoreProtect no está disponible. Mira a ver qué pasao."
+  disabled: "CoreProtect no tá activao. No se puede registrar na, picha."
+  api_null: "El API de CoreProtect no existe. No se puede registrar la acción."
+  placement:
+    error: "Error registrando la colocación del bloque en {0}: {1}."
+    errors: "Hubo {0} errore registrando loh bloqueh en CoreProtect por {1}."
+    success: "¡Registramos {0} bloqueh colocados por {1} en CoreProtect! ¡Toma ya!"
+    none: "No se registraron bloqueh colocados pa’ {0} en CoreProtect. Nada de nada."
+  removal:
+    error: "Error registrando la eliminación del bloque en {0}: {1}."
+    errors: "Hubo {0} errore eliminando bloqueh en CoreProtect por {1}."
+    success: "¡Se registraron {0} bloqueh eliminaos por {1} en CoreProtect! De lujo."
+    none: "No se registraron bloqueh eliminaos pa’ {0} en CoreProtect."
+  integration:
+    success: "¡Integración con CoreProtect hecha con éxito! ¡Arsa!"
+    api_disabled: "El API de CoreProtect no tá activao. No se pudo completá la integración."
+    not_found: "No encontramos el plugin CoreProtect o no tah activao."

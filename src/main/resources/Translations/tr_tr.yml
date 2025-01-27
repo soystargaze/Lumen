@@ -1,0 +1,213 @@
+#  _____ _   _      _
+# |_   _(_) (_)_ __| | _____ ___
+#   | | | | | | '__| |/ / __/ _ \
+#   | | | |_| | |  |   < (_|  __/
+#   |_|  \__,_|_|  |_|\_\___\___|
+#                        )_)
+
+# Çevirilerde stiller ve renkler için MiniMessage, (&6, &a...) ve (§b, §c...) kullanılabilir.
+
+plugin:
+  prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
+  dynamic_color: "<color:#21FFCE>" # Çevirilerde {0}, {1}, vb. için uygulanacak renk.
+  enabled: "Lumen başarıyla etkinleştirildi."
+  disabled: "Lumen devre dışı bırakıldı."
+  enable_error: "Eklenti etkinleştirilirken bir hata oluştu. Ayrıntılar için konsolu kontrol edin."
+  language_loaded: "Dil yüklendi: {0}.yml ({1} çeviri)"
+
+translations:
+  folder_error: "Hata: Çeviriler klasörü oluşturulamadı."
+  file_error: "Hata: Çeviri dosyası oluşturulamadı."
+
+database:
+  init_error: "Veritabanı başlatılırken bir hata oluştu."
+  init_fatal_error: "Veritabanı başlatılamadı. Eklenti devre dışı bırakıldı."
+  initialized: "Veritabanı başarıyla başlatıldı."
+  init:
+    already_initialized: "Veritabanı zaten başlatıldı."
+    error: "Veritabanı başlatılırken bir hata oluştu."
+    failed: "Veritabanı başlatılamadı. Günlüğü kontrol edin."
+    sqlite:
+      error_directory: "SQLite için dizin oluşturulamadı: {0}."
+  tables:
+    error: "Veritabanı tabloları oluşturulurken bir hata oluştu."
+    connection:
+      uninitialized: "Bağlantı havuzu başlatılmadı. Lütfen önce veritabanını başlatın."
+    close:
+      success: "Veritabanı bağlantı havuzu başarıyla kapatıldı."
+  operation:
+    register:
+      error: "İşlem kaydedilirken bir hata oluştu."
+      failed: "İşlem kaydedilemedi."
+    get_uuid:
+      error: "ID'den UUID alınırken bir hata oluştu."
+      failed: "ID için UUID alınamadı: {0}."
+    get_id:
+      error: "UUID'den ID alınırken bir hata oluştu."
+      failed: "UUID için ID alınamadı: {0}."
+
+commandmanager:
+  init_error: "Komut Yöneticisi başlatılırken bir hata oluştu: {0}"
+  init_failure: "Komut Yöneticisi başlatılamadı."
+
+command:
+  no_permission: "Bu komutu kullanma izniniz yok."
+  registered: "Komutlar başarıyla kaydedildi."
+  usage: "Kullanım: /lumen <altkomut>"
+  only_players: "Bu komutu yalnızca oyuncular kullanabilir."
+  register_error: "Komutlar kaydedilirken bir hata oluştu. Eklenti devre dışı bırakıldı."
+  undo:
+    only_players: "Bu komut yalnızca oyuncular tarafından yürütülebilir!"
+    no_previous_operations: "Geri alınacak önceki bir işlem yok."
+    no_blocks: "Son {0} işlemde geri alınacak blok bulunamadı."
+    success: "Son {1} işlemden {0} ışık bloğu başarıyla geri alındı."
+  redo:
+    no_previous_operations: "Geri yüklenecek önceki bir işlem yok."
+    no_blocks_found: "{0} işlem için geri yüklenecek blok bulunamadı."
+    restoration_started: "{0} blok geri yüklenmeye başladı..."
+    restoration_completed: "{0} işlem için geri yükleme başarıyla tamamlandı."
+    restoration_completed_log: "{0} işlem için geri yükleme tamamlandı."
+    retrying_failed_blocks: "Başarısız bloklar yeniden deneniyor..."
+    cannot_set_light: "{0} konumunda ışık bloğu ayarlanamadı."
+    light_level_error: "{0} konumunda ışık seviyesi ayarlanırken hata: {1}."
+  remove:
+    coreprotect_not_available: "CoreProtect kullanılabilir değil veya devre dışı bırakılmış."
+    coreprotect_disabled_log: "CoreProtect devre dışı veya kullanılamaz; blok kaldırmaları kaydedilmeyecek."
+    area:
+      success: "{1} blok mesafesinde {0} ışık bloğu kaldırıldı."
+      success_log: "{0} oyuncusu {2} blok mesafesinde {1} ışık bloğunu kaldırdı."
+      no_blocks: "{0} blok mesafesinde kaldırılacak ışık bloğu bulunamadı."
+      no_blocks_log: "{0} oyuncusu {1} blok mesafesinde ışık bloğu kaldırmaya çalıştı, ancak bulunamadı."
+  light:
+    usage: "Kullanım: /lumen light <mesafe> <seviye> <gökyüzü ışığını dahil et>"
+    invalid_level: "Işık seviyesi 0 ile 15 arasında olmalıdır."
+    success: "Işıklar {0} ışık seviyesi ile yerleştirildi. İşlem ID'si: {1}."
+  cancel:
+    success: "Aydınlatma göreviniz iptal edildi."
+    no_task: "İptal edilecek aktif bir göreviniz yok."
+  clear:
+    request: "Tüm aydınlatılmış blokları kaldırmak istediğinizden emin misiniz? Onaylamak için /lumen clear confirm yazın. 30 saniyeniz var."
+    no_request: "Aktif bir onay talebiniz yok."
+    expired: "Onay talebinizin süresi doldu."
+    success: "Tüm aydınlatılmış bloklar kaldırıldı."
+  reload:
+    no_permission: "Bu komutu kullanma izniniz yok."
+    success: "Yapılandırma yeniden yüklendi. {0} çeviri yüklendi."
+    error: "Yapılandırma yeniden yüklenirken bir hata oluştu."
+    success_log: "/reload komutu {0} tarafından başarıyla yürütüldü. {1} çeviri yüklendi."
+    error_log: "/reload komutu {0} tarafından yürütülemedi."
+  give:
+    invalid_amount: "Miktar 0'dan büyük olmalıdır!"
+    invalid_torch: "Geçersiz meşale türü! 'torch' veya 'guard' kullanın."
+    invalid_player: "Oyuncu bulunamadı veya çevrimdışı!"
+    success_one: "{0} oyuncusuna {2} türünden {1} meşale(ler) verdiniz."
+    success_all: "Tüm oyunculara {1} türünden {0} meşale(ler) verdiniz."
+    received: "{0} türünden {1} meşale(ler) aldınız."
+
+items:
+  registered: "Özel eşyalar başarıyla kaydedildi."
+  init_error: "Özel eşyalar başlatılırken bir hata oluştu."
+  torch:
+    name: "<yellow><bold>Lumen Meşalesi</yellow>"
+  guard:
+    name: "<blue><bold>Lumen Koruyucusu</blue>"
+  recipe_registered: "Tarif kaydedildi: {0}."
+
+events:
+  registered: "Etkinlikler başarıyla kaydedildi."
+  register_error: "Etkinlikler kaydedilirken bir hata oluştu."
+
+mobs:
+  protected_areas_loaded: "Korunan alanlar veritabanından yüklendi."
+  area_created: "Düşman yaratıklara karşı korunan alan oluşturuldu: {0}, yarıçap: {1}."
+  area_removed: "Düşman yaratıklara karşı korunan alan kaldırıldı: {0}."
+  spawn_cancelled: "Düşman yaratık ortaya çıkışı iptal edildi: {0}."
+  area_created_by_player: "{1} tarafından düşman yaratıklara karşı korunan alan oluşturuldu: {0}."
+
+torch:
+  light_placed: "Lumen Meşalesi yerleştirildi: {0}, işlem ID'si: {1}."
+  guard_placed: "Lumen Koruyucusu yerleştirildi: {0}."
+  light_broken: "Lumen Meşalesi kırıldı. Kaldırılan ışıklar: {0}."
+  guard_broken: "Lumen Koruyucusu kırıldı. Koruma alanı kaldırıldı: {0}."
+
+light:
+  error:
+    no_world: "Dünya bulunamadı. Lütfen dünyanın yüklü olduğundan emin olun."
+    no_blocks_found: "Belirtilen alanda aydınlatılacak geçerli blok bulunamadı."
+    calculating_positions: "Işık bloklarının pozisyonlarını hesaplarken bir hata oluştu: {0}."
+    fawe_failed: "FAWE ile blok yerleştirilmeye çalışılırken bir hata oluştu."
+    setting_level: "{0} konumunda ışık seviyesi ayarlanırken bir hata oluştu: {1}."
+    setting_level_torch: "{0} konumunda ışık seviyesi ayarlanırken bir hata oluştu: {1}."
+    no_lights_to_remove: "{0} işlemi için kaldırılacak ışık bulunamadı."
+    add_block_failed: "{0} konumundaki blok, '{1}' işlemine eklenemedi."
+  warning:
+    invalid_block_data: "{0} işlemindeki {1} konumundaki blok verileri geçersiz."
+    no_world: "'{0}' adlı dünya bulunamadı. Dünyanın doğru şekilde yüklendiğinden emin olun."
+  success:
+    completed: "'{1}' işlemi için {0} ışık bloğunun yerleştirilmesi tamamlandı."
+    fawe: "{0} ışık bloğu başarıyla FAWE ile yerleştirildi."
+    placed: "'{0}' işlemi için tüm ışıklar başarıyla yerleştirildi."
+    removed: "'{0}' işlemi için tüm ışıklar başarıyla kaldırıldı."
+  info:
+    blocks_registered: "'{1}' işlemi için {0} ışık bloğu kaydedildi."
+    batch_processed: "'{1}' işlemi için {0} blok işlendi."
+    calculated_blocks: "Aydınlatma için {0} blok hesaplandı."
+    fawe_found: "FastAsyncWorldEdit (FAWE) algılandı. Gelişmiş entegrasyon kullanılıyor."
+    fawe_not_found: "FAWE mevcut değil. Varsayılan blok yerleştirme sistemi kullanılıyor."
+    completed_operation: "'{0}' işlemi başarıyla tamamlandı."
+    removed_lights: "'{0}' işlemiyle ilişkilendirilen tüm ışıklar kaldırıldı."
+    operation_cancelled: "'{0}' işlemi iptal edildi."
+
+mob_registry:
+  protected_area_added: "{0} konumunda {1} blok yarıçaplı korunan alan eklendi."
+  protected_area_removed: "{0} konumundaki korunan alan kaldırıldı."
+  error:
+    adding_area: "{0} konumunda korunan alan eklenirken bir hata oluştu."
+    removing_area: "{0} konumundaki korunan alan kaldırılırken bir hata oluştu."
+    fetching_areas: "Korunan alanlar alınırken bir hata oluştu."
+  warning:
+    world_not_found: "'{0}' adlı dünya bulunamadı. Dünyanın doğru şekilde yüklendiğinden emin olun."
+
+light_registry:
+  error:
+    invalid_light_level: "{1} konumundaki ışık seviyesi {0} geçersiz. 1 ile 15 arasında olmalıdır."
+    add_block: "Veritabanına bir blok eklenirken bir hata oluştu."
+    soft_delete: "{0} işlemi için bloklar silinmiş olarak işaretlenirken bir hata oluştu."
+    restore: "{0} işlemi için bloklar geri yüklenirken bir hata oluştu."
+    fetch_soft_deleted: "{0} işlemi için silinmiş bloklar alınırken bir hata oluştu."
+    fetch_last_soft_deleted: "Son silinmiş işlem alınırken bir hata oluştu."
+    fetch_blocks_by_operation: "{0} işlemi için bloklar alınırken bir hata oluştu."
+    remove_blocks: "{0} işlemi için bloklar kaldırılırken bir hata oluştu."
+    fetch_blocks_in_range: "Belirtilen aralıktaki bloklar alınırken bir hata oluştu."
+    fetch_all_blocks: "Tüm bloklar alınırken bir hata oluştu."
+    fetch_last_operations: "Son {0} işlemler alınırken bir hata oluştu."
+    clear_all_blocks: "Tüm bloklar temizlenirken bir hata oluştu."
+  warning:
+    world_not_found: "'{0}' adlı dünya bulunamadı. Dünyanın doğru şekilde yüklendiğinden emin olun."
+  info:
+    blocks_soft_deleted: "{0} işlemi için bloklar silinmiş olarak işaretlendi."
+    blocks_restored: "{0} işlemi için bloklar geri yüklendi."
+    blocks_removed: "{0} işlemi için bloklar kaldırıldı."
+    blocks_added: "'{1}' işlemi için {0} ışık bloğu eklendi."
+    all_blocks_removed: "Kayıtlı tüm bloklar kaldırıldı."
+    batch_processed: "'{1}' işlemi için {0} blok işlendi."
+
+coreprotect:
+  enabled: "CoreProtect etkinleştirildi ve kullanılabilir."
+  unavailable: "CoreProtect mevcut değil."
+  disabled: "CoreProtect devre dışı bırakıldı. İşlem kaydedilemez."
+  api_null: "CoreProtect API mevcut değil. İşlem kaydedilemez."
+  placement:
+    error: "Blok yerleştirme kaydı sırasında hata oluştu {0}: {1}."
+    errors: "CoreProtect'te {1} için blok kaydedilirken {0} hata oluştu."
+    success: "{1} tarafından yerleştirilen {0} blok başarıyla CoreProtect'te kaydedildi."
+    none: "{0} tarafından CoreProtect'te yerleştirme için herhangi bir blok kaydedilmedi."
+  removal:
+    error: "Blok kaldırma kaydı sırasında hata oluştu {0}: {1}."
+    errors: "CoreProtect'te {1} için blok kaldırılırken {0} hata oluştu."
+    success: "{1} tarafından kaldırılan {0} blok başarıyla CoreProtect'te kaydedildi."
+    none: "{0} tarafından CoreProtect'te kaldırma için herhangi bir blok kaydedilmedi."
+  integration:
+    success: "CoreProtect entegrasyonu başarılı!"
+    api_disabled: "CoreProtect API devre dışı. Entegrasyon tamamlanamaz."
+    not_found: "CoreProtect eklentisi bulunamadı veya etkin değil."

@@ -1,0 +1,212 @@
+#  ____             _            _
+# |  _ \  ___ _   _| |_ ___  ___| |__
+# | | | |/ _ \ | | | __/ __|/ __| '_ \
+# | |_| |  __/ |_| | |_\__ \ (__| | | |
+# |____/ \___|\__,_|\__|___/\___|_| |_|
+
+# Du kannst MiniMessage, (&6, &a...) und (§b, §c...) für Stile und Farben in den Übersetzungen verwenden.
+
+plugin:
+  prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
+  dynamic_color: "<color:#21FFCE>" # Die Farbe, die auf {0}, {1}, usw. in den Übersetzungen angewendet wird
+  enabled: "Lumen erfolgreich aktiviert."
+  disabled: "Lumen erfolgreich deaktiviert."
+  enable_error: "Fehler beim Aktivieren des Plugins. Siehe Konsole für weitere Details."
+  language_loaded: "Sprache geladen: {0}.yml ({1} Übersetzungen)"
+
+translations:
+  folder_error: "Fehler: Der Übersetzungsordner konnte nicht erstellt werden."
+  file_error: "Fehler: Die Übersetzungsdatei konnte nicht erstellt werden."
+
+database:
+  init_error: "Fehler bei der Initialisierung der Datenbank."
+  init_fatal_error: "Datenbankinitialisierung fehlgeschlagen. Plugin deaktiviert."
+  initialized: "Datenbank erfolgreich initialisiert."
+  init:
+    already_initialized: "Die Datenbank ist bereits initialisiert."
+    error: "Ein Fehler ist bei der Initialisierung der Datenbank aufgetreten."
+    failed: "Datenbank konnte nicht initialisiert werden. Details finden Sie in den Protokollen."
+    sqlite:
+      error_directory: "Das Verzeichnis für SQLite konnte nicht erstellt werden: {0}."
+  tables:
+    error: "Ein Fehler ist beim Erstellen der Datenbanktabellen aufgetreten."
+    connection:
+      uninitialized: "Der Verbindungspool ist nicht initialisiert. Bitte initialisieren Sie zuerst die Datenbank."
+    close:
+      success: "Der Verbindungspool der Datenbank wurde erfolgreich geschlossen."
+  operation:
+    register:
+      error: "Fehler beim Registrieren der Operation."
+      failed: "Operation konnte nicht registriert werden."
+    get_uuid:
+      error: "Fehler beim Abrufen der UUID anhand der ID."
+      failed: "UUID für ID {0} konnte nicht abgerufen werden."
+    get_id:
+      error: "Fehler beim Abrufen der ID anhand der UUID."
+      failed: "ID für UUID {0} konnte nicht abgerufen werden."
+
+commandmanager:
+  init_error: "Fehler beim Initialisieren des CommandManagers: {0}"
+  init_failure: "Die Initialisierung des CommandManagers ist fehlgeschlagen."
+
+command:
+  no_permission: "Du hast keine Berechtigung, diesen Befehl zu verwenden."
+  registered: "Befehle erfolgreich registriert."
+  usage: "Verwendung: /lumen <Unterbefehl>"
+  only_players: "Nur Spieler können diesen Befehl verwenden."
+  register_error: "Fehler beim Registrieren der Befehle. Plugin deaktiviert."
+  undo:
+    only_players: "Nur Spieler können diesen Befehl ausführen!"
+    no_previous_operations: "Keine vorherigen Operationen zum Rückgängigmachen vorhanden."
+    no_blocks: "Keine Blöcke zum Rückgängigmachen in den letzten {0} Operationen gefunden."
+    success: "Erfolgreich {0} Lichtblöcke aus den letzten {1} Operationen rückgängig gemacht."
+  redo:
+    no_previous_operations: "Keine vorherigen Operationen zum Wiederherstellen vorhanden."
+    no_blocks_found: "Keine Blöcke für die Operation: {0} gefunden."
+    restoration_started: "Die Wiederherstellung von {0} Blöcken wurde gestartet..."
+    restoration_completed: "Die Wiederherstellung der Operation {0} wurde erfolgreich abgeschlossen."
+    restoration_completed_log: "Die Wiederherstellung der Operation {0} ist abgeschlossen."
+    retrying_failed_blocks: "Erneuter Versuch, fehlgeschlagene Blöcke wiederherzustellen..."
+    cannot_set_light: "Lichtblock konnte bei {0} nicht gesetzt werden."
+    light_level_error: "Fehler beim Festlegen des Lichtlevels bei {0}: {1}."
+  remove:
+    coreprotect_not_available: "CoreProtect ist nicht verfügbar oder aktiviert."
+    coreprotect_disabled_log: "CoreProtect ist nicht aktiviert oder verfügbar. Blockentfernungen werden nicht protokolliert."
+    area:
+      success: "Erfolgreich {0} Lichtblöcke im Umkreis von {1} Blöcken entfernt."
+      success_log: "Spieler {0} hat {1} Lichtblöcke im Umkreis von {2} Blöcken entfernt."
+      no_blocks: "Keine Lichtblöcke im Umkreis von {0} Blöcken gefunden."
+      no_blocks_log: "Spieler {0} hat versucht, Lichtblöcke im Umkreis von {1} Blöcken zu entfernen, aber keine gefunden."
+  light:
+    usage: "Verwendung: /lumen light <Bereich> <Level> <Himmelslicht einschließen>"
+    invalid_level: "Das Lichtlevel muss zwischen 0 und 15 liegen."
+    success: "Lichter mit Lichtlevel {0} platziert. Operation mit ID: {1}."
+  cancel:
+    success: "Deine Lichtoperation wurde abgebrochen."
+    no_task: "Du hast keine aktive Aufgabe zum Abbrechen."
+  clear:
+    request: "Bist du sicher, dass du alle Lichtblöcke entfernen möchtest? Schreibe /lumen clear confirm zur Bestätigung. Du hast 30 Sekunden Zeit."
+    no_request: "Du hast keine aktive Bestätigungsanfrage."
+    expired: "Deine Bestätigungsanfrage ist abgelaufen."
+    success: "Alle Lichtblöcke wurden entfernt."
+  reload:
+    no_permission: "Du hast keine Berechtigung, diesen Befehl zu verwenden."
+    success: "Konfiguration neu geladen. {0} Übersetzungen geladen."
+    error: "Fehler beim Neuladen der Konfiguration aufgetreten."
+    success_log: "/reload erfolgreich ausgeführt von {0}. {1} Übersetzungen geladen."
+    error_log: "/reload konnte nicht von {0} ausgeführt werden."
+  give:
+    invalid_amount: "Die Menge muss größer als 0 sein!"
+    invalid_torch: "Ungültiger Fackeltyp! Verwende 'torch' oder 'guard'."
+    invalid_player: "Spieler nicht gefunden oder offline!"
+    success_one: "Du hast {1} Fackel(n) vom Typ '{2}' an {0} gegeben."
+    success_all: "Du hast {0} Fackel(n) vom Typ '{1}' an alle Spieler gegeben."
+    received: "Du hast {0} Fackel(n) vom Typ '{1}' erhalten."
+
+items:
+  registered: "Benutzerdefinierte Objekte erfolgreich registriert."
+  init_error: "Fehler beim Initialisieren der benutzerdefinierten Objekte."
+  torch:
+    name: "<yellow><bold>Lumen Fackel</yellow>"
+  guard:
+    name: "<blue><bold>Lumen Wächter</blue>"
+  recipe_registered: "Rezept registriert: {0}."
+
+events:
+  registered: "Ereignisse erfolgreich registriert."
+  register_error: "Fehler beim Registrieren der Ereignisse."
+
+mobs:
+  protected_areas_loaded: "Geschützte Bereiche aus der Datenbank geladen."
+  area_created: "Geschützter Bereich gegen feindliche Mobs erstellt bei: {0} mit einem Radius von {1}."
+  area_removed: "Geschützter Bereich gegen feindliche Mobs entfernt bei: {0}."
+  spawn_cancelled: "Mob-Spawn bei {0} abgebrochen."
+  area_created_by_player: "Geschützter Bereich gegen feindliche Mobs erstellt bei: {0} von {1}."
+
+torch:
+  light_placed: "Lumen Fackel platziert bei: {0} mit Operations-ID: {1}."
+  guard_placed: "Lumen Wächter platziert bei: {0}."
+  light_broken: "Lumen Fackel zerstört. Lichter entfernt: {0}."
+  guard_broken: "Lumen Wächter zerstört. Schutzbereich entfernt bei: {0}."
+
+light:
+  error:
+    no_world: "Die Welt wurde nicht gefunden. Stelle sicher, dass die Welt geladen ist."
+    no_blocks_found: "Keine gültigen Blöcke zum Beleuchten im angegebenen Bereich gefunden."
+    calculating_positions: "Fehler beim Berechnen der Blockpositionen: {0}."
+    fawe_failed: "Fehler beim Platzieren von Blöcken mit FAWE."
+    setting_level: "Fehler beim Festlegen des Lichtlevels bei {0}: {1}."
+    setting_level_torch: "Fehler beim Festlegen des Lichtlevels bei {0}: {1}."
+    no_lights_to_remove: "Keine Lichter für die Operation {0} gefunden."
+    add_block_failed: "Block konnte bei {0} nicht zur Operation '{1}' hinzugefügt werden."
+  warning:
+    invalid_block_data: "Ungültige Blockdaten für die Operation {0} bei Position {1}."
+    no_world: "Die Welt '{0}' wurde nicht gefunden. Überprüfe, ob die Welt korrekt geladen ist."
+  success:
+    completed: "{0} Lichtblöcke erfolgreich mit der Operation '{1}' platziert."
+    fawe: "{0} Lichtblöcke erfolgreich mit FAWE platziert."
+    placed: "Alle Lichter der Operation '{0}' erfolgreich platziert."
+    removed: "Alle Lichter der Operation '{0}' entfernt."
+  info:
+    blocks_registered: "{0} Lichtblöcke für die Operation '{1}' registriert."
+    batch_processed: "{0} Blöcke in der Operation '{1}' verarbeitet."
+    calculated_blocks: "{0} Blöcke zum Beleuchten berechnet."
+    fawe_found: "FastAsyncWorldEdit (FAWE) erkannt. Erweiterte Integration wird verwendet."
+    fawe_not_found: "FAWE ist nicht verfügbar. Standardsystem für Blockplatzierung wird verwendet."
+    completed_operation: "Die Operation '{0}' wurde erfolgreich abgeschlossen."
+    removed_lights: "Alle Lichter der Operation '{0}' entfernt."
+    operation_cancelled: "Die Operation '{0}' wurde abgebrochen."
+
+mob_registry:
+  protected_area_added: "Geschützter Bereich hinzugefügt bei {0} mit einem Radius von {1} Blöcken."
+  protected_area_removed: "Geschützter Bereich entfernt bei {0}."
+  error:
+    adding_area: "Fehler beim Hinzufügen eines geschützten Bereichs bei {0}."
+    removing_area: "Fehler beim Entfernen eines geschützten Bereichs bei {0}."
+    fetching_areas: "Fehler beim Abrufen der geschützten Bereiche."
+  warning:
+    world_not_found: "Die Welt '{0}' wurde nicht gefunden. Überprüfe, ob die Welt korrekt geladen ist."
+
+light_registry:
+  error:
+    invalid_light_level: "Das Lichtlevel {0} bei {1} ist ungültig. Es muss zwischen 1 und 15 liegen."
+    add_block: "Fehler beim Hinzufügen eines Blocks zur Datenbank."
+    soft_delete: "Fehler beim Markieren der Blöcke der Operation {0} als entfernt."
+    restore: "Fehler beim Wiederherstellen der Blöcke der Operation {0}."
+    fetch_soft_deleted: "Fehler beim Abrufen der entfernten Blöcke der Operation {0}."
+    fetch_last_soft_deleted: "Fehler beim Abrufen der letzten entfernten Operation."
+    fetch_blocks_by_operation: "Fehler beim Abrufen der Blöcke der Operation {0}."
+    remove_blocks: "Fehler beim Entfernen der Blöcke der Operation {0}."
+    fetch_blocks_in_range: "Fehler beim Abrufen der Blöcke im angegebenen Bereich."
+    fetch_all_blocks: "Fehler beim Abrufen aller Blöcke."
+    fetch_last_operations: "Fehler beim Abrufen der letzten {0} Operationen."
+    clear_all_blocks: "Fehler beim Entfernen aller Blöcke."
+  warning:
+    world_not_found: "Die Welt '{0}' wurde nicht gefunden. Überprüfe, ob die Welt korrekt geladen ist."
+  info:
+    blocks_soft_deleted: "Die Blöcke der Operation {0} wurden als entfernt markiert."
+    blocks_restored: "Die Blöcke der Operation {0} wurden wiederhergestellt."
+    blocks_removed: "Die Blöcke der Operation {0} wurden entfernt."
+    blocks_added: "{0} Lichtblöcke mit der Operation {1} hinzugefügt."
+    all_blocks_removed: "Alle registrierten Blöcke wurden entfernt."
+    batch_processed: "{0} Blöcke in der Operation '{1}' verarbeitet."
+
+coreprotect:
+  enabled: "CoreProtect aktiviert und verfügbar."
+  unavailable: "CoreProtect ist nicht verfügbar."
+  disabled: "CoreProtect ist nicht aktiviert. Aktionen können nicht registriert werden."
+  api_null: "Die CoreProtect-API ist nicht verfügbar. Aktionen können nicht registriert werden."
+  placement:
+    error: "Fehler beim Registrieren der Blockplatzierung bei {0}: {1}."
+    errors: "{0} Fehler beim Registrieren der Blockplatzierungen durch {1} in CoreProtect."
+    success: "{0} Blöcke von {1} in CoreProtect registriert."
+    none: "Keine Blockplatzierungen für {0} in CoreProtect registriert."
+  removal:
+    error: "Fehler beim Registrieren der Blockentfernung bei {0}: {1}."
+    errors: "{0} Fehler beim Entfernen von Blöcken durch {1} in CoreProtect."
+    success: "{0} Blöcke von {1} in CoreProtect entfernt."
+    none: "Keine Blockentfernungen für {0} in CoreProtect registriert."
+  integration:
+    success: "Integration mit CoreProtect erfolgreich!"
+    api_disabled: "Die CoreProtect-API ist deaktiviert. Integration kann nicht abgeschlossen werden."
+    not_found: "Das CoreProtect-Plugin wurde nicht gefunden oder ist nicht aktiviert."
