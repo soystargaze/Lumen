@@ -35,15 +35,50 @@ public class LumenCommandManager {
         manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands commands = event.registrar();
 
-            // Registro del comando principal `/lumen` y sus subcomandos
             commands.register(
                     Commands.literal("lumen")
+                            .requires(source -> source.getSender().hasPermission("lumen.use"))
                             .executes(ctx -> {
                                 CommandSourceStack source = ctx.getSource();
                                 source.getSender().sendMessage(Component.text(TranslationHandler.get("command.usage")));
-                                return 1; // Comando ejecutado con éxito
+                                return 1;
                             })
-                            // Subcomandos
+                            .then(LightCommand.register())
+                            .then(CancelCommand.register())
+                            .then(undoCommand.register())
+                            .then(redoCommand.register())
+                            .then(clearCommand.register())
+                            .then(removeCommand.register())
+                            .then(GiveCommand.register())
+                            .then(ReloadCommand.register(plugin))
+                            .build()
+            );
+            commands.register(
+                    Commands.literal("l")
+                            .requires(source -> source.getSender().hasPermission("lumen.use"))
+                            .executes(ctx -> {
+                                CommandSourceStack source = ctx.getSource();
+                                source.getSender().sendMessage(Component.text(TranslationHandler.get("command.usage")));
+                                return 1;
+                            })
+                            .then(LightCommand.register())
+                            .then(CancelCommand.register())
+                            .then(undoCommand.register())
+                            .then(redoCommand.register())
+                            .then(clearCommand.register())
+                            .then(removeCommand.register())
+                            .then(GiveCommand.register())
+                            .then(ReloadCommand.register(plugin))
+                            .build()
+            );
+            commands.register(
+                    Commands.literal("lu")
+                            .requires(source -> source.getSender().hasPermission("lumen.use"))
+                            .executes(ctx -> {
+                                CommandSourceStack source = ctx.getSource();
+                                source.getSender().sendMessage(Component.text(TranslationHandler.get("command.usage")));
+                                return 1;
+                            })
                             .then(LightCommand.register())
                             .then(CancelCommand.register())
                             .then(undoCommand.register())
