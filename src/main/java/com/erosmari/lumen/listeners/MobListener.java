@@ -90,7 +90,7 @@ public class MobListener implements Listener {
 
                     if (customItem != null) {
                         // Drop del ítem con todas sus propiedades intactas
-                        brokenBlock.getWorld().dropItemNaturally(brokenLocation, customItem.clone());
+                        brokenBlock.getWorld().dropItemNaturally(brokenBlock.getLocation(), customItem.clone());
 
                         // Evitar el drop predeterminado
                         event.setDropItems(false);
