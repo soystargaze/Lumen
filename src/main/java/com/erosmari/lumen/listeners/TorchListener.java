@@ -46,7 +46,7 @@ public class TorchListener implements Listener {
             if (itemContainer.has(lumenIdKey, PersistentDataType.STRING)) {
                 String id = itemContainer.get(lumenIdKey, PersistentDataType.STRING);
 
-                if ("light".equals(id)) {
+                if ("torch".equals(id)) {
                     Block placedBlock = event.getBlock();
                     Player player = event.getPlayer();
                     Location placedLocation = placedBlock.getLocation();
@@ -86,7 +86,7 @@ public class TorchListener implements Listener {
             if (blockContainer.has(lumenIdKey, PersistentDataType.STRING)) {
                 String id = blockContainer.get(lumenIdKey, PersistentDataType.STRING);
 
-                if ("light".equals(id)) {
+                if ("torch".equals(id)) {
                     try {
                         // Recuperar el ID incremental del bloque
                         NamespacedKey operationKey = new NamespacedKey(plugin, "operation_id");

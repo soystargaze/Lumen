@@ -37,12 +37,12 @@ public class LumenItems {
         ItemStack lumenTorch = createLumenTorch(
                 TranslationHandler.get("items.torch.name"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzViNTFjYzJlOTlkMDhkZDI4NzlhNzkyZjA2MmUwNzc4MzJhMDE2M2YzZDg1YzI0NGUwYmExYzM5MmFiMDlkZSJ9fX0=",
-                "light"
+                "torch"
         );
         ItemStack lumenGuard = createLumenTorch(
                 TranslationHandler.get("items.guard.name"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg0NDE3MjViZDQzMDczNmNmNDBkNGNlOTVjYjVhNWUxMDMwNWI3OTVhYzRmZjg0NzRlMDUzNWRmN2FmMWRkNyJ9fX0=",
-                "anti_mob"
+                "guard"
         );
 
         // Agregar los ítems al mapa
