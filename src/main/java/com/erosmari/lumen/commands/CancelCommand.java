@@ -5,8 +5,6 @@ import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -19,7 +17,7 @@ public class CancelCommand {
      */
     public static LiteralArgumentBuilder<CommandSourceStack> register() {
         return Commands.literal("cancel")
-                .requires(source -> source.getSender().hasPermission("lumen.cancel")) // Validar permisos
+                .requires(source -> source.getSender().hasPermission("lumen.cancel"))
                 .executes(ctx -> handleCancelCommand(ctx.getSource()));
     }
 
@@ -31,17 +29,17 @@ public class CancelCommand {
      */
     private static int handleCancelCommand(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
-            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
             return 0;
         }
 
         if (TaskManager.hasActiveTask(player.getUniqueId())) {
             TaskManager.cancelTask(player.getUniqueId());
-            player.sendMessage(Component.text(TranslationHandler.get("command.cancel.success")).color(NamedTextColor.GREEN));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.cancel.success"));
         } else {
-            player.sendMessage(Component.text(TranslationHandler.get("command.cancel.no_task")).color(NamedTextColor.RED));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.cancel.no_task"));
         }
 
-        return 1; // Comando ejecutado con éxito
+        return 1;
     }
 }

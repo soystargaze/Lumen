@@ -6,8 +6,6 @@ import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -48,14 +46,14 @@ public class ClearCommand {
      */
     private int handleClearRequest(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
-            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
             return 0;
         }
 
         UUID playerId = player.getUniqueId();
 
         confirmationRequests.put(playerId, System.currentTimeMillis());
-        player.sendMessage(Component.text(TranslationHandler.get("command.clear.request")).color(NamedTextColor.YELLOW));
+        player.sendMessage(TranslationHandler.getPlayerMessage("command.clear.request"));
 
         return 1;
     }
@@ -68,21 +66,21 @@ public class ClearCommand {
      */
     private int handleClearConfirm(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
-            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
             return 0;
         }
 
         UUID playerId = player.getUniqueId();
 
         if (!confirmationRequests.containsKey(playerId)) {
-            player.sendMessage(Component.text(TranslationHandler.get("command.clear.no_request")).color(NamedTextColor.RED));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.clear.no_request"));
             return 0;
         }
 
         long requestTime = confirmationRequests.get(playerId);
         if (System.currentTimeMillis() - requestTime > CONFIRMATION_TIMEOUT) {
             confirmationRequests.remove(playerId);
-            player.sendMessage(Component.text(TranslationHandler.get("command.clear.expired")).color(NamedTextColor.RED));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.clear.expired"));
             return 0;
         }
 
@@ -96,7 +94,7 @@ public class ClearCommand {
         LightRegistry.clearAllBlocks();
         confirmationRequests.remove(playerId);
 
-        player.sendMessage(Component.text(TranslationHandler.getFormatted("command.clear.success", removedCount)).color(NamedTextColor.GREEN));
+        player.sendMessage(TranslationHandler.getPlayerMessage("command.clear.success", removedCount));
         return 1;
     }
 }

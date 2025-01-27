@@ -6,7 +6,6 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
-import net.kyori.adventure.text.Component;
 import org.bukkit.plugin.Plugin;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -40,7 +39,7 @@ public class LumenCommandManager {
                             .requires(source -> source.getSender().hasPermission("lumen.use"))
                             .executes(ctx -> {
                                 CommandSourceStack source = ctx.getSource();
-                                source.getSender().sendMessage(Component.text(TranslationHandler.get("command.usage")));
+                                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
                                 return 1;
                             })
                             .then(LightCommand.register())
@@ -58,7 +57,7 @@ public class LumenCommandManager {
                             .requires(source -> source.getSender().hasPermission("lumen.use"))
                             .executes(ctx -> {
                                 CommandSourceStack source = ctx.getSource();
-                                source.getSender().sendMessage(Component.text(TranslationHandler.get("command.usage")));
+                                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
                                 return 1;
                             })
                             .then(LightCommand.register())
@@ -76,7 +75,7 @@ public class LumenCommandManager {
                             .requires(source -> source.getSender().hasPermission("lumen.use"))
                             .executes(ctx -> {
                                 CommandSourceStack source = ctx.getSource();
-                                source.getSender().sendMessage(Component.text(TranslationHandler.get("command.usage")));
+                                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
                                 return 1;
                             })
                             .then(LightCommand.register())

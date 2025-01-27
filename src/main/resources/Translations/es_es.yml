@@ -40,10 +40,10 @@ commandmanager:
   init_failure: "Falló la inicialización del CommandManager."
 
 command:
-  no_permission: "§cNo tienes permiso para usar este comando."
+  no_permission: "No tienes permiso para usar este comando."
   registered: "Comandos registrados correctamente."
-  usage: "§aUso: /lumen <subcomando>"
-  only_players: "§cSolo los jugadores pueden usar este comando."
+  usage: "Uso: /lumen <subcomando>"
+  only_players: "Solo los jugadores pueden usar este comando."
   register_error: "Error al registrar los comandos. Plugin deshabilitado."
   undo:
     only_players: "¡Solo los jugadores pueden ejecutar este comando!"
@@ -68,21 +68,21 @@ command:
       no_blocks: "No se encontraron bloques de luz para eliminar dentro de un rango de {0} bloques."
       no_blocks_log: "El jugador {0} intentó eliminar bloques de luz dentro de un rango de {1} bloques, pero no se encontraron bloques."
   light:
-    usage: "§aUso: /lumen light <rango> <nivel> <incluir skylight>"
-    invalid_level: "§cEl nivel de luz debe estar entre 0 y 15."
-    success: "§fSe han colocado luces con nivel de luz §a{0}§f. ID de operación: §a{1}§f."
+    usage: "Uso: /lumen light <rango> <nivel> <incluir skylight>"
+    invalid_level: "El nivel de luz debe estar entre 0 y 15."
+    success: "Se han colocado luces con nivel de luz {0}. Operación con ID: {1}."
   cancel:
-    success: "§aTu tarea de iluminación ha sido cancelada."
-    no_task: "§eNo tienes ninguna tarea activa para cancelar."
+    success: "Tu tarea de iluminación ha sido cancelada."
+    no_task: "No tienes ninguna tarea activa para cancelar."
   clear:
-    request: "§e¿Estás seguro de que deseas eliminar todos los bloques iluminados? Escribe §a/lumen clear confirm §epara confirmar. Tienes 30 segundos."
-    no_request: "§cNo tienes ninguna solicitud de confirmación activa."
-    expired: "§cTu solicitud de confirmación ha expirado."
-    success: "§aTodos los bloques iluminados han sido eliminados."
+    request: "¿Estás seguro de que deseas eliminar todos los bloques iluminados? Escribe /lumen clear confirm para confirmar. Tienes 30 segundos."
+    no_request: "No tienes ninguna solicitud de confirmación activa."
+    expired: "Tu solicitud de confirmación ha expirado."
+    success: "Todos los bloques iluminados han sido eliminados."
   reload:
-    no_permission: "§cNo tienes permiso para usar este comando."
-    success: "§aConfiguración recargada. Se cargaron {0} traducciones."
-    error: "§cOcurrió un error al recargar la configuración."
+    no_permission: "No tienes permiso para usar este comando."
+    success: "Configuración recargada. Se cargaron {0} traducciones."
+    error: "Ocurrió un error al recargar la configuración."
     success_log: "El comando /reload se ejecutó correctamente por {0}. Se cargaron {1} traducciones."
     error_log: "El comando /reload falló al ejecutarse por {0}."
   give:
@@ -97,9 +97,9 @@ items:
   registered: "Objetos personalizados registrados correctamente."
   init_error: "Error al inicializar los objetos personalizados."
   lumen_torch:
-    name: "Antorcha Lumen"
+    name: "Lumen Torch"
   lumen_torch_mob:
-    name: "Antorcha Lumen Antimobs"
+    name: "Lumen Guard"
   recipe_registered: "Receta registrada: {0}."
 
 events:
@@ -115,9 +115,9 @@ mobs:
 
 torch:
   light_placed: "Lumen Torch colocada en: {0} con ID de operación: {1}."
-  mob_torch_placed: "Lumen Torch Mob colocada en: {0}."
+  mob_torch_placed: "Lumen Guard colocada en: {0}."
   light_broken: "Lumen Torch rota. Operación cancelada y luces eliminadas: {0}."
-  mob_torch_broken: "Lumen Torch Mob rota. Área de protección eliminada en: {0}."
+  mob_torch_broken: "Lumen Guard rota. Área de protección eliminada en: {0}."
 
 light:
   error:

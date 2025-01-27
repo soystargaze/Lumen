@@ -9,8 +9,6 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -47,7 +45,7 @@ public class RemoveCommand {
 
     private int handleRemoveAreaCommand(CommandSourceStack source, int range) {
         if (!(source.getSender() instanceof Player player)) {
-            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.remove.only_players")).color(NamedTextColor.RED));
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.remove.only_players"));
             return 0;
         }
 
@@ -57,17 +55,17 @@ public class RemoveCommand {
         CoreProtectHandler coreProtectHandler = plugin.getCoreProtectHandler();
 
         if (coreProtectHandler == null || !coreProtectHandler.isEnabled()) {
-            player.sendMessage(Component.text(TranslationHandler.get("command.remove.coreprotect_not_available")).color(NamedTextColor.RED));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.remove.coreprotect_not_available"));
             logger.warning(TranslationHandler.get("command.remove.coreprotect_disabled_log"));
         }
 
         int removedCount = removeAndLogBlocks(blocks, player, coreProtectHandler);
 
         if (removedCount > 0) {
-            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.success", removedCount, range)).color(NamedTextColor.GREEN));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.remove.area.success", removedCount, range));
             logger.info(TranslationHandler.getFormatted("command.remove.area.success_log", player.getName(), removedCount, range));
         } else {
-            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.remove.area.no_blocks", range)).color(NamedTextColor.RED));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.remove.area.no_blocks", range));
             logger.info(TranslationHandler.getFormatted("command.remove.area.no_blocks_log", player.getName(), range));
         }
 

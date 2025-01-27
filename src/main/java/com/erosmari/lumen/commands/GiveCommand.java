@@ -10,8 +10,6 @@ import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -49,7 +47,7 @@ public class GiveCommand {
 
     private static int handleGiveCommand(CommandSourceStack source, String target, String torchType, int amount) {
         if (amount <= 0) {
-            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.give.invalid_amount")).color(NamedTextColor.RED));
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.invalid_amount"));
             return 0;
         }
 
@@ -57,7 +55,7 @@ public class GiveCommand {
         ItemStack torch = lumenItems.getLumenItem(torchType.toLowerCase());
 
         if (torch == null) {
-            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.give.invalid_torch")).color(NamedTextColor.RED));
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.invalid_torch"));
             return 0;
         }
 
@@ -66,17 +64,17 @@ public class GiveCommand {
         if (target.equalsIgnoreCase("@a")) {
             Bukkit.getOnlinePlayers().forEach(player -> {
                 player.getInventory().addItem(torch.clone());
-                player.sendMessage(Component.text(TranslationHandler.getFormatted("command.give.received", amount, torchType)).color(NamedTextColor.GREEN));
+                player.sendMessage(TranslationHandler.getPlayerMessage("command.give.received", amount, torchType));
             });
-            source.getSender().sendMessage(Component.text(TranslationHandler.getFormatted("command.give.success_all", amount, torchType)).color(NamedTextColor.GREEN));
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.success_all", amount, torchType));
         } else {
             Player player = Bukkit.getPlayerExact(target);
             if (player != null && player.isOnline()) {
                 player.getInventory().addItem(torch.clone());
-                player.sendMessage(Component.text(TranslationHandler.getFormatted("command.give.received", amount, torchType)).color(NamedTextColor.GREEN));
-                source.getSender().sendMessage(Component.text(TranslationHandler.getFormatted("command.give.success_one", target, amount, torchType)).color(NamedTextColor.GREEN));
+                player.sendMessage(TranslationHandler.getPlayerMessage("command.give.received", amount, torchType));
+                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.success_one", target, amount, torchType));
             } else {
-                source.getSender().sendMessage(Component.text(TranslationHandler.get("command.give.invalid_player")).color(NamedTextColor.RED));
+                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.invalid_player"));
             }
         }
 

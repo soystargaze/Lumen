@@ -9,8 +9,6 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.entity.Player;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -41,25 +39,25 @@ public class LightCommand {
                                 )
                 )
                 .executes(ctx -> {
-                    ctx.getSource().getSender().sendMessage(Component.text(TranslationHandler.get("command.light.usage")).color(NamedTextColor.RED));
+                    ctx.getSource().getSender().sendMessage(TranslationHandler.getPlayerMessage("command.light.usage"));
                     return 0;
                 });
     }
 
     private static int handleLightCommand(CommandSourceStack source, int areaBlocks, int lightLevel, boolean includeSkylight) {
         if (!(source.getSender() instanceof Player player)) {
-            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
             return 0;
         }
 
         // Verificar si el jugador tiene permiso
         if (!player.hasPermission("lumen.light")) {
-            player.sendMessage(Component.text(TranslationHandler.get("command.no_permission")).color(NamedTextColor.RED));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.no_permission"));
             return 0;
         }
 
         if (lightLevel < 0 || lightLevel > 15) {
-            player.sendMessage(Component.text(TranslationHandler.get("command.light.invalid_level")).color(NamedTextColor.RED));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.light.invalid_level"));
             return 0;
         }
 
@@ -70,7 +68,7 @@ public class LightCommand {
         LightHandler lightHandler = new LightHandler(Lumen.getInstance());
         lightHandler.placeLights(player, areaBlocks, lightLevel, includeSkylight, operationId);
 
-        player.sendMessage(Component.text(TranslationHandler.getFormatted("command.light.success", lightLevel, operationId)));
+        player.sendMessage(TranslationHandler.getPlayerMessage("command.light.success", lightLevel, operationId));
         return 1;
     }
 }

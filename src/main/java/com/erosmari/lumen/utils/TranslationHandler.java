@@ -1,5 +1,7 @@
 package com.erosmari.lumen.utils;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -73,5 +75,19 @@ public class TranslationHandler {
 
     public static int getLoadedTranslationsCount() {
         return translations.size();
+    }
+
+    public static Component getPlayerMessage(String key, Object... args) {
+        String prefix = "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> ";
+        String template = translations.getOrDefault(key, "Translation not found: " + key + "!");
+
+        for (int i = 0; i < args.length; i++) {
+            template = template.replace("{" + i + "}", args[i].toString());
+        }
+
+        String fullMessage = prefix + template;
+
+        // Use MiniMessage to parse the full message
+        return MiniMessage.miniMessage().deserialize(fullMessage);
     }
 }

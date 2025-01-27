@@ -11,8 +11,6 @@ import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -45,19 +43,19 @@ public class RedoCommand {
 
     private int handleRedoCommand(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
-            source.getSender().sendMessage(Component.text(TranslationHandler.get("command.only_players")).color(NamedTextColor.RED));
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
             return 0;
         }
 
         Integer operationId = LightRegistry.getLastSoftDeletedOperationId();
         if (operationId == null) {
-            player.sendMessage(Component.text(TranslationHandler.get("command.redo.no_previous_operations")).color(NamedTextColor.RED));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.redo.no_previous_operations"));
             return 0;
         }
 
         Map<Location, Integer> blocksWithLightLevels = LightRegistry.getSoftDeletedBlocksWithLightLevelByOperationId(operationId);
         if (blocksWithLightLevels.isEmpty()) {
-            player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.no_blocks_found", operationId)).color(NamedTextColor.RED));
+            player.sendMessage(TranslationHandler.getPlayerMessage("command.redo.no_blocks_found", operationId));
             return 0;
         }
 
@@ -68,7 +66,7 @@ public class RedoCommand {
             // Si FAWE no está disponible, usar processBlock
             Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
             Queue<Map.Entry<Location, Integer>> failedQueue = new LinkedList<>();
-            List<Location> processedBlocks = new ArrayList<>(); // Acumula bloques procesados
+            List<Location> processedBlocks = new ArrayList<>();
             int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
             int totalBlocks = blockQueue.size();
 
@@ -101,8 +99,7 @@ public class RedoCommand {
 
                     logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", operationId));
                     LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
-                    player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.restoration_completed", operationId))
-                            .color(NamedTextColor.GREEN));
+                    player.sendMessage(TranslationHandler.getPlayerMessage("command.redo.restoration_completed", operationId));
                     DisplayUtil.hideBossBar(player);
                     task.cancel();
                 } else if (blockQueue.isEmpty()) {
@@ -113,8 +110,7 @@ public class RedoCommand {
             }, 0L, 1L);
         }
 
-        player.sendMessage(Component.text(TranslationHandler.getFormatted("command.redo.restoration_started", blocksWithLightLevels.size()))
-                .color(NamedTextColor.GREEN));
+        player.sendMessage(TranslationHandler.getPlayerMessage("command.redo.restoration_started", blocksWithLightLevels.size()));
         return 1;
     }
 
