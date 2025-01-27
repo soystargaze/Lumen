@@ -25,6 +25,10 @@ public class ItemFAWEHandler {
         coreProtectHandler = new CoreProtectHandler(plugin);
     }
 
+    public static void setCoreProtectHandler(CoreProtectHandler handler) {
+        coreProtectHandler = handler;
+    }
+
     /**
      * Coloca bloques de luz usando FAWE.
      *
@@ -93,7 +97,7 @@ public class ItemFAWEHandler {
             editSession.flushQueue();
 
             // Notificar al jugador
-            player.sendMessage(TranslationHandler.getFormatted("light.success.completed", operationId));
+            player.sendMessage(TranslationHandler.getFormatted("light.success.fawe", placedLocations.size()));
             plugin.getLogger().info("FAWE placed " + placedLocations.size() + " light blocks for operation: " + operationId);
         } catch (Exception e) {
             player.sendMessage(TranslationHandler.getFormatted("light.error", e.getMessage()));

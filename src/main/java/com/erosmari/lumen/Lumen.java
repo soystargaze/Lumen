@@ -6,6 +6,7 @@ import com.erosmari.lumen.database.DatabaseHandler;
 import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
+import com.erosmari.lumen.lights.integrations.ItemFAWEHandler;
 import com.erosmari.lumen.listeners.MobListener;
 import com.erosmari.lumen.listeners.TorchListener;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
@@ -140,6 +141,8 @@ public class Lumen extends JavaPlugin implements Listener {
     private void initializeCoreProtectIntegration() {
         if (coreProtectHandler == null) {
             coreProtectHandler = new CoreProtectHandler(this);
+            ItemFAWEHandler.setCoreProtectHandler(coreProtectHandler);
+
 
             if (coreProtectHandler.isEnabled()) {
                 getLogger().info(TranslationHandler.get("coreprotect.enabled"));
