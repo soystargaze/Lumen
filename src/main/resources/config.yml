@@ -11,7 +11,7 @@
 
 # Plugin settings
 # Language of the plugin
-language: "es_es"
+language: "en_en"
 
 settings:
   # Lumen Command settings
