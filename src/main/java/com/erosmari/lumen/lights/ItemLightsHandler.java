@@ -224,6 +224,6 @@ public class ItemLightsHandler {
 
         // Mensajes de feedback
         DisplayUtil.hideBossBar(player);
-        player.sendMessage(TranslationHandler.getPlayerMessage("light.info.cancelled_and_removed", operationId));
+        player.sendMessage(TranslationHandler.getPlayerMessage("light.success.removed", operationId));
     }
 }

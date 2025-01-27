@@ -61,7 +61,7 @@ public class GiveCommand {
 
         torch.setAmount(amount);
 
-        if (target.equalsIgnoreCase("@a")) {
+        if (target.equalsIgnoreCase("all") || target.equalsIgnoreCase("@a")) {
             Bukkit.getOnlinePlayers().forEach(player -> {
                 player.getInventory().addItem(torch.clone());
                 player.sendMessage(TranslationHandler.getPlayerMessage("command.give.received", amount, torchType));
@@ -83,7 +83,7 @@ public class GiveCommand {
 
     private static CompletableFuture<Suggestions> suggestTargets(SuggestionsBuilder builder) {
         Bukkit.getOnlinePlayers().forEach(player -> builder.suggest(player.getName()));
-        builder.suggest("@a");
+        builder.suggest("all");
         return builder.buildFuture();
     }
 }

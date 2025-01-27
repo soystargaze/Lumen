@@ -79,27 +79,25 @@ public class TranslationHandler {
     }
 
     public static Component getPlayerMessage(String key, Object... args) {
-        String prefix = "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> ";
+        String prefix = translations.getOrDefault("plugin.prefix", "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> ");
+        String dynamicColor = translations.getOrDefault("plugin.dynamic_color", "<color:#21FFCE>");
         String template = translations.getOrDefault(key, "Translation not found: " + key + "!");
 
         for (int i = 0; i < args.length; i++) {
-            String coloredArg = "<color:#21FFCE>" + args[i].toString() + "</color>";
+            String coloredArg = dynamicColor + args[i].toString() + "</color>";
             template = template.replace("{" + i + "}", coloredArg);
         }
 
         String fullMessage = prefix + template;
 
-        // Reemplazar códigos '&' por '§' para procesar como códigos legacy
         if (fullMessage.contains("&")) {
             fullMessage = fullMessage.replace("&", "§");
         }
 
-        // Detectar códigos legacy (§) y procesar con LegacyComponentSerializer
         if (fullMessage.contains("§")) {
             return LegacyComponentSerializer.legacySection().deserialize(fullMessage);
         }
 
-        // Si no hay códigos legacy, procesar con MiniMessage
         return MiniMessage.miniMessage().deserialize(fullMessage);
     }
 }

@@ -1,4 +1,6 @@
 plugin:
+  prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
+  dynamic_color: "<color:#21FFCE>" # El color que se aplica a {0}, {1}, etc. en las traducciones
   enabled: "Lumen habilitado correctamente."
   disabled: "Lumen deshabilitado correctamente."
   enable_error: "Error al habilitar el plugin. Consulta la consola para más detalles."
@@ -87,9 +89,9 @@ command:
     error_log: "El comando /reload falló al ejecutarse por {0}."
   give:
     invalid_amount: "¡La cantidad debe ser mayor a 0!"
-    invalid_torch: "¡Tipo de antorcha no válido! Usa 'light' o 'mob'."
+    invalid_torch: "¡Tipo de antorcha no válido! Usa 'torch' o 'guard'."
     invalid_player: "¡Jugador no encontrado o desconectado!"
-    success_one: "Has dado {0} antorcha/s tipo '{1}' a {2}."
+    success_one: "Has dado {1} antorcha/s tipo '{2}' a {0}."
     success_all: "Has dado {0} antorcha/s tipo '{1}' a todos los jugadores."
     received: "Has recibido {0} antorcha/s tipo '{1}'."
 
@@ -116,7 +118,7 @@ mobs:
 torch:
   light_placed: "Lumen Torch colocada en: {0} con ID de operación: {1}."
   guard_placed: "Lumen Guard colocada en: {0}."
-  light_broken: "Lumen Torch rota. Operación cancelada y luces eliminadas: {0}."
+  light_broken: "Lumen Torch rota. Luces eliminadas: {0}."
   guard_broken: "Lumen Guard rota. Área de protección eliminada en: {0}."
 
 light:
@@ -146,7 +148,6 @@ light:
     completed_operation: "La operación '{0}' se completó con éxito."
     removed_lights: "Se eliminaron todas las luces asociadas a la operación '{0}'."
     operation_cancelled: "La operación '{0}' fue cancelada."
-    cancelled_and_removed: "La operación '{0}' fue cancelada y todas las luces asociadas fueron eliminadas."
 
 mob_registry:
   protected_area_added: "Área protegida añadida en {0} con un radio de {1} bloques."
