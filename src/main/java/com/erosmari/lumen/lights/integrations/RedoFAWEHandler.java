@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class RedoFAWEHandler {
 
-    public static void handleRedoWithFAWE(Lumen plugin, Player player, Map<Location, Integer> blocksWithLightLevels, String operationId) {
+    public static void handleRedoWithFAWE(Lumen plugin, Player player, Map<Location, Integer> blocksWithLightLevels, int operationId) {
         List<Location> locations = new ArrayList<>(blocksWithLightLevels.keySet());
         int lightLevel = blocksWithLightLevels.values().iterator().next();
 

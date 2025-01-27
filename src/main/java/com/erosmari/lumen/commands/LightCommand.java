@@ -1,6 +1,7 @@
 package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.Lumen;
+import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.lights.LightHandler;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -62,7 +63,9 @@ public class LightCommand {
             return 0;
         }
 
-        String operationId = java.util.UUID.randomUUID().toString();
+        // Registrar la operación en la base de datos y obtener el ID incremental
+        int operationId = LightRegistry.registerOperation(java.util.UUID.randomUUID(), "Generación de luces");
+
 
         LightHandler lightHandler = new LightHandler(Lumen.getInstance());
         lightHandler.placeLights(player, areaBlocks, lightLevel, includeSkylight, operationId);

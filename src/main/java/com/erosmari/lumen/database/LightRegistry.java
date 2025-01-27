@@ -6,23 +6,18 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.*;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@SuppressWarnings("CommentedOutCode")
 public class LightRegistry {
 
     private static final Logger logger = Logger.getLogger("Lumen-LightRegistry");
 
-    public static void addBlockAsync(Location location, int lightLevel, String operationId) {
+    public static void addBlockAsync(Location location, int lightLevel, int operationId) {
         CompletableFuture.runAsync(() -> {
             if (lightLevel <= 0 || lightLevel > 15) {
                 logger.warning(TranslationHandler.getFormatted("light_registry.error.invalid_light_level", lightLevel, location));
@@ -43,13 +38,69 @@ public class LightRegistry {
         });
     }
 
-    public static void softDeleteBlocksByOperationId(String operationId) {
+    public static int registerOperation(UUID operationUuid, String description) {
+        String sql = "INSERT INTO operations (operation_uuid, description) VALUES (?, ?)";
+
+        try (Connection connection = DatabaseHandler.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, operationUuid.toString());
+            stmt.setString(2, description);
+            stmt.executeUpdate();
+
+            try (ResultSet keys = stmt.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return keys.getInt(1); // Retorna el ID generado
+                }
+            }
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, TranslationHandler.get("database.operation.register.error"), e);
+        }
+        throw new IllegalStateException(TranslationHandler.get("database.operation.register.failed"));
+    }
+
+//    public static UUID getOperationUUID(int id) {
+//        String sql = "SELECT operation_uuid FROM operations WHERE id = ?";
+//
+//        try (Connection connection = DatabaseHandler.getConnection();
+//             PreparedStatement stmt = connection.prepareStatement(sql)) {
+//            stmt.setInt(1, id);
+//
+//            try (ResultSet resultSet = stmt.executeQuery()) {
+//                if (resultSet.next()) {
+//                    return UUID.fromString(resultSet.getString("operation_uuid"));
+//                }
+//            }
+//        } catch (SQLException e) {
+//            logger.log(Level.SEVERE, TranslationHandler.get("database.operation.get_uuid.error"), e);
+//        }
+//        throw new IllegalStateException(TranslationHandler.getFormatted("database.operation.get_uuid.failed", id));
+//    }
+//
+//    public static int getOperationId(UUID operationUuid) {
+//        String sql = "SELECT id FROM operations WHERE operation_uuid = ?";
+//
+//        try (Connection connection = DatabaseHandler.getConnection();
+//             PreparedStatement stmt = connection.prepareStatement(sql)) {
+//            stmt.setString(1, operationUuid.toString());
+//
+//            try (ResultSet resultSet = stmt.executeQuery()) {
+//                if (resultSet.next()) {
+//                    return resultSet.getInt("id");
+//                }
+//            }
+//        } catch (SQLException e) {
+//            logger.log(Level.SEVERE, TranslationHandler.get("database.operation.get_id.error"), e);
+//        }
+//        throw new IllegalStateException(TranslationHandler.getFormatted("database.operation.get_id.failed", operationUuid));
+//    }
+
+    public static void softDeleteBlocksByOperationId(int operationId) {
         String query = "UPDATE illuminated_blocks SET is_deleted = 1 WHERE operation_id = ?;";
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, operationId);
+            statement.setInt(1, operationId);
             statement.executeUpdate();
             logger.info(TranslationHandler.getFormatted("light_registry.info.blocks_soft_deleted", operationId));
         } catch (SQLException e) {
@@ -57,13 +108,13 @@ public class LightRegistry {
         }
     }
 
-    public static void restoreSoftDeletedBlocksByOperationId(String operationId) {
+    public static void restoreSoftDeletedBlocksByOperationId(int operationId) {
         String query = "UPDATE illuminated_blocks SET is_deleted = 0 WHERE operation_id = ?;";
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, operationId);
+            statement.setInt(1, operationId);
             statement.executeUpdate();
             logger.info(TranslationHandler.getFormatted("light_registry.info.blocks_restored", operationId));
         } catch (SQLException e) {
@@ -71,14 +122,14 @@ public class LightRegistry {
         }
     }
 
-    public static Map<Location, Integer> getSoftDeletedBlocksWithLightLevelByOperationId(String operationId) {
+    public static Map<Location, Integer> getSoftDeletedBlocksWithLightLevelByOperationId(int operationId) {
         String query = "SELECT world, x, y, z, light_level FROM illuminated_blocks WHERE operation_id = ? AND is_deleted = 1;";
         Map<Location, Integer> blocksWithLightLevel = new HashMap<>();
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, operationId);
+            statement.setInt(1, operationId);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -96,7 +147,7 @@ public class LightRegistry {
         return blocksWithLightLevel;
     }
 
-    public static String getLastSoftDeletedOperationId() {
+    public static Integer getLastSoftDeletedOperationId() {
         String query = "SELECT operation_id FROM illuminated_blocks WHERE is_deleted = 1 ORDER BY id DESC LIMIT 1;";
 
         try (Connection connection = DatabaseHandler.getConnection();
@@ -104,7 +155,7 @@ public class LightRegistry {
              ResultSet resultSet = statement.executeQuery()) {
 
             if (resultSet.next()) {
-                return resultSet.getString("operation_id");
+                return resultSet.getInt("operation_id");
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, TranslationHandler.get("light_registry.error.fetch_last_soft_deleted"), e);
@@ -113,14 +164,14 @@ public class LightRegistry {
         return null;
     }
 
-    public static List<Location> getBlocksByOperationId(String operationId) {
+    public static List<Location> getBlocksByOperationId(int operationId) {
         String query = "SELECT * FROM illuminated_blocks WHERE operation_id = ?;";
         List<Location> blocks = new ArrayList<>();
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
 
-            statement.setString(1, operationId);
+            statement.setInt(1, operationId);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
@@ -137,7 +188,7 @@ public class LightRegistry {
         return blocks;
     }
 
-    public static void removeBlocksByOperationId(String operationId) {
+    public static void removeBlocksByOperationId(int operationId) {
         String queryUpdate = "UPDATE illuminated_blocks SET is_deleted = 1 WHERE operation_id = ?;";
         String querySelect = "SELECT world, x, y, z FROM illuminated_blocks WHERE operation_id = ? AND is_deleted = 0;";
 
@@ -145,7 +196,7 @@ public class LightRegistry {
              PreparedStatement selectStatement = connection.prepareStatement(querySelect);
              PreparedStatement updateStatement = connection.prepareStatement(queryUpdate)) {
 
-            selectStatement.setString(1, operationId);
+            selectStatement.setInt(1, operationId);
 
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -153,7 +204,7 @@ public class LightRegistry {
                 }
             }
 
-            updateStatement.setString(1, operationId);
+            updateStatement.setInt(1, operationId);
             updateStatement.executeUpdate();
 
             logger.info(TranslationHandler.getFormatted("light_registry.info.blocks_removed", operationId));
@@ -207,9 +258,9 @@ public class LightRegistry {
         return blocks;
     }
 
-    public static List<String> getLastOperations(int count) {
+    public static List<Integer> getLastOperations(int count) {
         String query = "SELECT DISTINCT operation_id FROM illuminated_blocks WHERE is_deleted = 0 ORDER BY id DESC LIMIT ?;";
-        List<String> operations = new ArrayList<>();
+        List<Integer> operations = new ArrayList<>();
 
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -218,7 +269,7 @@ public class LightRegistry {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 while (resultSet.next()) {
-                    operations.add(resultSet.getString("operation_id"));
+                    operations.add(resultSet.getInt("operation_id"));
                 }
             }
         } catch (SQLException e) {
@@ -281,7 +332,7 @@ public class LightRegistry {
         statement.setInt(7, center.getBlockZ() + range);
     }
 
-    public static void addBlocksAsync(List<Location> locations, int lightLevel, String operationId) {
+    public static void addBlocksAsync(List<Location> locations, int lightLevel, int operationId) {
         CompletableFuture.runAsync(() -> {
             String query = "INSERT INTO illuminated_blocks (world, x, y, z, light_level, operation_id, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0);";
 
@@ -310,12 +361,12 @@ public class LightRegistry {
         });
     }
 
-    private static void setBlockStatementParameters(PreparedStatement statement, Location location, int lightLevel, String operationId) throws SQLException {
+    private static void setBlockStatementParameters(PreparedStatement statement, Location location, int lightLevel, int operationId) throws SQLException {
         statement.setString(1, location.getWorld().getName());
         statement.setInt(2, location.getBlockX());
         statement.setInt(3, location.getBlockY());
         statement.setInt(4, location.getBlockZ());
         statement.setInt(5, lightLevel);
-        statement.setString(6, operationId);
+        statement.setInt(6, operationId);
     }
 }

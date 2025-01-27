@@ -17,6 +17,9 @@ settings:
   # Lumen Command settings
   command_lights_per_tick: 1000 # Quantity of lights added per tick with the command
 
+  # Async settings
+  async_thread_pool_size: 4 # Quantity of threads used for async tasks
+
   # Lumen Torch settings
   default_torch_radius: 20 # Radius of the torch
   torch_lights_per_tick: 10 # Quantity of lights added per tick with the torch

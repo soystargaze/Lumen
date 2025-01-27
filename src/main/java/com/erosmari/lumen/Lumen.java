@@ -40,6 +40,7 @@ public class Lumen extends JavaPlugin implements Listener {
         getLogger().info("--------------------------------------------");
 
         try {
+
             loadConfigurations();
             initializeDatabase();
             initializeSystems();
@@ -55,7 +56,7 @@ public class Lumen extends JavaPlugin implements Listener {
 
     @Override
     public void onDisable() {
-        AsyncExecutor.shutdown(); // Apagar el ExecutorService centralizado
+        AsyncExecutor.shutdown();
         DatabaseHandler.close();
         getLogger().info(TranslationHandler.get("plugin.disabled"));
         instance = null;
@@ -74,8 +75,9 @@ public class Lumen extends JavaPlugin implements Listener {
     }
 
     private void loadConfigurations() {
+        ConfigHandler.setup(this);
+        AsyncExecutor.initialize();
         CompletableFuture.runAsync(() -> {
-            ConfigHandler.setup(this);
             setupTranslations();
             TranslationHandler.loadTranslations(this, ConfigHandler.getLanguage());
         }, AsyncExecutor.getExecutor()).exceptionally(ex -> null);

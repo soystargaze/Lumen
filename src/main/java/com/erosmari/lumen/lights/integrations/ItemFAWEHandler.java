@@ -34,7 +34,7 @@ public class ItemFAWEHandler {
      * @param lightLevel  Nivel de luz de los bloques.
      * @param operationId Identificador de la operación.
      */
-    public static void placeLightsWithFAWE(Lumen plugin, Player player, List<Location> locations, int lightLevel, String operationId) {
+    public static void placeLightsWithFAWE(Lumen plugin, Player player, List<Location> locations, int lightLevel, int operationId) {
         if (locations == null || locations.isEmpty()) {
             player.sendMessage(TranslationHandler.get("light.error.no_locations"));
             return;

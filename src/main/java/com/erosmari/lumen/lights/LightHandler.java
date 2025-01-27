@@ -32,7 +32,7 @@ public class LightHandler {
         this.coreProtectHandler = plugin.getCoreProtectHandler();
     }
 
-    public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight, String operationId) {
+    public void placeLights(Player player, int areaBlocks, int lightLevel, boolean includeSkylight, int operationId) {
         Location center = player.getLocation();
         World world = center.getWorld();
 
@@ -134,7 +134,7 @@ public class LightHandler {
         return false;
     }
 
-    private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, String operationId) {
+    private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int operationId) {
         // Si FAWE está disponible, delegar la colocación de bloques a FAWE
         if (isFAWEAvailable()) {
             plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_found"));
@@ -208,7 +208,7 @@ public class LightHandler {
         return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
-    private boolean processSingleBlock(Location blockLocation, int lightLevel, String operationId) {
+    private boolean processSingleBlock(Location blockLocation, int lightLevel, int operationId) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);
 

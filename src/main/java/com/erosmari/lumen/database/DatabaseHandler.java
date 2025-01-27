@@ -63,6 +63,7 @@ public class DatabaseHandler {
      */
     private static void createTables() {
         try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
+            // Crear tabla illuminated_blocks
             String createIlluminatedBlocksTable = "CREATE TABLE IF NOT EXISTS illuminated_blocks (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "world TEXT NOT NULL," +
@@ -70,8 +71,10 @@ public class DatabaseHandler {
                     "y INTEGER NOT NULL," +
                     "z INTEGER NOT NULL," +
                     "light_level INTEGER NOT NULL," +
-                    "operation_id TEXT NOT NULL," +
-                    "is_deleted BOOLEAN DEFAULT 0" +
+                    "operation_id INTEGER NOT NULL," +
+                    "is_deleted BOOLEAN DEFAULT 0," +
+                    "FOREIGN KEY(operation_id) REFERENCES operations(id)," +
+                    "UNIQUE(world, x, y, z, operation_id) ON CONFLICT IGNORE" +
                     ");";
             stmt.executeUpdate(createIlluminatedBlocksTable);
 
@@ -84,6 +87,14 @@ public class DatabaseHandler {
                     "radius INTEGER NOT NULL" +
                     ");";
             stmt.executeUpdate(createProtectedAreasTable);
+
+            String createOperationsTable = "CREATE TABLE IF NOT EXISTS operations (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "operation_uuid TEXT NOT NULL UNIQUE," +
+                    "description TEXT" +
+                    ");";
+            stmt.executeUpdate(createOperationsTable);
+
         } catch (SQLException e) {
             logger.log(Level.SEVERE, TranslationHandler.get("database.tables.error"), e);
         }

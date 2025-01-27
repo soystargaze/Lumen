@@ -5,6 +5,7 @@ import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.lights.integrations.ItemFAWEHandler;
 import com.erosmari.lumen.tasks.TaskManager;
+import com.erosmari.lumen.utils.AsyncExecutor;
 import com.erosmari.lumen.utils.DisplayUtil;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.*;
@@ -18,18 +19,18 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class ItemLightsHandler {
 
     private final Lumen plugin;
-    private final Executor executor = Executors.newFixedThreadPool(4);
+    private final Executor executor = AsyncExecutor.getExecutor();
+
 
     public ItemLightsHandler(Lumen plugin) {
         this.plugin = plugin;
     }
 
-    public void placeLights(Player player, Location center, String operationId) {
+    public void placeLights(Player player, Location center, int operationId) {
         World world = center.getWorld();
 
         if (world == null) {
@@ -104,7 +105,7 @@ public class ItemLightsHandler {
         return false;
     }
 
-    public void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, String operationId) {
+    public void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, int operationId) {
         // Si FAWE está disponible, delegar la colocación de bloques al manejado de FAWE
         if (isFAWEAvailable()) {
             plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_found"));
@@ -170,7 +171,7 @@ public class ItemLightsHandler {
         return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
-    private void placeLight(Location location, int lightLevel, String operationId) {
+    private void placeLight(Location location, int lightLevel, int operationId) {
         Block block = location.getBlock();
         block.setType(Material.LIGHT, false);
 
@@ -191,7 +192,7 @@ public class ItemLightsHandler {
         }
     }
 
-    public void removeLights(Player player, String operationId) {
+    public void removeLights(Player player, int operationId) {
         CompletableFuture.supplyAsync(() -> LightRegistry.getBlocksByOperationId(operationId), executor)
                 .thenAcceptAsync(blocksToRemove -> {
                     if (blocksToRemove.isEmpty()) {
@@ -212,7 +213,7 @@ public class ItemLightsHandler {
                     });
                 });
     }
-    public void cancelOperation(Player player, String operationId) {
+    public void cancelOperation(Player player, int operationId) {
         // Cancelar la tarea activa (si existe)
         if (TaskManager.hasActiveTask(player.getUniqueId())) {
             TaskManager.cancelTask(player.getUniqueId());

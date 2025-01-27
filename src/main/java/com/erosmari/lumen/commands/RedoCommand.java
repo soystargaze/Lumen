@@ -49,7 +49,7 @@ public class RedoCommand {
             return 0;
         }
 
-        String operationId = LightRegistry.getLastSoftDeletedOperationId();
+        Integer operationId = LightRegistry.getLastSoftDeletedOperationId();
         if (operationId == null) {
             player.sendMessage(Component.text(TranslationHandler.get("command.redo.no_previous_operations")).color(NamedTextColor.RED));
             return 0;
@@ -122,7 +122,7 @@ public class RedoCommand {
         return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
-    private boolean processBlock(Location blockLocation, int lightLevel, String operationId, List<Location> processedBlocks) {
+    private boolean processBlock(Location blockLocation, int lightLevel, int operationId, List<Location> processedBlocks) {
         Block block = blockLocation.getBlock();
         block.setType(Material.LIGHT, false);
 

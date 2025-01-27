@@ -18,12 +18,22 @@ database:
     failed: "No se pudo inicializar la base de datos. Verifique los registros para más detalles."
     sqlite:
       error_directory: "No se pudo crear el directorio para SQLite: {0}."
-    tables:
-      error: "Ocurrió un error al crear las tablas de la base de datos."
+  tables:
+    error: "Ocurrió un error al crear las tablas de la base de datos."
     connection:
       uninitialized: "El pool de conexiones no está inicializado. Por favor, inicialice primero la base de datos."
     close:
       success: "El pool de conexiones de la base de datos se ha cerrado correctamente."
+  operation:
+    register:
+      error: "Error al registrar la operación."
+      failed: "No se pudo registrar la operación."
+    get_uuid:
+      error: "Error al obtener el UUID desde el ID."
+      failed: "No se pudo obtener el UUID para el ID: {0}."
+    get_id:
+      error: "Error al obtener el ID desde el UUID."
+      failed: "No se pudo obtener el ID para el UUID: {0}."
 
 commandmanager:
   init_error: "Error al inicializar el CommandManager: {0}"

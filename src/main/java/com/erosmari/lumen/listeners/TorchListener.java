@@ -1,5 +1,6 @@
 package com.erosmari.lumen.listeners;
 
+import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
@@ -19,6 +20,7 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class TorchListener implements Listener {
 
@@ -49,20 +51,24 @@ public class TorchListener implements Listener {
                     Player player = event.getPlayer();
                     Location placedLocation = placedBlock.getLocation();
 
+                    // Generar un ID incremental para la operación
+                    int incrementalId = LightRegistry.registerOperation(UUID.randomUUID(), "Lumen Torch placed at " + placedLocation);
+
                     // Transfiere el ID al bloque colocado si es compatible con TileState
                     if (placedBlock.getState() instanceof TileState tileState) {
-                        transferPersistentData(itemContainer, tileState.getPersistentDataContainer());
+                        PersistentDataContainer container = tileState.getPersistentDataContainer();
+                        transferPersistentData(itemContainer, container);
+                        container.set(new NamespacedKey(plugin, "operation_id"), PersistentDataType.INTEGER, incrementalId); // Guardar el ID
                         tileState.update();
                     }
 
                     // Lógica para el Lumen Torch (luz)
-                    String operationId = "torch-" + placedLocation.hashCode();
-                    lightsHandler.placeLights(player, placedLocation, operationId);
+                    lightsHandler.placeLights(player, placedLocation, incrementalId);
 
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "torch");
 
-                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_placed", placedLocation, operationId));
+                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_placed", placedLocation, incrementalId));
                 }
             }
         }
@@ -81,23 +87,29 @@ public class TorchListener implements Listener {
 
                 if ("light".equals(id)) {
                     try {
-                        String operationId = "torch-" + brokenBlock.getLocation().hashCode();
+                        // Recuperar el ID incremental del bloque
+                        NamespacedKey operationKey = new NamespacedKey(plugin, "operation_id");
+                        if (blockContainer.has(operationKey, PersistentDataType.INTEGER)) {
+                            Integer incrementalId = blockContainer.get(operationKey, PersistentDataType.INTEGER);
+                            if (incrementalId != null) {
 
-                        // Cancela operaciones de luz asociadas con la antorcha
-                        lightsHandler.cancelOperation(player, operationId);
-                        lightsHandler.removeLights(player, operationId);
+                            // Cancelar operaciones asociadas con este ID
+                            lightsHandler.cancelOperation(player, incrementalId);
+                            lightsHandler.removeLights(player, incrementalId);
 
-                        // Obtener el ítem original desde la instancia de lumenItems
-                        ItemStack customItem = lumenItems.getLumenItem(id);
+                            // Obtener el ítem original desde la instancia de lumenItems
+                            ItemStack customItem = lumenItems.getLumenItem(id);
 
-                        if (customItem != null) {
-                            // Soltar el ítem clonado
-                            brokenBlock.getWorld().dropItemNaturally(brokenBlock.getLocation(), customItem.clone());
+                                if (customItem != null) {
+                                    // Soltar el ítem clonado
+                                    brokenBlock.getWorld().dropItemNaturally(brokenBlock.getLocation(), customItem.clone());
 
-                            // Evitar el drop predeterminado
-                            event.setDropItems(false);
+                                    // Evitar el drop predeterminado
+                                    event.setDropItems(false);
 
-                            player.sendMessage(TranslationHandler.getFormatted("torch.light_broken", operationId));
+                                    player.sendMessage(TranslationHandler.getFormatted("torch.light_broken", incrementalId));
+                                }
+                            }
                         }
                     } catch (Exception e) {
                         plugin.getLogger().severe(String.format(

@@ -32,7 +32,7 @@ public class BatchProcessor {
      * @param lightLevel Nivel de luz.
      * @param operationId ID de la operación.
      */
-    public static void addBlockToBatch(Location location, int lightLevel, String operationId) {
+    public static void addBlockToBatch(Location location, int lightLevel, int operationId) {
         boolean success = batchQueue.offer(new BatchEntry(location, lightLevel, operationId));
         if (!success) {
             logger.warning(TranslationHandler.getFormatted("light_registry.error.add_block_failed", location, operationId));
@@ -48,7 +48,7 @@ public class BatchProcessor {
         batchQueue.drainTo(batch, BATCH_SIZE); // Extrae hasta BATCH_SIZE elementos de la cola
 
         if (!batch.isEmpty()) {
-            String operationId = batch.getFirst().operationId();
+            int operationId = batch.getFirst().operationId();
             List<Location> locations = new ArrayList<>();
             int lightLevel = batch.getFirst().lightLevel();
 
@@ -64,6 +64,6 @@ public class BatchProcessor {
     /**
      * Clase interna para representar entradas de lotes.
      */
-    private record BatchEntry(Location location, int lightLevel, String operationId) {
+    private record BatchEntry(Location location, int lightLevel, int operationId) {
     }
 }

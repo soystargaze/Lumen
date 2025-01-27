@@ -45,7 +45,7 @@ public class UndoCommand {
             return 0;
         }
 
-        List<String> lastOperations = LightRegistry.getLastOperations(count);
+        List<Integer> lastOperations = LightRegistry.getLastOperations(count);
 
         if (lastOperations.isEmpty()) {
             player.sendMessage(Component.text(TranslationHandler.get("command.undo.no_previous_operations")).color(NamedTextColor.RED));
@@ -63,11 +63,11 @@ public class UndoCommand {
         }
     }
 
-    private int removeLightBlocksByOperations(List<String> operationIds, Player player) {
+    private int removeLightBlocksByOperations(List<Integer> operationIds, Player player) {
         CoreProtectHandler coreProtectHandler = plugin.getCoreProtectHandler();
         List<Location> allRemovedBlocks = new ArrayList<>();
 
-        for (String operationId : operationIds) {
+        for (int operationId : operationIds) {
             List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
             if (!blocks.isEmpty()) {
                 for (Location location : blocks) {
