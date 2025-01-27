@@ -44,7 +44,7 @@ public class MobListener implements Listener {
             if (itemContainer.has(lumenIdKey, PersistentDataType.STRING)) {
                 String id = itemContainer.get(lumenIdKey, PersistentDataType.STRING);
 
-                if ("anti_mob".equals(id)) {
+                if ("guard".equals(id)) {
                     Block placedBlock = event.getBlock();
                     Player player = event.getPlayer();
                     Location placedLocation = placedBlock.getLocation();
@@ -59,10 +59,10 @@ public class MobListener implements Listener {
                     mobsHandler.registerAntiMobArea(player, placedLocation);
 
                     // Efecto visual y sonoro
-                    ItemEffectUtil.playEffect(placedLocation, "mob_torch");
+                    ItemEffectUtil.playEffect(placedLocation, "guard");
 
-                    plugin.getLogger().info(TranslationHandler.getFormatted(
-                            "torch.mob_torch_placed", placedLocation));
+                    player.sendMessage(TranslationHandler.getPlayerMessage("torch.guard_placed", placedLocation));
+                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.guard_placed", placedLocation));
                 }
             }
         }
@@ -71,6 +71,7 @@ public class MobListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
         Block brokenBlock = event.getBlock();
+        Player player = event.getPlayer();
 
         if (brokenBlock.getState() instanceof TileState tileState) {
             PersistentDataContainer blockContainer = tileState.getPersistentDataContainer();
@@ -78,7 +79,7 @@ public class MobListener implements Listener {
             if (blockContainer.has(lumenIdKey, PersistentDataType.STRING)) {
                 String id = blockContainer.get(lumenIdKey, PersistentDataType.STRING);
 
-                if ("anti_mob".equals(id)) {
+                if ("guard".equals(id)) {
                     Location brokenLocation = brokenBlock.getLocation();
 
                     // Elimina el área protegida
@@ -94,8 +95,8 @@ public class MobListener implements Listener {
                         // Evitar el drop predeterminado
                         event.setDropItems(false);
 
-                        plugin.getLogger().info(TranslationHandler.getFormatted(
-                                "torch.mob_torch_broken", brokenLocation));
+                        player.sendMessage(TranslationHandler.getPlayerMessage("torch.guard_broken", brokenLocation));
+                        plugin.getLogger().info(TranslationHandler.getFormatted("torch.guard_broken", brokenLocation));
                     }
                 }
             }

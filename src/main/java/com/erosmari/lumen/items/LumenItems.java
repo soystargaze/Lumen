@@ -4,6 +4,8 @@ import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.erosmari.lumen.utils.TranslationHandler;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -33,23 +35,23 @@ public class LumenItems {
     public void registerItems() {
         // Crear los objetos con texturas
         ItemStack lumenTorch = createLumenTorch(
-                TranslationHandler.get("items.lumen_torch.name"),
+                TranslationHandler.get("items.torch.name"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzViNTFjYzJlOTlkMDhkZDI4NzlhNzkyZjA2MmUwNzc4MzJhMDE2M2YzZDg1YzI0NGUwYmExYzM5MmFiMDlkZSJ9fX0=",
                 "light"
         );
-        ItemStack lumenTorchMob = createLumenTorch(
-                TranslationHandler.get("items.lumen_torch_mob.name"),
+        ItemStack lumenGuard = createLumenTorch(
+                TranslationHandler.get("items.guard.name"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg0NDE3MjViZDQzMDczNmNmNDBkNGNlOTVjYjVhNWUxMDMwNWI3OTVhYzRmZjg0NzRlMDUzNWRmN2FmMWRkNyJ9fX0=",
                 "anti_mob"
         );
 
         // Agregar los ítems al mapa
-        lumenItems.put("light", lumenTorch);
-        lumenItems.put("anti_mob", lumenTorchMob);
+        lumenItems.put("torch", lumenTorch);
+        lumenItems.put("guard", lumenGuard);
 
         // Registrar las recetas de los objetos
         registerRecipe("lumen_torch", lumenTorch, Material.GOLD_INGOT);
-        registerRecipe("lumen_torch_mob", lumenTorchMob, Material.DIAMOND);
+        registerRecipe("lumen_guard", lumenGuard, Material.DIAMOND);
     }
 
     /**
@@ -68,7 +70,8 @@ public class LumenItems {
         ItemMeta meta = head.getItemMeta();
 
         if (meta != null) {
-            meta.displayName(Component.text(name)); // Asignar el nombre traducido al objeto
+            Component displayName = MiniMessage.miniMessage().deserialize(name).decoration(TextDecoration.ITALIC, false);
+            meta.displayName(displayName);
 
             // Agregar el identificador al PersistentDataContainer
             NamespacedKey key = new NamespacedKey(plugin, "lumen_id");

@@ -2,6 +2,7 @@ package com.erosmari.lumen.utils;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -82,12 +83,23 @@ public class TranslationHandler {
         String template = translations.getOrDefault(key, "Translation not found: " + key + "!");
 
         for (int i = 0; i < args.length; i++) {
-            template = template.replace("{" + i + "}", args[i].toString());
+            String coloredArg = "<color:#21FFCE>" + args[i].toString() + "</color>";
+            template = template.replace("{" + i + "}", coloredArg);
         }
 
         String fullMessage = prefix + template;
 
-        // Use MiniMessage to parse the full message
+        // Reemplazar códigos '&' por '§' para procesar como códigos legacy
+        if (fullMessage.contains("&")) {
+            fullMessage = fullMessage.replace("&", "§");
+        }
+
+        // Detectar códigos legacy (§) y procesar con LegacyComponentSerializer
+        if (fullMessage.contains("§")) {
+            return LegacyComponentSerializer.legacySection().deserialize(fullMessage);
+        }
+
+        // Si no hay códigos legacy, procesar con MiniMessage
         return MiniMessage.miniMessage().deserialize(fullMessage);
     }
 }

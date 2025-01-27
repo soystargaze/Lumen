@@ -34,7 +34,7 @@ public class ItemLightsHandler {
         World world = center.getWorld();
 
         if (world == null) {
-            player.sendMessage(TranslationHandler.get("light.error.no_world"));
+            player.sendMessage(TranslationHandler.getPlayerMessage("light.error.no_world"));
             return;
         }
 
@@ -111,13 +111,13 @@ public class ItemLightsHandler {
             plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_found"));
             CompletableFuture.runAsync(() -> ItemFAWEHandler.placeLightsWithFAWE(plugin, player, blocks, lightLevel, operationId), executor)
                     .thenRun(() -> {
-                        player.sendMessage(TranslationHandler.getFormatted("light.success.placed", operationId));
+                        player.sendMessage(TranslationHandler.getPlayerMessage("light.success.placed", operationId));
                         plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                         DisplayUtil.hideBossBar(player);
                         TaskManager.cancelTask(player.getUniqueId());
                     })
                     .exceptionally(ex -> {
-                        player.sendMessage(TranslationHandler.getFormatted("light.error", ex.getMessage()));
+                        player.sendMessage(TranslationHandler.getPlayerMessage("light.error", ex.getMessage()));
                         plugin.getLogger().severe("Error during FAWE block placement: " + ex.getMessage());
                         return null;
                     });
@@ -156,7 +156,7 @@ public class ItemLightsHandler {
             DisplayUtil.showActionBar(player, progress);
 
             if (blockQueue.isEmpty()) {
-                player.sendMessage(TranslationHandler.getFormatted("light.success.placed", operationId));
+                player.sendMessage(TranslationHandler.getPlayerMessage("light.success.placed", operationId));
                 DisplayUtil.hideBossBar(player);
                 plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 TaskManager.cancelTask(player.getUniqueId());
@@ -196,7 +196,7 @@ public class ItemLightsHandler {
         CompletableFuture.supplyAsync(() -> LightRegistry.getBlocksByOperationId(operationId), executor)
                 .thenAcceptAsync(blocksToRemove -> {
                     if (blocksToRemove.isEmpty()) {
-                        player.sendMessage(TranslationHandler.getFormatted("light.error.no_lights_to_remove", operationId));
+                        player.sendMessage(TranslationHandler.getPlayerMessage("light.error.no_lights_to_remove", operationId));
                         return;
                     }
 
@@ -209,7 +209,7 @@ public class ItemLightsHandler {
                         });
 
                         LightRegistry.removeBlocksByOperationId(operationId);
-                        player.sendMessage(TranslationHandler.getFormatted("light.success.removed", operationId));
+                        player.sendMessage(TranslationHandler.getPlayerMessage("light.success.removed", operationId));
                     });
                 });
     }
@@ -224,6 +224,6 @@ public class ItemLightsHandler {
 
         // Mensajes de feedback
         DisplayUtil.hideBossBar(player);
-        player.sendMessage(TranslationHandler.getFormatted("light.info.cancelled_and_removed", operationId));
+        player.sendMessage(TranslationHandler.getPlayerMessage("light.info.cancelled_and_removed", operationId));
     }
 }

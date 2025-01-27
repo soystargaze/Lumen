@@ -68,6 +68,7 @@ public class TorchListener implements Listener {
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "torch");
 
+                    player.sendMessage(TranslationHandler.getPlayerMessage("torch.light_placed", placedLocation, incrementalId));
                     plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_placed", placedLocation, incrementalId));
                 }
             }
@@ -107,7 +108,9 @@ public class TorchListener implements Listener {
                                     // Evitar el drop predeterminado
                                     event.setDropItems(false);
 
-                                    player.sendMessage(TranslationHandler.getFormatted("torch.light_broken", incrementalId));
+                                    player.sendMessage(TranslationHandler.getPlayerMessage("torch.light_broken", incrementalId));
+                                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_broken", incrementalId));
+
                                 }
                             }
                         }

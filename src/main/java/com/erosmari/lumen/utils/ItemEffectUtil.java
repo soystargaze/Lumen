@@ -26,8 +26,8 @@ public class ItemEffectUtil {
                 playTorchEffect(world, location);
                 break;
 
-            case "mob_torch":
-                playMobTorchEffect(world, location);
+            case "guard":
+                playGuardEffect(world, location);
                 break;
 
             default:
@@ -53,7 +53,7 @@ public class ItemEffectUtil {
     /**
      * Efecto de partículas y sonido para el Lumen Torch Mob.
      */
-    private static void playMobTorchEffect(World world, Location location) {
+    private static void playGuardEffect(World world, Location location) {
         // Partículas de esmeralda y chispa
         world.spawnParticle(Particle.HAPPY_VILLAGER, location.add(0.5, 0.5, 0.5), 15, 0.3, 0.3, 0.3, 0.01);
         world.spawnParticle(Particle.CRIT, location.add(0.5, 0.5, 0.5), 10, 0.2, 0.2, 0.2, 0.01);

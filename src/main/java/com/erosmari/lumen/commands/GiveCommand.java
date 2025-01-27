@@ -28,8 +28,8 @@ public class GiveCommand {
                                 .then(
                                         Commands.argument("torch", StringArgumentType.string())
                                                 .suggests((context, builder) -> {
-                                                    builder.suggest("light");
-                                                    builder.suggest("anti_mob");
+                                                    builder.suggest("torch");
+                                                    builder.suggest("guard");
                                                     return builder.buildFuture();
                                                 })
                                                 .then(
