@@ -209,7 +209,6 @@ public class ItemLightsHandler {
                         });
 
                         LightRegistry.removeBlocksByOperationId(operationId);
-                        player.sendMessage(TranslationHandler.getPlayerMessage("light.success.removed", operationId));
                     });
                 });
     }
@@ -225,5 +224,6 @@ public class ItemLightsHandler {
         // Mensajes de feedback
         DisplayUtil.hideBossBar(player);
         player.sendMessage(TranslationHandler.getPlayerMessage("light.success.removed", operationId));
+        plugin.getLogger().info(TranslationHandler.getFormatted("light.success.removed", operationId));
     }
 }
