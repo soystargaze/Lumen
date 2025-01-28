@@ -7,7 +7,7 @@ import com.erosmari.lumen.lights.integrations.ItemFAWEHandler;
 import com.erosmari.lumen.tasks.TaskManager;
 import com.erosmari.lumen.utils.AsyncExecutor;
 import com.erosmari.lumen.utils.DisplayUtil;
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Levelled;
@@ -34,7 +34,7 @@ public class ItemLightsHandler {
         World world = center.getWorld();
 
         if (world == null) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("light.error.no_world"));
+            LoggingUtils.sendAndLog(player,"light.error.no_world");
             return;
         }
 
@@ -57,7 +57,7 @@ public class ItemLightsHandler {
                     processBlocksAsync(player, blocksToLight, lightLevel, lightsPerTick, tickInterval, operationId);
                 }, runnable -> Bukkit.getScheduler().runTask(plugin, runnable))
                 .exceptionally(ex -> {
-                    plugin.getLogger().severe("Error calculating positions: " + ex.getMessage());
+                    LoggingUtils.logTranslated("light.error.calculating_positions" + ex.getMessage());
                     return null;
                 });
     }
@@ -78,7 +78,7 @@ public class ItemLightsHandler {
                 }
             }
         }
-        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.calculated_blocks", positions.size()));
+        LoggingUtils.logTranslated("light.info.calculated_blocks", positions.size());
         return positions;
     }
 
@@ -108,30 +108,28 @@ public class ItemLightsHandler {
     public void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, int operationId) {
         // Si FAWE está disponible, delegar la colocación de bloques al manejado de FAWE
         if (isFAWEAvailable()) {
-            plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_found"));
+            LoggingUtils.logTranslated("light.info.fawe_found");
             CompletableFuture.runAsync(() -> ItemFAWEHandler.placeLightsWithFAWE(plugin, player, blocks, lightLevel, operationId), executor)
                     .thenRun(() -> {
-                        player.sendMessage(TranslationHandler.getPlayerMessage("light.success.placed", operationId));
-                        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
+                        LoggingUtils.sendAndLog(player,"light.success.placed", operationId);
                         DisplayUtil.hideBossBar(player);
                         TaskManager.cancelTask(player.getUniqueId());
                     })
                     .exceptionally(ex -> {
-                        player.sendMessage(TranslationHandler.getPlayerMessage("light.error", ex.getMessage()));
-                        plugin.getLogger().severe("Error during FAWE block placement: " + ex.getMessage());
+                        LoggingUtils.sendAndLog(player,"light.error.fawe_failed", ex.getMessage());
                         return null;
                     });
             return;
         }
 
         // Lógica original si FAWE no está disponible
-        plugin.getLogger().info(TranslationHandler.getFormatted("light.info.fawe_not_found"));
+        LoggingUtils.logTranslated("light.info.fawe_not_found");
         Queue<Location> blockQueue = new LinkedList<>(blocks);
         final BukkitTask[] taskHolder = new BukkitTask[1];
 
         taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (!TaskManager.hasActiveTask(player.getUniqueId())) {
-                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.operation_cancelled", operationId));
+                LoggingUtils.logTranslated("light.info.operation_cancelled", operationId);
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
                 taskHolder[0].cancel();
@@ -156,9 +154,8 @@ public class ItemLightsHandler {
             DisplayUtil.showActionBar(player, progress);
 
             if (blockQueue.isEmpty()) {
-                player.sendMessage(TranslationHandler.getPlayerMessage("light.success.placed", operationId));
+                LoggingUtils.sendAndLog(player,"light.success.placed", operationId);
                 DisplayUtil.hideBossBar(player);
-                plugin.getLogger().info(TranslationHandler.getFormatted("light.info.completed_operation", operationId));
                 TaskManager.cancelTask(player.getUniqueId());
                 taskHolder[0].cancel();
             }
@@ -184,10 +181,10 @@ public class ItemLightsHandler {
                 if (lightLevel >= 0 && lightLevel <= 15) {
                     LightRegistry.addBlockAsync(location, lightLevel, operationId);
                 } else {
-                    plugin.getLogger().warning("Invalid block data for operation: " + operationId + " at location: " + location);
+                    LoggingUtils.logTranslated("light.error.setting_level_torch", location);
                 }
             } catch (ClassCastException e) {
-                plugin.getLogger().warning(TranslationHandler.getFormatted("light.error.setting_level_torch", location, e.getMessage()));
+                LoggingUtils.logTranslated("light.error.setting_level_torch", location, e.getMessage());
             }
         }
     }
@@ -196,7 +193,7 @@ public class ItemLightsHandler {
         CompletableFuture.supplyAsync(() -> LightRegistry.getBlocksByOperationId(operationId), executor)
                 .thenAcceptAsync(blocksToRemove -> {
                     if (blocksToRemove.isEmpty()) {
-                        player.sendMessage(TranslationHandler.getPlayerMessage("light.error.no_lights_to_remove", operationId));
+                        LoggingUtils.sendAndLog(player,"light.error.no_lights_to_remove", operationId);
                         return;
                     }
 
@@ -223,7 +220,6 @@ public class ItemLightsHandler {
 
         // Mensajes de feedback
         DisplayUtil.hideBossBar(player);
-        player.sendMessage(TranslationHandler.getPlayerMessage("light.success.removed", operationId));
-        plugin.getLogger().info(TranslationHandler.getFormatted("light.success.removed", operationId));
+        LoggingUtils.sendAndLog(player,"light.success.removed", operationId);
     }
 }

@@ -100,4 +100,27 @@ public class TranslationHandler {
 
         return MiniMessage.miniMessage().deserialize(fullMessage);
     }
+
+    public static Component getLogMessage(String key, Object... args) {
+        String prefix = translations.getOrDefault("plugin.prefix", "<gray>[<gradient:#21FFCE:#D3FFAD>Lumen</gradient>]</gray> ");
+        String template = translations.getOrDefault(key, "Translation not found: " + key + "!");
+        String dynamicColor = translations.getOrDefault("plugin.dynamic_color", "<color:#21FFCE>");
+
+        for (int i = 0; i < args.length; i++) {
+            String coloredArg = dynamicColor + args[i].toString() + "</color>";
+            template = template.replace("{" + i + "}", coloredArg);
+        }
+
+        String fullMessage = prefix + template;
+
+        if (fullMessage.contains("&")) {
+            fullMessage = fullMessage.replace("&", "§");
+        }
+
+        if (fullMessage.contains("§")) {
+            return LegacyComponentSerializer.legacySection().deserialize(fullMessage);
+        }
+
+        return MiniMessage.miniMessage().deserialize(fullMessage);
+    }
 }

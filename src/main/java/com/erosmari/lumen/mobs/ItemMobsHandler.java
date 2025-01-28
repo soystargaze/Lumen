@@ -1,7 +1,7 @@
 package com.erosmari.lumen.mobs;
 
 import com.erosmari.lumen.database.MobRegistry;
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -27,13 +27,13 @@ public class ItemMobsHandler {
         int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 35);
         protectedAreas.put(location, radius);
         MobRegistry.addProtectedArea(location, radius);
-        plugin.getLogger().info(TranslationHandler.getFormatted("mobs.area_created_by_player", location, player.getName()));
+        LoggingUtils.logTranslated("mobs.area_created_by_player", location, player.getName());
     }
 
     public void unregisterAntiMobArea(Location location) {
         if (protectedAreas.remove(location) != null) {
             MobRegistry.removeProtectedArea(location);
-            plugin.getLogger().info(TranslationHandler.getFormatted("mobs.area_removed", location));
+            LoggingUtils.logTranslated("mobs.area_removed", location);
         }
     }
 }

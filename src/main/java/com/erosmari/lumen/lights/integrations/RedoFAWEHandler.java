@@ -2,7 +2,7 @@ package com.erosmari.lumen.lights.integrations;
 
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.database.LightRegistry;
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -21,15 +21,13 @@ public class RedoFAWEHandler {
                 locations,
                 lightLevel,
                 player,
-                plugin,
                 plugin.getCoreProtectHandler()
         );
 
         // Actualizar el registro de LightRegistry después de completar la colocación
         plugin.getServer().getScheduler().runTask(plugin, () -> {
-            plugin.getLogger().info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", operationId));
             LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
-            player.sendMessage(TranslationHandler.getFormatted("command.redo.restoration_completed", operationId));
+            LoggingUtils.sendAndLog(player,"command.redo.restoration_completed", operationId);
         });
     }
 }

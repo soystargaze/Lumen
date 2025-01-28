@@ -3,6 +3,7 @@ package com.erosmari.lumen.commands;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.connections.CoreProtectHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -40,23 +41,24 @@ public class UndoCommand {
     private int handleUndoCommand(CommandSourceStack source, int count) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.undo.only_players"));
+            LoggingUtils.logTranslated("command.undo.only_players");
             return 0;
         }
 
         List<Integer> lastOperations = LightRegistry.getLastOperations(count);
 
         if (lastOperations.isEmpty()) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.undo.no_previous_operations"));
+            LoggingUtils.sendAndLog(player,"command.undo.no_previous_operations");
             return 0;
         }
 
         int totalRemovedBlocks = removeLightBlocksByOperations(lastOperations, player);
 
         if (totalRemovedBlocks > 0) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.undo.success", totalRemovedBlocks, count));
+            LoggingUtils.sendAndLog(player,"command.undo.success", totalRemovedBlocks, count);
             return 1;
         } else {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.undo.no_blocks", count));
+            LoggingUtils.sendAndLog(player,"command.undo.no_blocks", count);
             return 0;
         }
     }

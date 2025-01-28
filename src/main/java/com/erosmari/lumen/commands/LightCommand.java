@@ -3,6 +3,7 @@ package com.erosmari.lumen.commands;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.lights.LightHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -46,18 +47,19 @@ public class LightCommand {
 
     private static int handleLightCommand(CommandSourceStack source, int areaBlocks, int lightLevel, boolean includeSkylight) {
         if (!(source.getSender() instanceof Player player)) {
+            LoggingUtils.logTranslated("command.only_players");
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
             return 0;
         }
 
         // Verificar si el jugador tiene permiso
         if (!player.hasPermission("lumen.light")) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.no_permission"));
+            LoggingUtils.sendAndLog(player,"command.no_permission");
             return 0;
         }
 
         if (lightLevel < 0 || lightLevel > 15) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.light.invalid_level"));
+            LoggingUtils.sendAndLog(player,"command.light.invalid_level");
             return 0;
         }
 
@@ -68,7 +70,7 @@ public class LightCommand {
         LightHandler lightHandler = new LightHandler(Lumen.getInstance());
         lightHandler.placeLights(player, areaBlocks, lightLevel, includeSkylight, operationId);
 
-        player.sendMessage(TranslationHandler.getPlayerMessage("command.light.success", lightLevel, operationId));
+        LoggingUtils.sendAndLog(player,"command.light.success", lightLevel, operationId);
         return 1;
     }
 }

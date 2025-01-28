@@ -1,6 +1,7 @@
 package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.RemoveLightUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
@@ -47,13 +48,14 @@ public class ClearCommand {
     private int handleClearRequest(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
+            LoggingUtils.logTranslated("command.clear.only_players");
             return 0;
         }
 
         UUID playerId = player.getUniqueId();
 
         confirmationRequests.put(playerId, System.currentTimeMillis());
-        player.sendMessage(TranslationHandler.getPlayerMessage("command.clear.request"));
+        LoggingUtils.sendAndLog(player,"command.clear.request");
 
         return 1;
     }
@@ -67,20 +69,21 @@ public class ClearCommand {
     private int handleClearConfirm(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
+            LoggingUtils.logTranslated("command.clear.only_players");
             return 0;
         }
 
         UUID playerId = player.getUniqueId();
 
         if (!confirmationRequests.containsKey(playerId)) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.clear.no_request"));
+            LoggingUtils.sendAndLog(player,"command.clear.no_request");
             return 0;
         }
 
         long requestTime = confirmationRequests.get(playerId);
         if (System.currentTimeMillis() - requestTime > CONFIRMATION_TIMEOUT) {
             confirmationRequests.remove(playerId);
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.clear.expired"));
+            LoggingUtils.sendAndLog(player,"command.clear.expired");
             return 0;
         }
 
@@ -94,7 +97,7 @@ public class ClearCommand {
         LightRegistry.clearAllBlocks();
         confirmationRequests.remove(playerId);
 
-        player.sendMessage(TranslationHandler.getPlayerMessage("command.clear.success", removedCount));
+        LoggingUtils.sendAndLog(player,"command.clear.success", removedCount);
         return 1;
     }
 }

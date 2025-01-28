@@ -31,14 +31,14 @@ public class ConsoleUtils {
      * */
     public static void displaySuccessMessage(JavaPlugin plugin) {
 
-        plugin.getLogger().info("--------------------------------------------");
-        plugin.getLogger().info(TranslationHandler.get("plugin.enabled"));
-        plugin.getLogger().info(TranslationHandler.getFormatted("plugin.language_loaded", ConfigHandler.getLanguage(), loadedKeys));
-        plugin.getLogger().info(TranslationHandler.get("database.initialized"));
-        plugin.getLogger().info(TranslationHandler.get("items.registered"));
-        plugin.getLogger().info(TranslationHandler.get("mobs.protected_areas_loaded"));
-        plugin.getLogger().info(TranslationHandler.get("command.registered"));
-        plugin.getLogger().info(TranslationHandler.get("events.registered"));
-        plugin.getLogger().info("--------------------------------------------");
+        LoggingUtils.logTranslated("plugin.separator");
+        LoggingUtils.logTranslated("plugin.enabled");
+        LoggingUtils.logTranslated("plugin.language_loaded", ConfigHandler.getLanguage(), loadedKeys);
+        LoggingUtils.logTranslated("database.initialized");
+        LoggingUtils.logTranslated("items.registered");
+        LoggingUtils.logTranslated("mobs.protected_areas_loaded");
+        LoggingUtils.logTranslated("command.registered");
+        LoggingUtils.logTranslated("events.registered");
+        LoggingUtils.logTranslated("plugin.separator");
     }
 }

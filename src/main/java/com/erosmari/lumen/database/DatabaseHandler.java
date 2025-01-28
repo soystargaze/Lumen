@@ -1,5 +1,6 @@
 package com.erosmari.lumen.database;
 
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -7,12 +8,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.sql.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class DatabaseHandler {
 
-    private static Logger logger;
     private static HikariDataSource dataSource;
 
     /**
@@ -22,17 +20,15 @@ public class DatabaseHandler {
      */
     public static void initialize(JavaPlugin plugin) {
         if (dataSource != null) {
-            logger.warning(TranslationHandler.get("database.init.already_initialized"));
+            LoggingUtils.logTranslated("database.init.already_initialized");
             return;
         }
-
-        logger = plugin.getLogger();
 
         try {
             initializeSQLite(plugin);
             createTables();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, TranslationHandler.get("database.init.error"), e);
+            LoggingUtils.logTranslated("database.init.error", e.getMessage());
             throw new IllegalStateException(TranslationHandler.get("database.init.failed"));
         }
     }
@@ -96,7 +92,7 @@ public class DatabaseHandler {
             stmt.executeUpdate(createOperationsTable);
 
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, TranslationHandler.get("database.tables.error"), e);
+            LoggingUtils.logTranslated("database.tables.error", e.getMessage());
         }
     }
 
@@ -120,7 +116,7 @@ public class DatabaseHandler {
         if (dataSource != null) {
             dataSource.close();
             dataSource = null;
-            logger.info(TranslationHandler.get("database.close.success"));
+            LoggingUtils.logTranslated("database.close.success");
         }
     }
 }

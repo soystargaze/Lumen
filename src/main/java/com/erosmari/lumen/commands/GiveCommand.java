@@ -2,6 +2,7 @@ package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.items.LumenItems;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -48,6 +49,7 @@ public class GiveCommand {
     private static int handleGiveCommand(CommandSourceStack source, String target, String torchType, int amount) {
         if (amount <= 0) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.invalid_amount"));
+            LoggingUtils.logTranslated("command.give.invalid_amount");
             return 0;
         }
 
@@ -56,6 +58,7 @@ public class GiveCommand {
 
         if (torch == null) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.invalid_torch"));
+            LoggingUtils.logTranslated("command.give.invalid_torch");
             return 0;
         }
 
@@ -64,17 +67,20 @@ public class GiveCommand {
         if (target.equalsIgnoreCase("all") || target.equalsIgnoreCase("@a")) {
             Bukkit.getOnlinePlayers().forEach(player -> {
                 player.getInventory().addItem(torch.clone());
-                player.sendMessage(TranslationHandler.getPlayerMessage("command.give.received", amount, torchType));
+                LoggingUtils.sendAndLog(player,"command.give.received", amount, torchType);
             });
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.success_all", amount, torchType));
+            LoggingUtils.logTranslated("command.give.success_all", amount, torchType);
         } else {
             Player player = Bukkit.getPlayerExact(target);
             if (player != null && player.isOnline()) {
                 player.getInventory().addItem(torch.clone());
-                player.sendMessage(TranslationHandler.getPlayerMessage("command.give.received", amount, torchType));
+                LoggingUtils.sendAndLog(player,"command.give.received", amount, torchType);
                 source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.success_one", target, amount, torchType));
+                LoggingUtils.logTranslated("command.give.success_one", target, amount, torchType);
             } else {
                 source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.invalid_player"));
+                LoggingUtils.logTranslated("command.give.invalid_player");
             }
         }
 

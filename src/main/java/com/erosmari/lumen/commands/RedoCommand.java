@@ -7,6 +7,7 @@ import com.erosmari.lumen.lights.integrations.RedoFAWEHandler;
 import com.erosmari.lumen.utils.BatchProcessor;
 import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.utils.DisplayUtil;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -19,13 +20,11 @@ import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
 
 import java.util.*;
-import java.util.logging.Logger;
 
 @SuppressWarnings("UnstableApiUsage")
 public class RedoCommand {
 
     private final Lumen plugin;
-    private static final Logger logger = Logger.getLogger("Lumen-RedoCommand");
 
     public RedoCommand(Lumen plugin) {
         this.plugin = plugin;
@@ -44,18 +43,19 @@ public class RedoCommand {
     private int handleRedoCommand(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
+            LoggingUtils.logTranslated("command.only_players");
             return 0;
         }
 
         Integer operationId = LightRegistry.getLastSoftDeletedOperationId();
         if (operationId == null) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.redo.no_previous_operations"));
+            LoggingUtils.sendAndLog(player,"command.redo.no_previous_operations");
             return 0;
         }
 
         Map<Location, Integer> blocksWithLightLevels = LightRegistry.getSoftDeletedBlocksWithLightLevelByOperationId(operationId);
         if (blocksWithLightLevels.isEmpty()) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.redo.no_blocks_found", operationId));
+            LoggingUtils.sendAndLog(player,"command.redo.no_blocks_found", operationId);
             return 0;
         }
 
@@ -97,20 +97,19 @@ public class RedoCommand {
                         coreProtectHandler.logLightPlacement(player.getName(), processedBlocks, Material.LIGHT);
                     }
 
-                    logger.info(TranslationHandler.getFormatted("command.redo.restoration_completed_log", operationId));
                     LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
-                    player.sendMessage(TranslationHandler.getPlayerMessage("command.redo.restoration_completed", operationId));
+                    LoggingUtils.sendAndLog(player,"command.redo.restoration_completed", operationId);
                     DisplayUtil.hideBossBar(player);
                     task.cancel();
                 } else if (blockQueue.isEmpty()) {
-                    logger.info(TranslationHandler.getFormatted("command.redo.retrying_failed_blocks"));
+                    LoggingUtils.logTranslated("command.redo.retrying_failed_blocks");
                     blockQueue.addAll(failedQueue);
                     failedQueue.clear();
                 }
             }, 0L, 1L);
         }
 
-        player.sendMessage(TranslationHandler.getPlayerMessage("command.redo.restoration_started", blocksWithLightLevels.size()));
+        LoggingUtils.sendAndLog(player,"command.redo.restoration_started", blocksWithLightLevels.size());
         return 1;
     }
 
@@ -135,11 +134,11 @@ public class RedoCommand {
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
                 return true;
             } catch (ClassCastException e) {
-                logger.warning(TranslationHandler.getFormatted("command.redo.light_level_error", blockLocation, e.getMessage()));
+                LoggingUtils.logTranslated("command.redo.light_level_error", blockLocation, e.getMessage());
                 return false;
             }
         } else {
-            logger.warning(TranslationHandler.getFormatted("command.redo.cannot_set_light", blockLocation));
+            LoggingUtils.logTranslated("command.redo.cannot_set_light", blockLocation);
             return false;
         }
     }

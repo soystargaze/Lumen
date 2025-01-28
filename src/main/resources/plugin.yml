@@ -3,7 +3,7 @@ version: '1.0-SNAPSHOT'
 main: com.erosmari.lumen.Lumen
 api-version: '1.21'
 load: STARTUP
-authors: [ Eros Marí ]
+authors: [Eros Marí]
 website: https://erosmari.com
 softdepend:
   - CoreProtect

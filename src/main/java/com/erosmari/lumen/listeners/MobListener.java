@@ -3,7 +3,7 @@ package com.erosmari.lumen.listeners;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -22,13 +22,11 @@ import java.util.Objects;
 
 public class MobListener implements Listener {
 
-    private final Plugin plugin;
     private final ItemMobsHandler mobsHandler;
     private final LumenItems lumenItems;
     private final NamespacedKey lumenIdKey;
 
     public MobListener(Plugin plugin, ItemMobsHandler mobsHandler, LumenItems lumenItems) {
-        this.plugin = plugin;
         this.mobsHandler = mobsHandler;
         this.lumenItems = lumenItems;
         this.lumenIdKey = new NamespacedKey(plugin, "lumen_id");
@@ -61,8 +59,7 @@ public class MobListener implements Listener {
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "guard");
 
-                    player.sendMessage(TranslationHandler.getPlayerMessage("torch.guard_placed", placedLocation));
-                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.guard_placed", placedLocation));
+                    LoggingUtils.sendAndLog(player,"torch.guard_placed", placedLocation);
                 }
             }
         }
@@ -95,8 +92,7 @@ public class MobListener implements Listener {
                         // Evitar el drop predeterminado
                         event.setDropItems(false);
 
-                        player.sendMessage(TranslationHandler.getPlayerMessage("torch.guard_broken", brokenLocation));
-                        plugin.getLogger().info(TranslationHandler.getFormatted("torch.guard_broken", brokenLocation));
+                        LoggingUtils.sendAndLog(player,"torch.guard_broken", brokenLocation);
                     }
                 }
             }

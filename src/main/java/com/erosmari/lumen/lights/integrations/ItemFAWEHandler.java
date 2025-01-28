@@ -3,7 +3,7 @@ package com.erosmari.lumen.lights.integrations;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.connections.CoreProtectHandler;
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.fastasyncworldedit.bukkit.FaweBukkitWorld;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -21,8 +21,8 @@ public class ItemFAWEHandler {
 
     private static CoreProtectHandler coreProtectHandler;
 
-    public ItemFAWEHandler(Lumen plugin) {
-        coreProtectHandler = new CoreProtectHandler(plugin);
+    public ItemFAWEHandler() {
+        coreProtectHandler = new CoreProtectHandler();
     }
 
     public static void setCoreProtectHandler(CoreProtectHandler handler) {
@@ -40,18 +40,18 @@ public class ItemFAWEHandler {
      */
     public static void placeLightsWithFAWE(Lumen plugin, Player player, List<Location> locations, int lightLevel, int operationId) {
         if (locations == null || locations.isEmpty()) {
-            player.sendMessage(TranslationHandler.get("light.error.no_locations"));
+            LoggingUtils.sendAndLog(player,"light.error.no_locations");
             return;
         }
 
         if (lightLevel < 0 || lightLevel > 15) {
-            player.sendMessage(TranslationHandler.getFormatted("light.error.invalid_light_level", lightLevel));
+            LoggingUtils.sendAndLog(player,"light.error.invalid_light_level", lightLevel);
             return;
         }
 
         org.bukkit.World bukkitWorld = locations.getFirst().getWorld();
         if (bukkitWorld == null) {
-            player.sendMessage(TranslationHandler.get("light.error.null_world"));
+            LoggingUtils.sendAndLog(player,"light.error.null_world");
             return;
         }
 
@@ -64,7 +64,7 @@ public class ItemFAWEHandler {
 
             BlockType lightType = BlockTypes.LIGHT;
             if (lightType == null) {
-                player.sendMessage(TranslationHandler.get("light.error.light_type_not_supported"));
+                LoggingUtils.sendAndLog(player,"light.error.light_type_not_supported");
                 return;
             }
 
@@ -88,20 +88,15 @@ public class ItemFAWEHandler {
                         placedLocations,
                         Material.LIGHT
                 );
-                plugin.getLogger().info("Logged " + placedLocations.size() + " light blocks in CoreProtect.");
             } else {
-                plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.not_found"));
+                LoggingUtils.logTranslated("coreprotect.integration.not_found");
             }
 
-            // Finalizar operaciones
             editSession.flushQueue();
 
-            // Notificar al jugador
-            player.sendMessage(TranslationHandler.getFormatted("light.success.fawe", placedLocations.size()));
-            plugin.getLogger().info("FAWE placed " + placedLocations.size() + " light blocks for operation: " + operationId);
+            LoggingUtils.sendAndLog(player,"light.success.fawe", placedLocations.size());
         } catch (Exception e) {
-            player.sendMessage(TranslationHandler.getFormatted("light.error", e.getMessage()));
-            plugin.getLogger().severe("Error using FAWE for light placement: " + e.getMessage());
+            LoggingUtils.sendAndLog(player,"light.error.fawe_failed", e.getMessage());
         }
     }
 }

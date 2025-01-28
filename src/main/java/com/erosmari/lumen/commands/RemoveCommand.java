@@ -3,6 +3,7 @@ package com.erosmari.lumen.commands;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.connections.CoreProtectHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.RemoveLightUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
@@ -15,17 +16,14 @@ import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 @SuppressWarnings("UnstableApiUsage")
 public class RemoveCommand {
 
     private final Lumen plugin;
-    private final Logger logger;
 
     public RemoveCommand(Lumen plugin) {
         this.plugin = plugin;
-        this.logger = plugin.getLogger();
     }
 
     public LiteralArgumentBuilder<CommandSourceStack> register() {
@@ -46,6 +44,7 @@ public class RemoveCommand {
     private int handleRemoveAreaCommand(CommandSourceStack source, int range) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.remove.only_players"));
+            LoggingUtils.logTranslated("command.remove.only_players_log");
             return 0;
         }
 
@@ -55,18 +54,15 @@ public class RemoveCommand {
         CoreProtectHandler coreProtectHandler = plugin.getCoreProtectHandler();
 
         if (coreProtectHandler == null || !coreProtectHandler.isEnabled()) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.remove.coreprotect_not_available"));
-            logger.warning(TranslationHandler.get("command.remove.coreprotect_disabled_log"));
+            LoggingUtils.sendAndLog(player,"command.remove.coreprotect_not_available");
         }
 
         int removedCount = removeAndLogBlocks(blocks, player, coreProtectHandler);
 
         if (removedCount > 0) {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.remove.area.success", removedCount, range));
-            logger.info(TranslationHandler.getFormatted("command.remove.area.success_log", player.getName(), removedCount, range));
+            LoggingUtils.sendAndLog(player,"command.remove.area.success", removedCount, range);
         } else {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.remove.area.no_blocks", range));
-            logger.info(TranslationHandler.getFormatted("command.remove.area.no_blocks_log", player.getName(), range));
+            LoggingUtils.sendAndLog(player,"command.remove.area.no_blocks", range);
         }
 
         return 1;

@@ -6,13 +6,11 @@ import org.bukkit.Location;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.logging.Logger;
 
 public class BatchProcessor {
     private static final BlockingQueue<BatchEntry> batchQueue = new LinkedBlockingQueue<>();
     private static final int BATCH_SIZE = 1000;
     private static final long BATCH_DELAY_MS = 500;
-    private static final Logger logger = Logger.getLogger("Lumen-BatchProcessor");
     private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
     static {
@@ -20,7 +18,7 @@ public class BatchProcessor {
             try {
                 processBatch();
             } catch (Exception e) {
-                logger.severe("Error while processing batch: " + e.getMessage());
+                LoggingUtils.logTranslated("light.error.batch_failed" + e.getMessage());
             }
         }, 0, BATCH_DELAY_MS, TimeUnit.MILLISECONDS);
     }
@@ -35,7 +33,7 @@ public class BatchProcessor {
     public static void addBlockToBatch(Location location, int lightLevel, int operationId) {
         boolean success = batchQueue.offer(new BatchEntry(location, lightLevel, operationId));
         if (!success) {
-            logger.warning(TranslationHandler.getFormatted("light_registry.error.add_block_failed", location, operationId));
+            LoggingUtils.logTranslated("light_registry.error.add_block_failed", location, operationId);
 
         }
     }
@@ -57,7 +55,7 @@ public class BatchProcessor {
             }
 
             LightRegistry.addBlocksAsync(locations, lightLevel, operationId);
-            logger.info(TranslationHandler.getFormatted("light_registry.info.batch_processed", locations.size(), operationId));
+            LoggingUtils.logTranslated("light_registry.info.batch_processed", locations.size(), operationId);
         }
     }
 

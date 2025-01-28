@@ -12,6 +12,7 @@ import com.erosmari.lumen.listeners.TorchListener;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
 import com.erosmari.lumen.utils.AsyncExecutor;
 import com.erosmari.lumen.utils.ConsoleUtils;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,8 +20,6 @@ import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
 
 public class Lumen extends JavaPlugin implements Listener {
 
@@ -29,20 +28,20 @@ public class Lumen extends JavaPlugin implements Listener {
     private LumenItems lumenItems;
     private CoreProtectHandler coreProtectHandler;
 
+    @SuppressWarnings("UnstableApiUsage")
     @Override
     public void onEnable() {
         instance = this;
+        loadConfigurations();
 
         ConsoleUtils.displayAsciiArt(this);
-        getLogger().info("--------------------------------------------");
-        getLogger().info("Lumen Plugin");
-        getLogger().info("v1.0");
-        getLogger().info("by Eros Marí");
-        getLogger().info("--------------------------------------------");
+        LoggingUtils.logTranslated("plugin.separator");
+        LoggingUtils.logTranslated("plugin.name");
+        LoggingUtils.logTranslated("plugin.version", getPluginMeta().getVersion());
+        LoggingUtils.logTranslated("plugin.author", getPluginMeta().getAuthors().getFirst());
+        LoggingUtils.logTranslated("plugin.separator");
 
         try {
-
-            loadConfigurations();
             initializeDatabase();
             initializeSystems();
             registerComponents();
@@ -50,7 +49,7 @@ public class Lumen extends JavaPlugin implements Listener {
 
             ConsoleUtils.displaySuccessMessage(this);
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, TranslationHandler.get("plugin.enable_error"), e);
+            LoggingUtils.logTranslated(("plugin.enable_error"), e);
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -59,7 +58,7 @@ public class Lumen extends JavaPlugin implements Listener {
     public void onDisable() {
         AsyncExecutor.shutdown();
         DatabaseHandler.close();
-        getLogger().info(TranslationHandler.get("plugin.disabled"));
+        LoggingUtils.logTranslated("plugin.disabled");
         instance = null;
     }
 
@@ -77,17 +76,14 @@ public class Lumen extends JavaPlugin implements Listener {
 
     private void loadConfigurations() {
         ConfigHandler.setup(this);
-        AsyncExecutor.initialize();
-        CompletableFuture.runAsync(() -> {
-            setupTranslations();
-            TranslationHandler.loadTranslations(this, ConfigHandler.getLanguage());
-        }, AsyncExecutor.getExecutor()).exceptionally(ex -> null);
+        setupTranslations();
+        TranslationHandler.loadTranslations(this, ConfigHandler.getLanguage());
     }
 
     private void setupTranslations() {
         File translationsFolder = new File(getDataFolder(), "Translations");
         if (!translationsFolder.exists() && !translationsFolder.mkdirs()) {
-            getLogger().severe(TranslationHandler.get("translations.folder_error"));
+            LoggingUtils.logTranslated("translations.folder_error");
             return;
         }
 
@@ -111,7 +107,7 @@ public class Lumen extends JavaPlugin implements Listener {
         try {
             DatabaseHandler.initialize(this);
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, TranslationHandler.get("database.init_error"), e);
+            LoggingUtils.logTranslated("database.init_error", e.getMessage());
             throw new IllegalStateException(TranslationHandler.get("database.init_fatal_error"));
         }
     }
@@ -128,7 +124,7 @@ public class Lumen extends JavaPlugin implements Listener {
                 commandManager.registerCommands();
             }
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, TranslationHandler.get("command.register_error"), e);
+            LoggingUtils.logTranslated("command.register_error", e.getMessage());
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -140,20 +136,21 @@ public class Lumen extends JavaPlugin implements Listener {
                 lumenItems.registerItems();
             }
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, TranslationHandler.get("items.init_error"), e);
+            LoggingUtils.logTranslated("items.init_error", e.getMessage());
         }
     }
 
     private void initializeCoreProtectIntegration() {
         if (coreProtectHandler == null) {
-            coreProtectHandler = new CoreProtectHandler(this);
+            coreProtectHandler = new CoreProtectHandler();
             ItemFAWEHandler.setCoreProtectHandler(coreProtectHandler);
 
-
             if (coreProtectHandler.isEnabled()) {
-                getLogger().info(TranslationHandler.get("coreprotect.enabled"));
+                LoggingUtils.logTranslated("coreprotect.enabled");
+                LoggingUtils.logTranslated("plugin.separator");
             } else {
-                getLogger().warning(TranslationHandler.get("coreprotect.unavailable"));
+                LoggingUtils.logTranslated("coreprotect.unavailable");
+                LoggingUtils.logTranslated("plugin.separator");
                 coreProtectHandler = null;
             }
         }
@@ -171,7 +168,7 @@ public class Lumen extends JavaPlugin implements Listener {
             getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems), this);
             getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler, lumenItems), this);
         } catch (Exception e) {
-            getLogger().log(Level.SEVERE, TranslationHandler.get("events.register_error"), e);
+            LoggingUtils.logTranslated("events.register_error", e.getMessage());
         }
     }
 

@@ -8,8 +8,13 @@
 # Puedes utilizar MiniMessage, (&6, &a...) y (§b, §c...) para los estilos y colores en las traducciones.
 
 plugin:
+  white_line: ""
   prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
   dynamic_color: "<color:#21FFCE>" # El color que se aplica a {0}, {1}, etc. en las traducciones
+  separator: "<gradient:#21FFCE:#D3FFAD><bold>--------------------------------------------</gradient>"
+  name: "<gradient:#21FFCE:#D3FFAD>Lumen</gradient>"
+  version: "v{0}"
+  author: "por {0}"
   enabled: "Lumen habilitado correctamente."
   disabled: "Lumen deshabilitado correctamente."
   enable_error: "Error al habilitar el plugin. Consulta la consola para más detalles."
@@ -132,6 +137,7 @@ torch:
 
 light:
   error:
+    batch_failed: "Ocurrió un error al procesar los bloques de luz: {0}."
     no_world: "El mundo no se encontró. Por favor, asegúrate de que el mundo esté cargado."
     no_blocks_found: "No se encontraron bloques válidos para iluminar en el área especificada."
     calculating_positions: "Ocurrió un error al calcular las posiciones de los bloques de luz: {0}."
@@ -208,6 +214,6 @@ coreprotect:
     success: "Se registraron {0} bloques eliminados por {1} en CoreProtect."
     none: "No se registraron bloques eliminados para {0} en CoreProtect."
   integration:
-    success: "¡Integración con CoreProtect exitosa!"
+    success: "Integración exitosa."
     api_disabled: "El API de CoreProtect está deshabilitado. La integración no puede completarse."
     not_found: "No se encontró el plugin CoreProtect o no está habilitado."

@@ -1,7 +1,7 @@
 package com.erosmari.lumen.lights.integrations;
 
 import com.erosmari.lumen.connections.CoreProtectHandler;
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.fastasyncworldedit.bukkit.FaweBukkitWorld;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -13,7 +13,6 @@ import com.sk89q.worldedit.world.block.BlockTypes;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +24,7 @@ public class FAWEHandler {
      *
      * @param locations List of locations where blocks should be placed.
      */
-    public static void placeLightBlocks(List<Location> locations, int lightLevel, Player player, JavaPlugin plugin, CoreProtectHandler coreProtectHandler) {
+    public static void placeLightBlocks(List<Location> locations, int lightLevel, Player player, CoreProtectHandler coreProtectHandler) {
         if (locations == null || locations.isEmpty()) {
             throw new IllegalArgumentException("Locations list is empty or null.");
         }
@@ -63,19 +62,19 @@ public class FAWEHandler {
                 try {
                     coreProtectHandler.logLightPlacement(player.getName(), placedLocations, Material.LIGHT);
                     // Enviar el mensaje al jugador
-                    player.sendMessage(TranslationHandler.getFormatted("light.success.fawe", placedLocations.size()));
+                    LoggingUtils.sendAndLog(player,"light.success.fawe", placedLocations.size());
                 } catch (Exception ex) {
-                    plugin.getLogger().severe("Error while logging light placement in CoreProtect: " + ex.getMessage());
+                    LoggingUtils.logTranslated("coreprotect.placement.error" + ex.getMessage());
                 }
             } else {
-                plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.not_found"));
+                LoggingUtils.logTranslated("coreprotect.integration.not_found");
             }
 
             // Finalizar operaciones
             editSession.flushQueue();
 
         } catch (Exception e) {
-            player.sendMessage(TranslationHandler.getFormatted("light.error.fawe_failed", e.getMessage()));
+            LoggingUtils.logTranslated("light.error.fawe_failed", e.getMessage());
         }
     }
     /**

@@ -1,6 +1,7 @@
 package com.erosmari.lumen.commands;
 
 import com.erosmari.lumen.tasks.TaskManager;
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -30,14 +31,15 @@ public class CancelCommand {
     private static int handleCancelCommand(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
+            LoggingUtils.logTranslated("command.only_players");
             return 0;
         }
 
         if (TaskManager.hasActiveTask(player.getUniqueId())) {
             TaskManager.cancelTask(player.getUniqueId());
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.cancel.success"));
+            LoggingUtils.sendAndLog(player,"command.cancel.success");
         } else {
-            player.sendMessage(TranslationHandler.getPlayerMessage("command.cancel.no_task"));
+            LoggingUtils.sendAndLog(player,"command.cancel.no_task");
         }
 
         return 1;

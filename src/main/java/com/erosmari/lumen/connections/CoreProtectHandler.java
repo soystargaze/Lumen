@@ -1,22 +1,19 @@
 package com.erosmari.lumen.connections;
 
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.plugin.Plugin;
 
 import java.util.List;
 
 public class CoreProtectHandler {
 
-    private final Plugin plugin;
     private CoreProtectAPI coreProtectAPI;
 
-    public CoreProtectHandler(Plugin plugin) {
-        this.plugin = plugin;
+    public CoreProtectHandler() {
         setupCoreProtect();
     }
 
@@ -25,10 +22,12 @@ public class CoreProtectHandler {
 
         if (coreProtect != null && coreProtect.isEnabled() && coreProtect.getAPI().isEnabled()) {
             coreProtectAPI = coreProtect.getAPI();
-            plugin.getLogger().info(TranslationHandler.get("coreprotect.integration.success"));
+            LoggingUtils.logTranslated("plugin.separator");
+            LoggingUtils.logTranslated("coreprotect.integration.success");
         } else {
             coreProtectAPI = null;
-            plugin.getLogger().warning(TranslationHandler.get("coreprotect.integration.not_found_or_disabled"));
+            LoggingUtils.logTranslated("plugin.separator");
+            LoggingUtils.logTranslated("coreprotect.integration.not_found_or_disabled");
         }
     }
 
@@ -38,45 +37,31 @@ public class CoreProtectHandler {
 
     public void logLightPlacement(String playerName, List<Location> locations, Material material) {
         if (locations == null || locations.isEmpty()) {
-            plugin.getLogger().warning(TranslationHandler.get("coreprotect.no_locations_provided"));
+            LoggingUtils.logTranslated("coreprotect.no_locations_provided");
             return;
         }
 
         int successCount = processLocations(playerName, locations, material, true);
 
         if (successCount > 0) {
-            plugin.getLogger().info(TranslationHandler.getFormatted(
-                    "coreprotect.placement.success",
-                    successCount,
-                    playerName
-            ));
+            LoggingUtils.logTranslated("coreprotect.placement.success", successCount, playerName);
         } else {
-            plugin.getLogger().warning(TranslationHandler.getFormatted(
-                    "coreprotect.placement.none",
-                    playerName
-            ));
+            LoggingUtils.logTranslated("coreprotect.placement.none", playerName);
         }
     }
 
     public void logRemoval(String playerName, List<Location> locations, Material forcedMaterial) {
         if (locations == null || locations.isEmpty()) {
-            plugin.getLogger().warning(TranslationHandler.get("coreprotect.no_locations_provided"));
+            LoggingUtils.logTranslated("coreprotect.no_locations_provided");
             return;
         }
 
         int successCount = processLocations(playerName, locations, forcedMaterial, false);
 
         if (successCount > 0) {
-            plugin.getLogger().info(TranslationHandler.getFormatted(
-                    "coreprotect.removal.success",
-                    successCount,
-                    playerName
-            ));
+            LoggingUtils.logTranslated("coreprotect.removal.success", successCount, playerName);
         } else {
-            plugin.getLogger().warning(TranslationHandler.getFormatted(
-                    "coreprotect.removal.none",
-                    playerName
-            ));
+            LoggingUtils.logTranslated("coreprotect.removal.none", playerName);
         }
     }
 
@@ -92,14 +77,9 @@ public class CoreProtectHandler {
                 }
                 successCount++;
             } catch (Exception e) {
-                plugin.getLogger().warning(TranslationHandler.getFormatted(
-                        isPlacement ? "coreprotect.placement.error" : "coreprotect.removal.error",
-                        location,
-                        e.getMessage()
-                ));
+                LoggingUtils.logTranslated(isPlacement ? "coreprotect.placement.error" : "coreprotect.removal.error", location, e.getMessage());
             }
         }
-
         return successCount;
     }
 }

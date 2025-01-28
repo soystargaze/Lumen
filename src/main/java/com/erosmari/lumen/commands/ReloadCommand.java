@@ -1,12 +1,11 @@
 package com.erosmari.lumen.commands;
 
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.logging.Level;
 
 @SuppressWarnings("UnstableApiUsage")
 public class ReloadCommand {
@@ -30,15 +29,11 @@ public class ReloadCommand {
         try {
             reloadConfig();
             int loadedTranslations = reloadTranslations();
-            source.getSender().sendMessage(
-                    TranslationHandler.getPlayerMessage("command.reload.success", loadedTranslations)
-            );
-            logInfo(source.getSender().getName(), loadedTranslations);
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.reload.success", loadedTranslations));
+            LoggingUtils.logTranslated("command.reload.success", loadedTranslations);
         } catch (Exception e) {
-            logError(source.getSender().getName(), e);
-            source.getSender().sendMessage(
-                    TranslationHandler.getPlayerMessage("command.reload.error")
-            );
+            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.reload.error"));
+            LoggingUtils.logTranslated("command.reload.error", e.getMessage());
         }
     }
 
@@ -50,17 +45,5 @@ public class ReloadCommand {
         TranslationHandler.clearTranslations();
         TranslationHandler.loadTranslations(plugin, plugin.getConfig().getString("language", "es_es"));
         return TranslationHandler.getLoadedTranslationsCount();
-    }
-
-    private void logInfo(Object... placeholders) {
-        plugin.getLogger().info(TranslationHandler.getFormatted("command.reload.success_log", placeholders));
-    }
-
-    private void logError(String playerName, Exception exception) {
-        plugin.getLogger().log(
-                Level.SEVERE,
-                TranslationHandler.getFormatted("command.reload.error_log", playerName),
-                exception
-        );
     }
 }

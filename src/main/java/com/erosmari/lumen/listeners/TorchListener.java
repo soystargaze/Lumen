@@ -4,7 +4,7 @@ import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.LoggingUtils;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -68,8 +68,7 @@ public class TorchListener implements Listener {
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "torch");
 
-                    player.sendMessage(TranslationHandler.getPlayerMessage("torch.light_placed", placedLocation, incrementalId));
-                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_placed", placedLocation, incrementalId));
+                    LoggingUtils.sendAndLog(player,"torch.light_placed", placedLocation, incrementalId);
                 }
             }
         }
@@ -108,9 +107,7 @@ public class TorchListener implements Listener {
                                     // Evitar el drop predeterminado
                                     event.setDropItems(false);
 
-                                    player.sendMessage(TranslationHandler.getPlayerMessage("torch.light_broken", incrementalId));
-                                    plugin.getLogger().info(TranslationHandler.getFormatted("torch.light_broken", incrementalId));
-
+                                    LoggingUtils.sendAndLog(player,"torch.light_broken", incrementalId);
                                 }
                             }
                         }
