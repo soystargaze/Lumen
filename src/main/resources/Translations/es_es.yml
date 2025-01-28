@@ -8,12 +8,11 @@
 # Puedes utilizar MiniMessage, (&6, &a...) y (§b, §c...) para los estilos y colores en las traducciones.
 
 plugin:
-  white_line: ""
   prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
   dynamic_color: "<color:#21FFCE>" # El color que se aplica a {0}, {1}, etc. en las traducciones
   separator: "<gradient:#21FFCE:#D3FFAD><bold>--------------------------------------------</gradient>"
   name: "<gradient:#21FFCE:#D3FFAD>Lumen</gradient>"
-  version: "v{0}"
+  version: "versión: {0}"
   author: "por {0}"
   enabled: "Lumen habilitado correctamente."
   disabled: "Lumen deshabilitado correctamente."
@@ -38,8 +37,8 @@ database:
     error: "Ocurrió un error al crear las tablas de la base de datos."
     connection:
       uninitialized: "El pool de conexiones no está inicializado. Por favor, inicialice primero la base de datos."
-    close:
-      success: "El pool de conexiones de la base de datos se ha cerrado correctamente."
+  close:
+    success: "El pool de conexiones de la base de datos se ha cerrado correctamente."
   operation:
     register:
       error: "Error al registrar la operación."

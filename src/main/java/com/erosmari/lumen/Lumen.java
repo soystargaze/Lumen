@@ -44,7 +44,7 @@ public class Lumen extends JavaPlugin implements Listener {
         try {
             initializeDatabase();
             initializeSystems();
-            registerComponents();
+            registerEvents();
             registerServerLoadListener();
 
             ConsoleUtils.displaySuccessMessage(this);
@@ -76,6 +76,7 @@ public class Lumen extends JavaPlugin implements Listener {
 
     private void loadConfigurations() {
         ConfigHandler.setup(this);
+        AsyncExecutor.initialize();
         setupTranslations();
         TranslationHandler.loadTranslations(this, ConfigHandler.getLanguage());
     }
@@ -87,7 +88,6 @@ public class Lumen extends JavaPlugin implements Listener {
             return;
         }
 
-        // Carga solo el idioma seleccionado en la configuración
         String language = ConfigHandler.getLanguage();
         saveDefaultTranslation(language + ".yml");
     }
@@ -154,10 +154,6 @@ public class Lumen extends JavaPlugin implements Listener {
                 coreProtectHandler = null;
             }
         }
-    }
-
-    private void registerComponents() {
-        registerEvents();
     }
 
     private void registerEvents() {
