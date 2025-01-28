@@ -14,12 +14,18 @@ import com.erosmari.lumen.utils.AsyncExecutor;
 import com.erosmari.lumen.utils.ConsoleUtils;
 import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
+import com.google.gson.Gson;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class Lumen extends JavaPlugin implements Listener {
 
@@ -27,11 +33,35 @@ public class Lumen extends JavaPlugin implements Listener {
     private LumenCommandManager commandManager;
     private LumenItems lumenItems;
     private CoreProtectHandler coreProtectHandler;
+    private static final Gson gson = new Gson();
 
-    @SuppressWarnings("UnstableApiUsage")
+    @SuppressWarnings("CallToPrintStackTrace")
     @Override
     public void onEnable() {
         instance = this;
+
+        try {
+            initializePlugin();
+        } catch (Exception e) {
+            LoggingUtils.logTranslated("plugin.enable_error", e.getMessage());
+            e.printStackTrace();
+            getServer().getPluginManager().disablePlugin(this);
+            return;
+        }
+        verifyLicense();
+    }
+
+    @Override
+    public void onDisable() {
+        AsyncExecutor.shutdown();
+        DatabaseHandler.close();
+        LoggingUtils.logTranslated("plugin.disabled");
+        instance = null;
+    }
+
+    @SuppressWarnings("UnstableApiUsage")
+    private void initializePlugin() {
+        startLicenseVerificationTask();
         loadConfigurations();
 
         ConsoleUtils.displayAsciiArt(this);
@@ -49,17 +79,9 @@ public class Lumen extends JavaPlugin implements Listener {
 
             ConsoleUtils.displaySuccessMessage(this);
         } catch (Exception e) {
-            LoggingUtils.logTranslated(("plugin.enable_error"), e);
+            LoggingUtils.logTranslated("plugin.enable_error", e);
             getServer().getPluginManager().disablePlugin(this);
         }
-    }
-
-    @Override
-    public void onDisable() {
-        AsyncExecutor.shutdown();
-        DatabaseHandler.close();
-        LoggingUtils.logTranslated("plugin.disabled");
-        instance = null;
     }
 
     public static Lumen getInstance() {
@@ -175,5 +197,86 @@ public class Lumen extends JavaPlugin implements Listener {
     @EventHandler
     public void onServerLoad(ServerLoadEvent event) {
         initializeCoreProtectIntegration();
+    }
+
+    private boolean verifyPurchase() {
+        try {
+            URI uri = new URI("https://api.polymart.org/v1/verifyPurchase");
+            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+
+            String postData = "license=" + URLEncoder.encode("%%__LICENSE__%%", StandardCharsets.UTF_8) +
+                    "&resource_id=" + URLEncoder.encode("%%__RESOURCE__%%", StandardCharsets.UTF_8) +
+                    "&user_id=" + URLEncoder.encode("%%__USER__%%", StandardCharsets.UTF_8) +
+                    "&signature=" + URLEncoder.encode("%%__SIGNATURE__%%", StandardCharsets.UTF_8);
+
+            try (OutputStream os = connection.getOutputStream()) {
+                os.write(postData.getBytes(StandardCharsets.UTF_8));
+                os.flush();
+            }
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode == 200) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    Map<?, ?> responseMap = gson.fromJson(reader, Map.class);
+                    boolean success = (Boolean) ((Map<?, ?>) responseMap.get("response")).get("success");
+                    if (!success) {
+                        getLogger().warning("License verification failed: " + responseMap.get("error"));
+                    }
+                    return success;
+                }
+            } else {
+                final String LOCAL_TEST_MESSAGE_KEY = "plugin.license_failed_with_response";
+                TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, "License verification failed. Disabling plugin. {0}");
+                LoggingUtils.logTranslated(LOCAL_TEST_MESSAGE_KEY,responseCode);
+            }
+        } catch (Exception e) {
+            final String LOCAL_TEST_MESSAGE_KEY = "plugin.license_failed_to_verify";
+            TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, "License verification failed. Disabling plugin. {0}");
+            LoggingUtils.logTranslated(LOCAL_TEST_MESSAGE_KEY, e.getMessage());
+        }
+        return false;
+    }
+
+    private boolean isLocalTest() {
+        return getServer().getIp().equalsIgnoreCase("127.0.0.1") || getServer().getPort() == 25565;
+    }
+
+    private void startLicenseVerificationTask() {
+        if (isLocalTest()) {
+            return;
+        }
+
+        getServer().getScheduler().runTaskTimerAsynchronously(this, () -> {
+            if (!verifyPurchase()) {
+                final String LOCAL_TEST_MESSAGE_KEY = "plugin.license_not_verified";
+                TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, "License verification failed. Disabling plugin.");
+                LoggingUtils.logTranslated(LOCAL_TEST_MESSAGE_KEY);
+                getServer().getScheduler().runTask(this, () -> getServer().getPluginManager().disablePlugin(this));
+            }
+        }, 0L, 72000L);
+    }
+
+    private void verifyLicense() {
+        if (isLocalTest()) {
+            final String LOCAL_TEST_MESSAGE_KEY = "plugin.local_test";
+            TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, "Skipping license verification (local test mode enabled)");
+            LoggingUtils.logTranslated(LOCAL_TEST_MESSAGE_KEY);
+            return;
+        }
+
+        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            if (verifyPurchase()) {
+                final String LOCAL_TEST_MESSAGE_KEY = "plugin.license_verified";
+                TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, "License verified successfully.");
+                LoggingUtils.logTranslated(LOCAL_TEST_MESSAGE_KEY);
+            } else {
+                final String LOCAL_TEST_MESSAGE_KEY = "plugin.license_not_verified";
+                TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, "License verification failed. Disabling plugin.");
+                LoggingUtils.logTranslated(LOCAL_TEST_MESSAGE_KEY);
+                getServer().getScheduler().runTask(this, () -> getServer().getPluginManager().disablePlugin(this));
+            }
+        });
     }
 }

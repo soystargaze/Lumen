@@ -14,14 +14,16 @@ public class ConsoleUtils {
      * @param plugin El plugin que ejecuta el mensaje.
      */
     public static void displayAsciiArt(JavaPlugin plugin) {
-        plugin.getLogger().info("\n" +
+
+        final String LOCAL_TEST_MESSAGE_KEY = "plugin.logo";
+        TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, "\n" +
                 "  _                                   \n" +
                 " | |                                  \n" +
                 " | |    _   _ _ __ ___   ___ _ __     \n" +
                 " | |   | | | | '_ ` _ \\ / _ \\ '_ \\ \n" +
                 " | |___| |_| | | | | | |  __/ | | |   \n" +
-                " |______\\__,_|_| |_| |_|\\___|_| |_| \n"
-        );
+                " |______\\__,_|_| |_| |_|\\___|_| |_| \n");
+        LoggingUtils.logTranslated(LOCAL_TEST_MESSAGE_KEY);
     }
 
     /**

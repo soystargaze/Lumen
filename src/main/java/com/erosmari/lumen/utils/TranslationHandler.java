@@ -123,4 +123,10 @@ public class TranslationHandler {
 
         return MiniMessage.miniMessage().deserialize(fullMessage);
     }
+
+    public static void registerTemporaryTranslation(String key, String message) {
+        if (!translations.containsKey(key)) {
+            translations.put(key, message);
+        }
+    }
 }
