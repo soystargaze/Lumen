@@ -30,7 +30,6 @@ public class ReloadCommand {
             reloadConfig();
             int loadedTranslations = reloadTranslations();
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.reload.success", loadedTranslations));
-            LoggingUtils.logTranslated("command.reload.success", loadedTranslations);
         } catch (Exception e) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.reload.error"));
             LoggingUtils.logTranslated("command.reload.error", e.getMessage());

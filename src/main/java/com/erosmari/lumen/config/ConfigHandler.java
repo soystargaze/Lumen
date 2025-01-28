@@ -6,8 +6,12 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.Map;
 
 public class ConfigHandler {
 
@@ -20,7 +24,6 @@ public class ConfigHandler {
      * @param plugin El plugin principal.
      */
     public static void setup(JavaPlugin plugin) {
-        // Configuración general (config.yml)
         File configFile = new File(plugin.getDataFolder(), "config.yml");
         if (!configFile.exists()) {
             plugin.saveResource("config.yml", false);
@@ -93,5 +96,12 @@ public class ConfigHandler {
 
     public static String getActionBarMessage() {
         return Lumen.getInstance().getConfig().getString("display.actionbar.message", "Progreso: {progress}% completado");
+    }
+
+    public static Map<String, Object> loadYaml(File file) throws Exception {
+        Yaml yaml = new Yaml();
+        try (InputStream inputStream = new FileInputStream(file)) {
+            return yaml.load(inputStream);
+        }
     }
 }
