@@ -59,6 +59,10 @@ command:
   usage: "Verwendung: /lumen <Unterbefehl>"
   only_players: "Nur Spieler können diesen Befehl ausführen."
   register_error: "Fehler beim Registrieren der Befehle. Plugin deaktiviert."
+  lang:
+    success: "Sprache auf {0} geändert. Geladene Übersetzungen: {1}."
+    file_not_found: "Die Sprachdatei {0} wurde im Ordner Translations nicht gefunden."
+    error: "Die Sprache konnte nicht auf {0} geändert werden. Siehe die Konsole für weitere Details."
   undo:
     only_players: "Nur Spieler können diesen Befehl ausführen!"
     no_previous_operations: "Es gibt keine vorherigen Operationen zum Rückgängigmachen."

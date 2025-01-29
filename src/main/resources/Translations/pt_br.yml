@@ -60,6 +60,10 @@ command:
   usage: "Uso: /lumen <subcomando>"
   only_players: "Apenas jogadores podem usar este comando."
   register_error: "Erro ao registrar os comandos. Plugin desabilitado."
+  lang:
+    success: "Idioma alterado para {0}. Traduções carregadas: {1}."
+    file_not_found: "O arquivo de idioma {0} não foi encontrado na pasta Translations."
+    error: "Não foi possível alterar o idioma para {0}. Verifique o console para mais detalhes."
   undo:
     only_players: "Apenas jogadores podem executar este comando!"
     no_previous_operations: "Não há operações anteriores para desfazer."

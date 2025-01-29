@@ -42,6 +42,7 @@ public class LumenCommandManager {
                                 source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
                                 return 1;
                             })
+                            .then(LangCommand.register(plugin))
                             .then(LightCommand.register())
                             .then(CancelCommand.register())
                             .then(undoCommand.register())
@@ -60,6 +61,7 @@ public class LumenCommandManager {
                                 source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
                                 return 1;
                             })
+                            .then(LangCommand.register(plugin))
                             .then(LightCommand.register())
                             .then(CancelCommand.register())
                             .then(undoCommand.register())
@@ -78,6 +80,7 @@ public class LumenCommandManager {
                                 source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
                                 return 1;
                             })
+                            .then(LangCommand.register(plugin))
                             .then(LightCommand.register())
                             .then(CancelCommand.register())
                             .then(undoCommand.register())
