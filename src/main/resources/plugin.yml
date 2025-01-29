@@ -1,5 +1,5 @@
 name: Lumen
-version: '1.0'
+version: '1.0.0'
 main: com.erosmari.lumen.Lumen
 api-version: '1.21'
 load: STARTUP
