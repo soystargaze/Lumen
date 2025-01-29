@@ -117,8 +117,10 @@ items:
   init_error: "Erreur lors de l'initialisation des objets personnalisés."
   torch:
     name: "<yellow><bold>Torche Lumen</yellow>"
+    no-permission: "Vous n'avez pas la permission de fabriquer une Lumen Torch."
   guard:
     name: "<blue><bold>Gardien Lumen</blue>"
+    no-permission: "Vous n'avez pas la permission de fabriquer un Lumen Guard."
   recipe_registered: "Recette enregistrée : {0}."
 
 events:
