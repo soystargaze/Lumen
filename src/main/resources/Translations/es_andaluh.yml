@@ -60,7 +60,7 @@ command:
   only_players: "¿Pero tú quién ereh? Ehsto ná máh lo pueden usá loh jugadores."
   register_error: "¡Uff! Error registrando comando'. Apagamo' Lumen pa' que no explote."
   lang:
-    success: "Er idioma ha seh cambiado a {0}. Traduccioneh cargáh: {1}."
+    success: "Olé. Er idioma ha cambiao a {0}. Traduccioneh cargáh: {1}."
     file_not_found: "No ze ha encontrao er archivoh de idioma {0} en la carpehta Translations."
     error: "No ze ha podio cambiáh er idioma a {0}. Revisa er console pa máh detalleh."
   undo:

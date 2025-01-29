@@ -142,9 +142,7 @@ public class Lumen extends JavaPlugin implements Listener {
         if (!translationFile.exists()) {
             try {
                 saveResource("Translations/" + fileName, false);
-                LoggingUtils.logTranslated("translations.default_created", fileName);
-            } catch (Exception e) {
-                LoggingUtils.logTranslated("translations.file_error", e.getMessage());
+            } catch (Exception ignored) {
             }
         }
     }
