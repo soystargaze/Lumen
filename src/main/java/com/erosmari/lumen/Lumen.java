@@ -112,7 +112,7 @@ public class Lumen extends JavaPlugin implements Listener {
             return;
         }
 
-        String[] defaultLanguages = {"en_us.yml", "es_es.yml", "fr_fr.yml", "de_de.yml", "it_it.yml", "pt_br.yml"};
+        String[] defaultLanguages = {"en_us.yml", "es_es.yml", "fr_fr.yml", "de_de.yml", "it_it.yml", "pt_br.yml", "es_andaluh.yml"};
 
         for (String languageFile : defaultLanguages) {
             saveDefaultTranslation(languageFile);

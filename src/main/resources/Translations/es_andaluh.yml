@@ -1,0 +1,225 @@
+#     _              _       _   __  _
+#    / \   _ __   __| | __ _| |_/_/_| |__
+#   / _ \ | '_ \ / _` |/ _` | | | | | '_ \
+#  / ___ \| | | | (_| | (_| | | |_| | | | |
+# /_/   \_\_| |_|\__,_|\__,_|_|\__,_|_| |_|
+
+# Pueh usá MiniMessage, (&6, &a…) y (§b, §c…) pa’ meté colorinchis y estilos en lah traduccioneh.
+
+plugin:
+  prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
+  dynamic_color: "<color:#21FFCE>" # Color pa' lo' mensajeh dinámicoh
+  separator: "<gradient:#21FFCE:#D3FFAD><bold>--------------------------------------------</gradient>"
+  name: "<gradient:#21FFCE:#D3FFAD>Lumen</gradient>"
+  version: "Velsión: {0}"
+  author: "Creao por {0}"
+  enabled: "¡Ea! ¡Lumen ta' listo pa' repartí máh luz que un chiringuito en feria!"
+  disabled: "Lumen se ha apagaó... Cucha, ¿quién ha desenchufao esto?"
+  enable_error: "Uff, ha habío un trancaço encendiendo Lumen. Mira la consola y arregraló."
+  language_loaded: "¡Habemus idioma! Se ha cargao: {0}.yml con {1} traduccioneh."
+
+translations:
+  folder_error: "Quillo, no s'ha podío creá la carpeta de traduccioneh. Algo raro pasah."
+  file_error: "Ehto no pintah ná bien... No s'ha podío creá el archivo de traduccioneh."
+
+database:
+  init_error: "Pisha, la base de dato' se ha mareao y no s'ha podío arrancá."
+  init_fatal_error: "Esto no hay quien lo levante. Base de dato' chafá, Lumen apagao."
+  initialized: "¡Oleee! Base de dato' lista pa' dar caña."
+  init:
+    already_initialized: "La base de dato' ya ehtaba montá, no hagah el pamplina."
+    error: "Ehto ha petao, no s'ha podío inicializá la base de dato'."
+    failed: "Algo ha salío regulero, no se ha inicializao la base de dato'. Mirah el log pa' sabé máh."
+    sqlite:
+      error_directory: "Mushasho, no s'ha podío hacé la carpeta pa'l SQLite: {0}."
+  tables:
+    error: "Madre mía, un lío con la base de dato'. No se han podío hacé la' tabla'."
+    connection:
+      uninitialized: "¡Ojito! La conexión no ehtá montá. Inicia la base de dato' antes de liarte."
+  close:
+    success: "Se ha cerráo la base de dato', pero que conste que no era porque quisiéramo'."
+  operation:
+    register:
+      error: "Arsa, ha habío un fallo al guardá la operación."
+      failed: "Quillo, no s'ha podío guardá la operación, algo raro pasah."
+    get_uuid:
+      error: "Vaya tela... No s'ha podío sacá el UUID desde el ID."
+      failed: "Mira que he buscao, pero ná de ná, no s'ha podío sacá el UUID pa' este ID: {0}."
+    get_id:
+      error: "Ehtoy confundío... No s'ha podío sacá el ID desde el UUID."
+      failed: "¡Complicao! No s'ha encontráo ID pa' ehto UUID: {0}."
+
+commandmanager:
+  init_error: "¡Mi arma! El CommandManager se ha encasquillao: {0}"
+  init_failure: "Quillo, el CommandManager ha reventao y no va."
+
+command:
+  no_permission: "¿Pero tú qué te creeh? No tieneh permiso pa' usá ehto, so picha."
+  registered: "¡Comando' montao' y listos pa' la acción!"
+  usage: "Uso: /lumen <subcomando>"
+  only_players: "¿Pero tú quién ereh? Ehsto ná máh lo pueden usá loh jugadores."
+  register_error: "¡Uff! Error registrando comando'. Apagamo' Lumen pa' que no explote."
+
+  undo:
+    only_players: "¡Tó er mundo quieto! Este comando eh ná máh pa' jugadores."
+    no_previous_operations: "Quillo, no tieneh ná que deshacé, no hagah el paripé."
+    no_blocks: "He rebuscao y no hay bloque' pa' quitá en la' últimah {0} operación."
+    success: "¡Ea! Se han quitáo {0} bloque' de luz de {1} operación."
+
+  redo:
+    no_previous_operations: "Pero niño, si no hay ná que rehacé… ¿pa' qué lo prueba'?"
+    no_blocks_found: "Pisha, no hay bloque' guardao' pa' ehta operación: {0}."
+    restoration_started: "¡Vamos allá! Se ha empezao a restaurá {0} bloque'..."
+    restoration_completed: "¡Ole tú! La operación {0} se ha restauráo perfectamén."
+    restoration_completed_log: "To' hecho, la operación {0} ha quedao lista."
+    retrying_failed_blocks: "Vamo' a probá otra vé con loh bloque' que fallaron..."
+    cannot_set_light: "¡Ay mi cabeza! No he podío poné luz en {0}."
+    light_level_error: "Ehto eh rariiiisimo, no se ha podío poné la luz en {0}: {1}."
+
+  remove:
+    coreprotect_not_available: "No, picha, CoreProtect no ehtá encendío. ¡Así no se pué!"
+    coreprotect_disabled_log: "Ojito, que no se guardarán eliminacione' en CoreProtect porque no ehtá activao."
+    area:
+      success: "¡Fuera luz! Se han quitao {0} bloque' de luz en un radio de {1} bloque'."
+      success_log: "Er colega {0} ha quitao {1} bloque' de luz en un radio de {2} bloque'."
+      no_blocks: "He buscao y aquí no hay ná que quitá en ehto rango de {0} bloque'."
+      no_blocks_log: "Er jugador {0} ha intentao quitá luces en {1} bloque', pero no había ná."
+
+  light:
+    usage: "Uso: /lumen light <rango> <nivel> <incluí skylight>"
+    invalid_level: "Quillo, ponme un nivel de luz entre 0 y 15, que ehto no eh feria."
+    success: "¡Se hizo la luz! Nivel {0}, con ID de operación: {1}."
+
+  cancel:
+    success: "Listo, tu tarea de iluminació se ha cancelao. ¡A otra cosa!"
+    no_task: "¿Pero qué quieréh cancelá? Si no tieneh ná en marcha…"
+
+  clear:
+    request: "Ojito cuidao, que si confirmah se borran to' loh bloque' ilumináo'. Pa' confirmá, escribí /lumen clear confirm en 30 segundillo'."
+    no_request: "¿Confirmá qué? Si no tieneh ná pendiente…"
+    expired: "Tardaste máh que en pedí er café. Se acabó la espera, confirmación caducá."
+    success: "¡A cascarla! Se han quitao to' loh bloque' ilumináo'."
+
+  reload:
+    no_permission: "¿Tú quién ereh pa' tocá ehto? No tieneh permiso."
+    success: "¡To' recargao! Se han metío {0} traducciones nuevah."
+    error: "Pisha, algo ha petao y no se ha podío recargá la configuración."
+    success_log: "Er comando /reload se ejecutó perfectamén por {0}. Traducciones cargás: {1}."
+    error_log: "Uyuyuy, er comando /reload ha fallao ejecutao por {0}."
+
+  give:
+    invalid_amount: "¡Illo, dame una cifra positiva, que aquí no se regalan bloque'!"
+    invalid_torch: "Eso que ha' pedío no existe, picha. Pon 'torch' o 'guard'."
+    invalid_player: "¿Pa' quién va? Que er jugador que pides no está ni online."
+    success_one: "¡Ea! {1} antorcha/s '{2}' pa' {0}."
+    success_all: "Arsa, {0} antorcha/s '{1}' pa' tó er mundo."
+    received: "¡Qué arte! Ha' recibío {0} antorcha/s '{1}'."
+
+items:
+  registered: "¡Ea! Loh objeto' personalizáo' están ya bien montao'."
+  init_error: "Quillo, algo ha salío torcío con loh objeto'."
+  torch:
+    name: "<yellow><bold>Antorcha Lumen</yellow>"
+  guard:
+    name: "<blue><bold>Guardia Lumen</blue>"
+  recipe_registered: "¡Receta lista! Se ha registráo: {0}."
+
+events:
+  registered: "¡Evento' registrao' y listos pa' la juerga!"
+  register_error: "Ojú, no se han podío registrá lo' evento'. Algo ha petao."
+
+mobs:
+  protected_areas_loaded: "Se han cargao la' zonah protegía contra bicho'."
+  area_created: "¡Ea! Se ha montao una zona protegía contra bicho' en {0}, con radio de {1} bloque'."
+  area_removed: "¡Fuera bicho'! Se ha quitao la zona protegía en {0}."
+  spawn_cancelled: "¿Quién te ha invitao? Spawn cancelao en {0}."
+  area_created_by_player: "Er colega {1} ha montao una zona protegía en {0}."
+
+torch:
+  light_placed: "¡Pum! Antorcha Lumen puesta en {0}, con ID de operación {1}."
+  guard_placed: "¡Guardia Lumen colocá en {0}! Ahora aquí no entran ni los gatos."
+  light_broken: "Se ha roto una Antorcha Lumen y se han quitao {0} luce'."
+  guard_broken: "Guardia Lumen destruyía. Área de protección eliminá en {0}."
+
+light:
+  error:
+    batch_failed: "Quillo, algo ha petao con lo' bloque' de luz: {0}."
+    no_world: "Ehtoy más perdío que un pulpo en un garaje... ¡No encuentro er mundo!"
+    no_blocks_found: "He mirao, remirao y ná, aquí no hay bloque' pa' iluminar."
+    calculating_positions: "Uff, algo ha salío regulero calculando la' posición de la' luce': {0}."
+    fawe_failed: "FAWE no ha querío curráh hoy, ha fallao poniendo bloque'."
+    setting_level: "Ojú, fallo poniendo nivel de luz en {0}: {1}."
+    setting_level_torch: "No se ha podío poné nivel de luz en la antorcha de {0}: {1}."
+    no_lights_to_remove: "No hay luces pa' quitar en la operación {0}, picha."
+    add_block_failed: "No se ha podío añadí er bloque en {0} a la operación '{1}'."
+  warning:
+    invalid_block_data: "Ojito, que el bloque en {1} tiene dato' raro' en la operación {0}."
+    no_world: "¿Qué clase de fantasía eh ehta? Er mundo '{0}' no aparecé, comprueba que esté cargao."
+  success:
+    completed: "¡Ole! Se han colocao {0} bloque' de luz en la operación '{1}'."
+    fawe: "¡FAWE ha hecho su magia! {0} bloque' colocaos."
+    placed: "¡Luz y color! To' listo en la operación '{0}'."
+    removed: "¡Fuera! Luce' elimináh de la operación '{0}'."
+  info:
+    blocks_registered: "Se han guardao {0} bloque' de luz pa' la operación '{1}'."
+    batch_processed: "Se han colocao {0} bloque' en la operación '{1}'."
+    calculated_blocks: "¡He contao {0} bloque' pa' iluminá!"
+    fawe_found: "FAWE detectao, vamo' a usá sus truquito'."
+    fawe_not_found: "FAWE no está por aquí, vamo' a hacé er trabajo a mano."
+    completed_operation: "¡Tó hecho! Operación '{0}' completa y brillante."
+    removed_lights: "Se han quitao todas las luce' de la operación '{0}'."
+    operation_cancelled: "Ojú, la operación '{0}' ha sío cancelá."
+
+mob_registry:
+  protected_area_added: "Se ha añadío un refugio en {0}, con un radio de {1} bloque'."
+  protected_area_removed: "¡Adióh, protección eliminá en {0}!"
+  error:
+    adding_area: "Algo ha salío regular metiendo un refugio en {0}."
+    removing_area: "Algo ha fallao quitando un refugio en {0}."
+    fetching_areas: "No se han podío sacá la' zona' protegía'."
+  warning:
+    world_not_found: "Er mundo '{0}' no aparecé, picha, mira que esté cargao."
+
+light_registry:
+  error:
+    invalid_light_level: "¡Esto no cuadra! Er nivel de luz {0} en {1} no es correcto. Debe í entre 1 y 15."
+    add_block: "Algo ha petao añadiendo un bloque a la base de dato'."
+    soft_delete: "Quillo, no s'ha podío marcá la operación {0} como eliminá."
+    restore: "Uff, no se ha podío restaurá la operación {0}."
+    fetch_soft_deleted: "No se han podío sacá loh bloque' eliminá' de la operación {0}."
+    fetch_last_soft_deleted: "¿Cómo que no hay ná? No se han sacao la' últimah operaciones elimináh."
+    fetch_blocks_by_operation: "Ojito, no se han podío sacá lo' bloque' de la operación {0}."
+    remove_blocks: "Quillo, no se han podío quitá lo' bloque' de la operación {0}."
+    fetch_blocks_in_range: "No se han podío sacá bloque' en ehto rango."
+    fetch_all_blocks: "No he podío sacá ni un bloque, picha."
+    fetch_last_operations: "No s'ha podío sacá lah últimah {0} operaciones."
+    clear_all_blocks: "Ojú, no se han podío eliminá to' lo' bloque'."
+  warning:
+    world_not_found: "¿Dónde está ese mundo? '{0}' no aparecé, mira a vé."
+  info:
+    blocks_soft_deleted: "To' marcaíto, los bloque' de la operación {0} están eliminá' en suave."
+    blocks_restored: "¡Recuperao! Se han restauráo loh bloque' de la operación {0}."
+    blocks_removed: "Loh bloque' de la operación {0} han sío eliminá'."
+    blocks_added: "Se han añadío {0} bloque' de luz en la operación '{1}'."
+    all_blocks_removed: "¡Se han quitao to' lo' bloque' del registro!"
+    batch_processed: "Se han procesao {0} bloque' en la operación '{1}'."
+
+coreprotect:
+  enabled: "¡CoreProtect activao y ready pa' vigilar!"
+  unavailable: "Quillo, CoreProtect no aparecé, no vamo' a podé guardá ná."
+  disabled: "Ojito, CoreProtect no está encendío, no se puede registrá la acción."
+  api_null: "Nada, que el API de CoreProtect no responde. Ehto no pinta bien."
+  placement:
+    error: "Ojú, error al registrá la colocación en {0}: {1}."
+    errors: "Mushasho, {0} fallos registrando bloque' en CoreProtect por {1}."
+    success: "¡Ea! Se han registráo {0} bloque' en CoreProtect por {1}."
+    none: "Ná, que pa' {0} no se ha registrao ni un bloque en CoreProtect."
+  removal:
+    error: "Error al registrá la eliminación en {0}: {1}."
+    errors: "Ehtoy confuso, {0} fallos al eliminá bloque' en CoreProtect por {1}."
+    success: "¡Limpieza lista! Se han registráo {0} bloque' eliminá' por {1}."
+    none: "Nada de nada, no hay bloque' eliminá' pa' {0} en CoreProtect."
+  integration:
+    success: "¡Integración con CoreProtect exitosa! Esto funciona de lujo."
+    api_disabled: "El API de CoreProtect está dormío. No se puede integrá."
+    not_found: "¿CoreProtect? No lo encuentro, picha, no está instalao o no va."
