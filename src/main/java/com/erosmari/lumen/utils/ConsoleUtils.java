@@ -1,6 +1,5 @@
 package com.erosmari.lumen.utils;
 
-import com.erosmari.lumen.config.ConfigHandler;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import static com.erosmari.lumen.utils.TranslationHandler.loadedKeys;
@@ -35,7 +34,7 @@ public class ConsoleUtils {
 
         LoggingUtils.logTranslated("plugin.separator");
         LoggingUtils.logTranslated("plugin.enabled");
-        LoggingUtils.logTranslated("plugin.language_loaded", ConfigHandler.getLanguage(), loadedKeys);
+        LoggingUtils.logTranslated("plugin.language_loaded", TranslationHandler.getActiveLanguage(), loadedKeys);
         LoggingUtils.logTranslated("database.initialized");
         LoggingUtils.logTranslated("items.registered");
         LoggingUtils.logTranslated("mobs.protected_areas_loaded");

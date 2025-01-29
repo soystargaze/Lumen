@@ -9,10 +9,14 @@
 
 plugin:
   prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
-  dynamic_color: "<color:#21FFCE>" # The color applied to {0}, {1}, etc., in translations.
-  enabled: "Lumen successfully enabled."
-  disabled: "Lumen successfully disabled."
-  enable_error: "Error enabling the plugin. Check the console for details."
+  dynamic_color: "<color:#21FFCE>" # The color applied to {0}, {1}, etc. in translations
+  separator: "<gradient:#21FFCE:#D3FFAD><bold>--------------------------------------------</gradient>"
+  name: "<gradient:#21FFCE:#D3FFAD>Lumen</gradient>"
+  version: "version: {0}"
+  author: "by {0}"
+  enabled: "Lumen enabled successfully."
+  disabled: "Lumen disabled successfully."
+  enable_error: "Error enabling the plugin. Check the console for more details."
   language_loaded: "Language loaded: {0}.yml ({1} translations)"
 
 translations:
@@ -26,72 +30,72 @@ database:
   init:
     already_initialized: "The database is already initialized."
     error: "An error occurred while initializing the database."
-    failed: "Failed to initialize the database. Check the logs for details."
+    failed: "Could not initialize the database. Check logs for details."
     sqlite:
       error_directory: "Could not create the directory for SQLite: {0}."
   tables:
-    error: "An error occurred while creating the database tables."
+    error: "An error occurred while creating database tables."
     connection:
       uninitialized: "The connection pool is not initialized. Please initialize the database first."
-    close:
-      success: "Database connection pool closed successfully."
+  close:
+    success: "Database connection pool successfully closed."
   operation:
     register:
       error: "Error registering the operation."
       failed: "Could not register the operation."
     get_uuid:
-      error: "Error fetching UUID from ID."
-      failed: "Failed to fetch UUID for ID: {0}."
+      error: "Error retrieving the UUID from the ID."
+      failed: "Could not retrieve the UUID for the ID: {0}."
     get_id:
-      error: "Error fetching ID from UUID."
-      failed: "Failed to fetch ID for UUID: {0}."
+      error: "Error retrieving the ID from the UUID."
+      failed: "Could not retrieve the ID for the UUID: {0}."
 
 commandmanager:
   init_error: "Error initializing the CommandManager: {0}"
   init_failure: "CommandManager initialization failed."
 
 command:
-  no_permission: "You don't have permission to use this command."
-  registered: "Commands successfully registered."
+  no_permission: "You do not have permission to use this command."
+  registered: "Commands registered successfully."
   usage: "Usage: /lumen <subcommand>"
   only_players: "Only players can use this command."
   register_error: "Error registering commands. Plugin disabled."
   undo:
     only_players: "Only players can execute this command!"
-    no_previous_operations: "There are no previous operations to undo."
+    no_previous_operations: "No previous operations to undo."
     no_blocks: "No blocks were found to undo in the last {0} operations."
-    success: "Successfully undid {0} light blocks from the last {1} operations."
+    success: "Successfully undone {0} light blocks from the last {1} operations."
   redo:
-    no_previous_operations: "There are no previous operations to restore."
-    no_blocks_found: "No blocks were found for operation: {0}."
-    restoration_started: "Started restoring {0} blocks..."
-    restoration_completed: "Restoration for operation {0} completed successfully."
-    restoration_completed_log: "Restoration for operation {0} has finished."
+    no_previous_operations: "No previous operations to restore."
+    no_blocks_found: "No blocks were found associated with operation: {0}."
+    restoration_started: "Restoration of {0} blocks has started..."
+    restoration_completed: "Restoration of operation {0} completed successfully."
+    restoration_completed_log: "Restoration of operation {0} has finished."
     retrying_failed_blocks: "Retrying failed blocks..."
     cannot_set_light: "Could not set a light block at {0}."
-    light_level_error: "Error setting light level at {0}: {1}."
+    light_level_error: "Error setting the light level at {0}: {1}."
   remove:
-    coreprotect_not_available: "CoreProtect functionality is unavailable or disabled."
-    coreprotect_disabled_log: "CoreProtect is disabled or unavailable; block removals will not be logged."
+    coreprotect_not_available: "CoreProtect functionality is not available or not enabled."
+    coreprotect_disabled_log: "CoreProtect is not enabled or available, block removals will not be logged."
     area:
-      success: "{0} light blocks have been removed within a range of {1} blocks."
+      success: "Successfully removed {0} light blocks within a range of {1} blocks."
       success_log: "Player {0} removed {1} light blocks within a range of {2} blocks."
       no_blocks: "No light blocks were found to remove within a range of {0} blocks."
       no_blocks_log: "Player {0} attempted to remove light blocks within a range of {1} blocks, but none were found."
   light:
     usage: "Usage: /lumen light <range> <level> <include skylight>"
-    invalid_level: "Light level must be between 0 and 15."
-    success: "Lights placed with light level {0}. Operation ID: {1}."
+    invalid_level: "The light level must be between 0 and 15."
+    success: "Lights with light level {0} have been placed. Operation ID: {1}."
   cancel:
     success: "Your lighting task has been canceled."
-    no_task: "You don't have any active tasks to cancel."
+    no_task: "You do not have any active tasks to cancel."
   clear:
-    request: "Are you sure you want to remove all lit blocks? Type /lumen clear confirm to confirm. You have 30 seconds."
-    no_request: "You don't have any active confirmation requests."
+    request: "Are you sure you want to remove all illuminated blocks? Type /lumen clear confirm to confirm. You have 30 seconds."
+    no_request: "You do not have an active confirmation request."
     expired: "Your confirmation request has expired."
-    success: "All lit blocks have been removed."
+    success: "All illuminated blocks have been removed."
   reload:
-    no_permission: "You don't have permission to use this command."
+    no_permission: "You do not have permission to use this command."
     success: "Configuration reloaded. {0} translations loaded."
     error: "An error occurred while reloading the configuration."
     success_log: "The /reload command was successfully executed by {0}. {1} translations loaded."
@@ -100,12 +104,12 @@ command:
     invalid_amount: "The amount must be greater than 0!"
     invalid_torch: "Invalid torch type! Use 'torch' or 'guard'."
     invalid_player: "Player not found or offline!"
-    success_one: "You have given {1} torch(es) of type '{2}' to {0}."
-    success_all: "You have given {0} torch(es) of type '{1}' to all players."
-    received: "You have received {0} torch(es) of type '{1}'."
+    success_one: "You gave {1} '{2}' torch(es) to {0}."
+    success_all: "You gave {0} '{1}' torch(es) to all players."
+    received: "You received {0} '{1}' torch(es)."
 
 items:
-  registered: "Custom items successfully registered."
+  registered: "Custom items registered successfully."
   init_error: "Error initializing custom items."
   torch:
     name: "<yellow><bold>Lumen Torch</yellow>"
@@ -114,7 +118,7 @@ items:
   recipe_registered: "Recipe registered: {0}."
 
 events:
-  registered: "Events successfully registered."
+  registered: "Events registered successfully."
   register_error: "Error registering events."
 
 mobs:
@@ -132,29 +136,30 @@ torch:
 
 light:
   error:
+    batch_failed: "An error occurred while processing light blocks: {0}."
     no_world: "The world was not found. Please make sure the world is loaded."
-    no_blocks_found: "No valid blocks were found to light in the specified area."
+    no_blocks_found: "No valid blocks were found to illuminate in the specified area."
     calculating_positions: "An error occurred while calculating light block positions: {0}."
     fawe_failed: "An error occurred while attempting to place blocks with FAWE."
-    setting_level: "Error setting light level at {0}: {1}."
-    setting_level_torch: "Error setting light level at {0}: {1}."
-    no_lights_to_remove: "No lights were found to remove for operation: {0}."
+    setting_level: "Error setting the light level at {0}: {1}."
+    setting_level_torch: "Error setting the light level at {0}: {1}."
+    no_lights_to_remove: "No lights were found to remove in operation: {0}."
     add_block_failed: "Could not add the block at {0} to operation '{1}'."
   warning:
     invalid_block_data: "Invalid block data for operation {0} at location {1}."
-    no_world: "The world '{0}' was not found. Verify the world is loaded correctly."
+    no_world: "The world '{0}' was not found. Make sure the world is properly loaded."
   success:
-    completed: "Placement of {0} light blocks for operation '{1}' completed."
-    fawe: "{0} light blocks successfully placed with FAWE."
-    placed: "All lights for operation '{0}' successfully placed."
-    removed: "All lights for operation '{0}' successfully removed."
+    completed: "Successfully completed placement of {0} light blocks for operation '{1}'."
+    fawe: "Successfully placed {0} light blocks with FAWE."
+    placed: "Successfully placed all lights for operation '{0}'."
+    removed: "All lights for operation '{0}' have been removed."
   info:
-    blocks_registered: "{0} light blocks registered for operation '{1}'."
-    batch_processed: "{0} blocks processed for operation '{1}'."
+    blocks_registered: "{0} light blocks have been registered for operation '{1}'."
+    batch_processed: "{0} blocks processed in operation '{1}'."
     calculated_blocks: "{0} blocks calculated for lighting."
     fawe_found: "FastAsyncWorldEdit (FAWE) detected. Using advanced integration."
-    fawe_not_found: "FAWE is not available. Using default block placement system."
-    completed_operation: "Operation '{0}' successfully completed."
+    fawe_not_found: "FAWE is not available. Using the default system for block placement."
+    completed_operation: "Operation '{0}' completed successfully."
     removed_lights: "All lights associated with operation '{0}' have been removed."
     operation_cancelled: "Operation '{0}' was canceled."
 
@@ -162,52 +167,52 @@ mob_registry:
   protected_area_added: "Protected area added at {0} with a radius of {1} blocks."
   protected_area_removed: "Protected area removed at {0}."
   error:
-    adding_area: "An error occurred while adding a protected area at {0}."
-    removing_area: "An error occurred while removing a protected area at {0}."
-    fetching_areas: "An error occurred while fetching protected areas."
+    adding_area: "An error occurred while trying to add a protected area at {0}."
+    removing_area: "An error occurred while trying to remove a protected area at {0}."
+    fetching_areas: "An error occurred while trying to fetch protected areas."
   warning:
-    world_not_found: "The world '{0}' was not found. Verify the world is loaded correctly."
+    world_not_found: "The world '{0}' was not found. Make sure the world is properly loaded."
 
 light_registry:
   error:
-    invalid_light_level: "Light level {0} at {1} is invalid. Must be between 1 and 15."
-    add_block: "An error occurred while adding a block to the database."
-    soft_delete: "An error occurred while marking blocks for operation {0} as deleted."
-    restore: "An error occurred while restoring blocks for operation {0}."
-    fetch_soft_deleted: "An error occurred while fetching deleted blocks for operation {0}."
-    fetch_last_soft_deleted: "An error occurred while fetching the last deleted operation."
-    fetch_blocks_by_operation: "An error occurred while fetching blocks for operation {0}."
-    remove_blocks: "An error occurred while removing blocks for operation {0}."
-    fetch_blocks_in_range: "An error occurred while fetching blocks in the specified range."
-    fetch_all_blocks: "An error occurred while fetching all blocks."
-    fetch_last_operations: "An error occurred while fetching the last {0} operations."
-    clear_all_blocks: "An error occurred while clearing all blocks."
+    invalid_light_level: "The light level {0} at {1} is not valid. It must be between 1 and 15."
+    add_block: "An error occurred while trying to add a block to the database."
+    soft_delete: "An error occurred while trying to mark the blocks in operation {0} as deleted."
+    restore: "An error occurred while trying to restore the blocks in operation {0}."
+    fetch_soft_deleted: "An error occurred while trying to fetch the soft-deleted blocks for operation {0}."
+    fetch_last_soft_deleted: "An error occurred while trying to fetch the last soft-deleted operation."
+    fetch_blocks_by_operation: "An error occurred while trying to fetch the blocks for operation {0}."
+    remove_blocks: "An error occurred while trying to remove the blocks for operation {0}."
+    fetch_blocks_in_range: "An error occurred while trying to fetch blocks in the specified range."
+    fetch_all_blocks: "An error occurred while trying to fetch all blocks."
+    fetch_last_operations: "An error occurred while trying to fetch the last {0} operations."
+    clear_all_blocks: "An error occurred while trying to clear all blocks."
   warning:
-    world_not_found: "The world '{0}' was not found. Verify the world is loaded correctly."
+    world_not_found: "The world '{0}' was not found. Verify that the world is properly loaded."
   info:
-    blocks_soft_deleted: "Blocks for operation {0} marked as deleted."
-    blocks_restored: "Blocks for operation {0} restored."
-    blocks_removed: "Blocks for operation {0} removed."
+    blocks_soft_deleted: "Blocks in operation {0} marked as deleted."
+    blocks_restored: "Blocks in operation {0} have been restored."
+    blocks_removed: "Blocks in operation {0} have been removed."
     blocks_added: "{0} light blocks added for operation {1}."
     all_blocks_removed: "All registered blocks have been removed."
-    batch_processed: "{0} blocks processed for operation '{1}'."
+    batch_processed: "{0} blocks processed in operation '{1}'."
 
 coreprotect:
   enabled: "CoreProtect enabled and available."
   unavailable: "CoreProtect is not available."
-  disabled: "CoreProtect is disabled. Action cannot be logged."
-  api_null: "CoreProtect API is unavailable. Action cannot be logged."
+  disabled: "CoreProtect is not enabled. Cannot register the action."
+  api_null: "The CoreProtect API is not available. Cannot register the action."
   placement:
-    error: "Error logging block placement at {0}: {1}."
-    errors: "{0} errors occurred while logging blocks in CoreProtect for {1}."
-    success: "{0} blocks placed by {1} successfully logged in CoreProtect."
-    none: "No blocks were logged for placement by {0} in CoreProtect."
+    error: "Error registering block placement at {0}: {1}."
+    errors: "There were {0} errors registering blocks in CoreProtect by {1}."
+    success: "{0} blocks placed by {1} were registered in CoreProtect."
+    none: "No blocks placed for {0} were registered in CoreProtect."
   removal:
-    error: "Error logging block removal at {0}: {1}."
-    errors: "{0} errors occurred while removing blocks in CoreProtect for {1}."
-    success: "{0} blocks removed by {1} successfully logged in CoreProtect."
-    none: "No blocks were logged for removal by {0} in CoreProtect."
+    error: "Error registering block removal at {0}: {1}."
+    errors: "There were {0} errors removing blocks in CoreProtect by {1}."
+    success: "{0} blocks removed by {1} were registered in CoreProtect."
+    none: "No blocks removed for {0} were registered in CoreProtect."
   integration:
-    success: "CoreProtect integration successful!"
-    api_disabled: "CoreProtect API is disabled. Integration cannot be completed."
-    not_found: "CoreProtect plugin not found or not enabled."
+    success: "Integration successful."
+    api_disabled: "The CoreProtect API is disabled. Integration cannot proceed."
+    not_found: "The CoreProtect plugin was not found or is not enabled."

@@ -106,22 +106,45 @@ public class Lumen extends JavaPlugin implements Listener {
 
     private void setupTranslations() {
         File translationsFolder = new File(getDataFolder(), "Translations");
+
         if (!translationsFolder.exists() && !translationsFolder.mkdirs()) {
             LoggingUtils.logTranslated("translations.folder_error");
             return;
         }
 
-        String language = ConfigHandler.getLanguage();
-        saveDefaultTranslation(language + ".yml");
+        String[] defaultLanguages = {"en_us.yml", "es_es.yml", "fr_fr.yml", "de_de.yml", "it_it.yml", "pt_br.yml"};
+
+        for (String languageFile : defaultLanguages) {
+            saveDefaultTranslation(languageFile);
+        }
+
+        File[] translationFiles = translationsFolder.listFiles((dir, name) -> name.endsWith(".yml"));
+        if (translationFiles != null) {
+            for (File file : translationFiles) {
+                String language = file.getName().replace(".yml", "");
+                TranslationHandler.loadTranslations(this, language);
+            }
+        }
+
+        String configuredLanguage = ConfigHandler.getLanguage();
+        if (TranslationHandler.isLanguageAvailable(configuredLanguage)) {
+            TranslationHandler.setActiveLanguage(configuredLanguage);
+        } else {
+            final String LICENSE_SUCCESS_KEY = "translations.language_not_found";
+            TranslationHandler.registerTemporaryTranslation(LICENSE_SUCCESS_KEY, "Language not found: {0}");
+            LoggingUtils.logTranslated(LICENSE_SUCCESS_KEY, configuredLanguage);
+        }
     }
 
     private void saveDefaultTranslation(String fileName) {
         File translationFile = new File(getDataFolder(), "Translations/" + fileName);
+
         if (!translationFile.exists()) {
             try {
                 saveResource("Translations/" + fileName, false);
+                LoggingUtils.logTranslated("translations.default_created", fileName);
             } catch (Exception e) {
-                getLogger().severe(TranslationHandler.get("translations.file_error") + ": " + e.getMessage());
+                LoggingUtils.logTranslated("translations.file_error", e.getMessage());
             }
         }
     }

@@ -16,6 +16,7 @@ public class TranslationHandler {
 
     private static final Map<String, String> translations = new HashMap<>();
     public static int loadedKeys = 0;
+    private static String activeLanguage = "en_us";
 
     public static void loadTranslations(JavaPlugin plugin, String language) {
         File translationsFolder = new File(plugin.getDataFolder(), "Translations");
@@ -32,6 +33,7 @@ public class TranslationHandler {
 
         FileConfiguration langConfig = YamlConfiguration.loadConfiguration(langFile);
         loadedKeys = 0;
+        translations.clear(); // Limpiar traducciones previas antes de cargar nuevas
 
         for (String key : langConfig.getKeys(true)) {
             if (langConfig.isString(key)) {
@@ -39,6 +41,8 @@ public class TranslationHandler {
                 loadedKeys++;
             }
         }
+
+        activeLanguage = language;
     }
 
     private static void createDefaultTranslationFile(JavaPlugin plugin, File langFile, String language) {
@@ -128,5 +132,18 @@ public class TranslationHandler {
         if (!translations.containsKey(key)) {
             translations.put(key, message);
         }
+    }
+
+    public static boolean isLanguageAvailable(String language) {
+        File langFile = new File(JavaPlugin.getProvidingPlugin(TranslationHandler.class).getDataFolder(), "Translations/" + language + ".yml");
+        return langFile.exists();
+    }
+    public static void setActiveLanguage(String language) {
+        if (isLanguageAvailable(language)) {
+            activeLanguage = language;
+        }
+    }
+    public static String getActiveLanguage() {
+        return activeLanguage;
     }
 }
