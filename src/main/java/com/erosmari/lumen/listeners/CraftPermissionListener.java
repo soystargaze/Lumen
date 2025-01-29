@@ -12,8 +12,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.Objects;
-
 public class CraftPermissionListener implements Listener {
 
     private final Lumen plugin;
@@ -26,8 +24,10 @@ public class CraftPermissionListener implements Listener {
     public void onPrepareItemCraft(PrepareItemCraftEvent event) {
         if (!(event.getView().getPlayer() instanceof Player player)) return;
 
-        ItemStack result = Objects.requireNonNull(event.getRecipe()).getResult();
-        if (!result.hasItemMeta()) return;
+        if (event.getRecipe() == null) return;
+
+        ItemStack result = event.getRecipe().getResult();
+        if (result.getType().isAir() || !result.hasItemMeta()) return;
 
         ItemMeta meta = result.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
@@ -38,10 +38,10 @@ public class CraftPermissionListener implements Listener {
 
             if ("torch".equals(itemId) && !player.hasPermission("lumen.craft.torch")) {
                 event.getInventory().setResult(null);
-                TranslationHandler.getPlayerMessage("items.torch.no-permission");
+                player.sendMessage(TranslationHandler.getPlayerMessage("items.torch.no-permission"));
             } else if ("guard".equals(itemId) && !player.hasPermission("lumen.craft.guard")) {
                 event.getInventory().setResult(null);
-                TranslationHandler.getPlayerMessage("items.guard.no-permission");
+                player.sendMessage(TranslationHandler.getPlayerMessage("items.guard.no-permission"));
             }
         }
     }
