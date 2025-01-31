@@ -300,10 +300,14 @@ public class Lumen extends JavaPlugin implements Listener {
                     return validateResponse(responseMap);
                 }
             } else {
-                LoggingUtils.logTranslated("plugin.license_response_code_error", responseCode);
+                final String LICENSE_FAILED_KEY = "plugin.license_response_code_error";
+                TranslationHandler.registerTemporaryTranslation(LICENSE_FAILED_KEY, "License response error: {0}");
+                LoggingUtils.logTranslated(LICENSE_FAILED_KEY, responseCode);
             }
         } catch (Exception e) {
-            LoggingUtils.logTranslated("plugin.license_exception", e.getMessage());
+            final String LICENSE_FAILED_KEY = "plugin.license_exception";
+            TranslationHandler.registerTemporaryTranslation(LICENSE_FAILED_KEY, "Invalid license response: {0}");
+            LoggingUtils.logTranslated(LICENSE_FAILED_KEY, e.getMessage());
         }
         return false;
     }
@@ -335,7 +339,9 @@ public class Lumen extends JavaPlugin implements Listener {
         }
 
         if (!receivedSignature.equals("%%__SIGNATURE__%%")) {
-            LoggingUtils.logTranslated("plugin.license_error", "Invalid response signature. Possible tampering detected.");
+            final String LICENSE_FAILED_KEY = "plugin.license_error";
+            TranslationHandler.registerTemporaryTranslation(LICENSE_FAILED_KEY, "Invalid response signature. Possible tampering detected.");
+            LoggingUtils.logTranslated(LICENSE_FAILED_KEY);
             return false;
         }
 
