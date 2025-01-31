@@ -223,3 +223,4 @@ coreprotect:
     success: "Integrazione completata con successo."
     api_disabled: "L'API di CoreProtect è disabilitata. L'integrazione non può essere completata."
     not_found: "Il plugin CoreProtect non è stato trovato o non è abilitato."
+    no_fawe: "FastAsyncWorldEdit (FAWE) non è disponibile. L'integrazione con CoreProtect non è possibile."

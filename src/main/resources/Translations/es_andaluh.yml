@@ -230,3 +230,4 @@ coreprotect:
     success: "¡Integración con CoreProtect exitosa! Esto funciona de lujo."
     api_disabled: "El API de CoreProtect está dormío. No se puede integrá."
     not_found: "¿CoreProtect? No lo encuentro, picha, no está instalao o no va."
+    no_fawe: "¡Ojú! FAWE no está activao, no se puede integrá con CoreProtect."

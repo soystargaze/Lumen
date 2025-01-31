@@ -201,6 +201,7 @@ public class Lumen extends JavaPlugin implements Listener {
             if (isFAWEAvailable()) {
                 ItemFAWEHandler.setCoreProtectHandler(coreProtectHandler);
             } else {
+                LoggingUtils.logTranslated("plugin.separator");
                 LoggingUtils.logTranslated("coreprotect.integration.no_fawe");
             }
 

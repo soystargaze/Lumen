@@ -223,3 +223,4 @@ coreprotect:
     success: "Integration erfolgreich."
     api_disabled: "Die CoreProtect-API ist deaktiviert. Integration kann nicht abgeschlossen werden."
     not_found: "Das CoreProtect-Plugin wurde nicht gefunden oder ist nicht aktiviert."
+    no_fawe: "FAWE ist nicht verfügbar. CoreProtect-Integration wird nicht unterstützt."
