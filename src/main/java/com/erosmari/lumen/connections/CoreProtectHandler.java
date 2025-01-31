@@ -14,7 +14,22 @@ public class CoreProtectHandler {
     private CoreProtectAPI coreProtectAPI;
 
     public CoreProtectHandler() {
-        setupCoreProtect();
+        if (isCoreProtectAvailable()) {
+            setupCoreProtect();
+        } else {
+            coreProtectAPI = null;
+            LoggingUtils.logTranslated("plugin.separator");
+            LoggingUtils.logTranslated("coreprotect.integration.not_found_or_disabled");
+        }
+    }
+
+    private boolean isCoreProtectAvailable() {
+        try {
+            Class.forName("net.coreprotect.CoreProtect");
+            return Bukkit.getPluginManager().getPlugin("CoreProtect") != null;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     public void setupCoreProtect() {
@@ -36,7 +51,7 @@ public class CoreProtectHandler {
     }
 
     public void logLightPlacement(String playerName, List<Location> locations, Material material) {
-        if (locations == null || locations.isEmpty()) {
+        if (!isEnabled() || locations == null || locations.isEmpty()) {
             LoggingUtils.logTranslated("coreprotect.no_locations_provided");
             return;
         }
@@ -51,7 +66,7 @@ public class CoreProtectHandler {
     }
 
     public void logRemoval(String playerName, List<Location> locations, Material forcedMaterial) {
-        if (locations == null || locations.isEmpty()) {
+        if (!isEnabled() || locations == null || locations.isEmpty()) {
             LoggingUtils.logTranslated("coreprotect.no_locations_provided");
             return;
         }
@@ -66,6 +81,8 @@ public class CoreProtectHandler {
     }
 
     private int processLocations(String playerName, List<Location> locations, Material material, boolean isPlacement) {
+        if (!isEnabled()) return 0; // Evita llamadas si CoreProtect no está disponible
+
         int successCount = 0;
 
         for (Location location : locations) {

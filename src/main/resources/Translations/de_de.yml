@@ -116,9 +116,11 @@ items:
   init_error: "Fehler beim Initialisieren der benutzerdefinierten Objekte."
   torch:
     name: "<yellow><bold>Lumen Fackel</yellow>"
+    lore: "<white>Stellen Sie diese Taschenlampe auf, um Ihre Umgebung zu beleuchten.</white>"
     no-permission: "Du hast keine Erlaubnis, eine Lumen Torch zu craften."
   guard:
     name: "<blue><bold>Lumen Wächter</blue>"
+    lore: "<white>Platziere diesen Schutz, um deine Umgebung vor feindlichen Mobs zu schützen.</white>"
     no-permission: "Du hast keine Erlaubnis, einen Lumen Guard zu craften."
   recipe_registered: "Rezept registriert: {0}."
 

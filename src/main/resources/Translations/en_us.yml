@@ -117,9 +117,11 @@ items:
   init_error: "Error initializing custom items."
   torch:
     name: "<yellow><bold>Lumen Torch</yellow>"
+    lore: "<white>Place this torch to illuminate the area around it.</white>"
     no-permission: "You do not have permission to craft the Lumen Torch."
   guard:
     name: "<blue><bold>Lumen Guard</blue>"
+    lore: "<white>Place this guard to protect the area against hostile mobs.</white>"
     no-permission: "You do not have permission to craft the Lumen Guard."
   recipe_registered: "Recipe registered: {0}."
 

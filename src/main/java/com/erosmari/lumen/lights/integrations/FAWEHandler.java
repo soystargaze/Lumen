@@ -20,11 +20,29 @@ import java.util.List;
 public class FAWEHandler {
 
     /**
+     * Verifica si FAWE y WorldEdit están disponibles en el servidor.
+     */
+    public static boolean isFAWEAvailable() {
+        try {
+            Class.forName("com.fastasyncworldedit.core.FaweAPI");
+            Class.forName("com.sk89q.worldedit.WorldEdit");
+            return false;
+        } catch (ClassNotFoundException e) {
+            return true;
+        }
+    }
+
+    /**
      * Places light blocks using FAWE.
      *
      * @param locations List of locations where blocks should be placed.
      */
     public static void placeLightBlocks(List<Location> locations, int lightLevel, Player player, CoreProtectHandler coreProtectHandler) {
+        if (isFAWEAvailable()) {
+            LoggingUtils.logTranslated("light.error.fawe_not_found");
+            return;
+        }
+
         if (locations == null || locations.isEmpty()) {
             throw new IllegalArgumentException("Locations list is empty or null.");
         }
@@ -46,7 +64,8 @@ public class FAWEHandler {
 
             BlockType lightType = BlockTypes.LIGHT;
             if (lightType == null) {
-                throw new IllegalStateException("BlockType LIGHT is not supported.");
+                LoggingUtils.logTranslated("light.error.blocktype_not_supported");
+                return;
             }
 
             // Create a BlockState with the custom light level
@@ -61,10 +80,9 @@ public class FAWEHandler {
             if (coreProtectHandler != null) {
                 try {
                     coreProtectHandler.logLightPlacement(player.getName(), placedLocations, Material.LIGHT);
-                    // Enviar el mensaje al jugador
-                    LoggingUtils.sendAndLog(player,"light.success.fawe", placedLocations.size());
+                    LoggingUtils.sendAndLog(player, "light.success.fawe", placedLocations.size());
                 } catch (Exception ex) {
-                    LoggingUtils.logTranslated("coreprotect.placement.error" + ex.getMessage());
+                    LoggingUtils.logTranslated("coreprotect.placement.error", ex.getMessage());
                 }
             } else {
                 LoggingUtils.logTranslated("coreprotect.integration.not_found");
@@ -77,6 +95,7 @@ public class FAWEHandler {
             LoggingUtils.logTranslated("light.error.fawe_failed", e.getMessage());
         }
     }
+
     /**
      * Procesa una lista de ubicaciones y coloca bloques usando FAWE.
      *
@@ -89,10 +108,14 @@ public class FAWEHandler {
         List<Location> placedLocations = new ArrayList<>();
         for (Location loc : locations) {
             if (loc == null) continue;
-            BlockVector3 position = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
 
-            editSession.smartSetBlock(position, customLightState);
-            placedLocations.add(loc);
+            try {
+                BlockVector3 position = BlockVector3.at(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ());
+                editSession.smartSetBlock(position, customLightState);
+                placedLocations.add(loc);
+            } catch (Exception e) {
+                LoggingUtils.logTranslated("light.error.fawe_failed_location", loc, e.getMessage());
+            }
         }
         return placedLocations;
     }

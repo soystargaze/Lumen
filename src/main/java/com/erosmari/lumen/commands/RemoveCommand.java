@@ -14,7 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -51,39 +50,36 @@ public class RemoveCommand {
         Location playerLocation = player.getLocation();
         List<Location> blocks = LightRegistry.getBlocksInRange(playerLocation, range);
 
+        if (blocks.isEmpty()) {
+            LoggingUtils.sendAndLog(player, "command.remove.area.no_blocks", range);
+            return 0;
+        }
+
         CoreProtectHandler coreProtectHandler = plugin.getCoreProtectHandler();
+        boolean coreProtectAvailable = coreProtectHandler != null && coreProtectHandler.isEnabled();
 
-        if (coreProtectHandler == null || !coreProtectHandler.isEnabled()) {
-            LoggingUtils.sendAndLog(player,"command.remove.coreprotect_not_available");
+        if (!coreProtectAvailable) {
+            LoggingUtils.sendAndLog(player, "command.remove.coreprotect_not_available");
         }
 
-        int removedCount = removeAndLogBlocks(blocks, player, coreProtectHandler);
+        int removedCount = removeAndLogBlocks(blocks, player, coreProtectAvailable ? coreProtectHandler : null);
 
-        if (removedCount > 0) {
-            LoggingUtils.sendAndLog(player,"command.remove.area.success", removedCount, range);
-        } else {
-            LoggingUtils.sendAndLog(player,"command.remove.area.no_blocks", range);
-        }
-
+        LoggingUtils.sendAndLog(player, "command.remove.area.success", removedCount, range);
         return 1;
     }
 
     private int removeAndLogBlocks(List<Location> blocks, Player player, CoreProtectHandler coreProtectHandler) {
         int removedCount = 0;
 
-        List<Location> registeredBlocks = new ArrayList<>();
-
-        // Eliminar bloques y acumular los procesados
         for (Location block : blocks) {
             if (RemoveLightUtils.removeLightBlock(block)) {
                 removedCount++;
-                registeredBlocks.add(block);
             }
         }
 
-        // Registrar los bloques eliminados en lotes
-        if (!registeredBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
-            coreProtectHandler.logRemoval(player.getName(), registeredBlocks, Material.LIGHT);
+        // Registrar la eliminación en CoreProtect solo si hay bloques eliminados
+        if (removedCount > 0 && coreProtectHandler != null) {
+            coreProtectHandler.logRemoval(player.getName(), blocks, Material.LIGHT);
         }
 
         return removedCount;

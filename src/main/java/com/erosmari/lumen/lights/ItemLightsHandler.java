@@ -3,6 +3,7 @@ package com.erosmari.lumen.lights;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
+import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.lights.integrations.ItemFAWEHandler;
 import com.erosmari.lumen.tasks.TaskManager;
 import com.erosmari.lumen.utils.AsyncExecutor;
@@ -24,40 +25,44 @@ public class ItemLightsHandler {
 
     private final Lumen plugin;
     private final Executor executor = AsyncExecutor.getExecutor();
+    private final CoreProtectHandler coreProtectHandler;
 
 
     public ItemLightsHandler(Lumen plugin) {
         this.plugin = plugin;
+        this.coreProtectHandler = plugin.getCoreProtectHandler();
     }
 
     public void placeLights(Player player, Location center, int operationId) {
         World world = center.getWorld();
 
         if (world == null) {
-            LoggingUtils.sendAndLog(player,"light.error.no_world");
+            LoggingUtils.sendAndLog(player, "light.error.no_world");
             return;
         }
 
         int radius = ConfigHandler.getInt("settings.default_torch_radius", 20);
-        int lightLevel = 15;
+        int lightLevel = ConfigHandler.getInt("settings.torch_light_level", 15);
         int lightsPerTick = ConfigHandler.getInt("settings.torch_lights_per_tick", 10);
         int tickInterval = ConfigHandler.getInt("settings.torch_tick_interval", 10);
-
-        // Registrar tarea en TaskManager antes de iniciar
-        TaskManager.addTask(player.getUniqueId(), null);
 
         // Calcular posiciones de bloques de luz de manera asíncrona
         CompletableFuture.supplyAsync(() -> calculateLightPositions(center, radius), executor)
                 .thenAcceptAsync(blocksToLight -> {
+                    if (blocksToLight.isEmpty()) {
+                        LoggingUtils.sendAndLog(player, "light.error.no_blocks_found");
+                        return;
+                    }
+
                     // Mostrar BossBar inicial
                     DisplayUtil.showBossBar(player, 0);
                     DisplayUtil.showActionBar(player, 0);
 
-                    // Registrar correctamente la tarea
+                    // Procesar los bloques (FAWE o colocación normal)
                     processBlocksAsync(player, blocksToLight, lightLevel, lightsPerTick, tickInterval, operationId);
                 }, runnable -> Bukkit.getScheduler().runTask(plugin, runnable))
                 .exceptionally(ex -> {
-                    LoggingUtils.logTranslated("light.error.calculating_positions" + ex.getMessage());
+                    LoggingUtils.logTranslated("light.error.calculating_positions", ex.getMessage());
                     return null;
                 });
     }
@@ -105,18 +110,17 @@ public class ItemLightsHandler {
         return false;
     }
 
-    public void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, int operationId) {
-        // Si FAWE está disponible, delegar la colocación de bloques al manejado de FAWE
+    private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, int operationId) {
         if (isFAWEAvailable()) {
             LoggingUtils.logTranslated("light.info.fawe_found");
-            CompletableFuture.runAsync(() -> ItemFAWEHandler.placeLightsWithFAWE(plugin, player, blocks, lightLevel, operationId), executor)
+            CompletableFuture.runAsync(() -> ItemFAWEHandler.placeLightsWithFAWE(player, blocks, lightLevel, operationId), executor)
                     .thenRun(() -> {
-                        LoggingUtils.sendAndLog(player,"light.success.placed", operationId);
+                        LoggingUtils.sendAndLog(player, "light.success.placed", operationId);
                         DisplayUtil.hideBossBar(player);
                         TaskManager.cancelTask(player.getUniqueId());
                     })
                     .exceptionally(ex -> {
-                        LoggingUtils.sendAndLog(player,"light.error.fawe_failed", ex.getMessage());
+                        LoggingUtils.sendAndLog(player, "light.error.fawe_failed", ex.getMessage());
                         return null;
                     });
             return;
@@ -138,11 +142,12 @@ public class ItemLightsHandler {
 
             int processed = 0;
             int totalBlocks = blocks.size();
+            List<Location> placedBlocks = new LinkedList<>();
 
             while (!blockQueue.isEmpty() && processed < lightsPerTick) {
                 Location blockLocation = blockQueue.poll();
-                if (blockLocation != null) {
-                    placeLight(blockLocation, lightLevel, operationId);
+                if (blockLocation != null && placeLight(blockLocation, lightLevel, operationId)) {
+                    placedBlocks.add(blockLocation);
                     processed++;
                 }
             }
@@ -154,7 +159,10 @@ public class ItemLightsHandler {
             DisplayUtil.showActionBar(player, progress);
 
             if (blockQueue.isEmpty()) {
-                LoggingUtils.sendAndLog(player,"light.success.placed", operationId);
+                if (coreProtectHandler != null && coreProtectHandler.isEnabled()) {
+                    coreProtectHandler.logLightPlacement(player.getName(), placedBlocks, Material.LIGHT);
+                }
+                LoggingUtils.sendAndLog(player, "light.success.placed", operationId);
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
                 taskHolder[0].cancel();
@@ -168,8 +176,10 @@ public class ItemLightsHandler {
         return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
     }
 
-    private void placeLight(Location location, int lightLevel, int operationId) {
+    private boolean placeLight(Location location, int lightLevel, int operationId) {
         Block block = location.getBlock();
+        if (!block.getType().isAir()) return false;
+
         block.setType(Material.LIGHT, false);
 
         if (block.getType() == Material.LIGHT) {
@@ -177,38 +187,39 @@ public class ItemLightsHandler {
                 Levelled lightData = (Levelled) block.getBlockData();
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
-
-                if (lightLevel >= 0 && lightLevel <= 15) {
-                    LightRegistry.addBlockAsync(location, lightLevel, operationId);
-                } else {
-                    LoggingUtils.logTranslated("light.error.setting_level_torch", location);
-                }
+                LightRegistry.addBlockAsync(location, lightLevel, operationId);
+                return true;
             } catch (ClassCastException e) {
                 LoggingUtils.logTranslated("light.error.setting_level_torch", location, e.getMessage());
             }
         }
+        return false;
     }
 
     public void removeLights(Player player, int operationId) {
         CompletableFuture.supplyAsync(() -> LightRegistry.getBlocksByOperationId(operationId), executor)
                 .thenAcceptAsync(blocksToRemove -> {
                     if (blocksToRemove.isEmpty()) {
-                        LoggingUtils.sendAndLog(player,"light.error.no_lights_to_remove", operationId);
+                        LoggingUtils.sendAndLog(player, "light.error.no_lights_to_remove", operationId);
                         return;
                     }
 
                     Bukkit.getScheduler().runTask(plugin, () -> {
-                        blocksToRemove.forEach(location -> {
+                        for (Location location : blocksToRemove) {
                             Block block = location.getBlock();
                             if (block.getType() == Material.LIGHT) {
                                 block.setType(Material.AIR, false);
                             }
-                        });
-
+                        }
                         LightRegistry.removeBlocksByOperationId(operationId);
                     });
+
+                    if (coreProtectHandler != null && coreProtectHandler.isEnabled()) {
+                        coreProtectHandler.logRemoval(player.getName(), blocksToRemove, Material.LIGHT);
+                    }
                 });
     }
+
     public void cancelOperation(Player player, int operationId) {
         // Cancelar la tarea activa (si existe)
         if (TaskManager.hasActiveTask(player.getUniqueId())) {

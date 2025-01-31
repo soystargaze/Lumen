@@ -41,11 +41,10 @@ public class LightHandler {
             return;
         }
 
-        // Usamos CompletableFuture para calcular posiciones asíncronamente
         CompletableFuture.supplyAsync(() -> calculateLightPositions(center, areaBlocks, includeSkylight), AsyncExecutor.getExecutor())
                 .thenAccept(blocksToLight -> {
                     if (blocksToLight.isEmpty()) {
-                        LoggingUtils.sendAndLog(player,"light.error.no_blocks_found");
+                        LoggingUtils.sendAndLog(player, "light.error.no_blocks_found");
                         return;
                     }
                     processBlocksAsync(player, blocksToLight, lightLevel, operationId);
@@ -135,7 +134,6 @@ public class LightHandler {
     }
 
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int operationId) {
-        // Si FAWE está disponible, delegar la colocación de bloques a FAWE
         if (isFAWEAvailable()) {
             LoggingUtils.logTranslated("light.info.fawe_found");
             CompletableFuture.runAsync(() -> {
@@ -150,7 +148,7 @@ public class LightHandler {
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
             }).exceptionally(ex -> {
-                LoggingUtils.sendAndLog(player,"light.error.fawe_failed", ex.getMessage());
+                LoggingUtils.sendAndLog(player, "light.error.fawe_failed", ex.getMessage());
                 return null;
             });
             return;
@@ -170,7 +168,7 @@ public class LightHandler {
                 if (blockLocation != null) {
                     boolean success = processSingleBlock(blockLocation, lightLevel, operationId);
                     if (success) {
-                        processedBlocks.add(blockLocation); // Agregar bloque procesado
+                        processedBlocks.add(blockLocation);
                     }
                     processedCount++;
                 }
@@ -181,8 +179,7 @@ public class LightHandler {
             DisplayUtil.showActionBar(player, progress);
 
             if (blockQueue.isEmpty()) {
-                // Solo registrar si hay bloques procesados
-                if (!processedBlocks.isEmpty()) {
+                if (!processedBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
                     coreProtectHandler.logLightPlacement(
                             player.getName(),
                             processedBlocks,

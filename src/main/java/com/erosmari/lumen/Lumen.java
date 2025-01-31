@@ -16,6 +16,7 @@ import com.erosmari.lumen.utils.ConsoleUtils;
 import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import com.google.gson.Gson;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
@@ -186,18 +187,62 @@ public class Lumen extends JavaPlugin implements Listener {
     }
 
     private void initializeCoreProtectIntegration() {
-        if (coreProtectHandler == null) {
+        if (!isCoreProtectAvailable()) {
+            LoggingUtils.logTranslated("plugin.separator");
+            LoggingUtils.logTranslated("coreprotect.unavailable");
+            LoggingUtils.logTranslated("plugin.separator");
+            return;
+        }
+
+        try {
             coreProtectHandler = new CoreProtectHandler();
-            ItemFAWEHandler.setCoreProtectHandler(coreProtectHandler);
+
+            // Verificar si FAWE está disponible antes de usar ItemFAWEHandler
+            if (isFAWEAvailable()) {
+                ItemFAWEHandler.setCoreProtectHandler(coreProtectHandler);
+            } else {
+                LoggingUtils.logTranslated("coreprotect.integration.no_fawe");
+            }
 
             if (coreProtectHandler.isEnabled()) {
+                LoggingUtils.logTranslated("plugin.separator");
                 LoggingUtils.logTranslated("coreprotect.enabled");
-                LoggingUtils.logTranslated("plugin.separator");
             } else {
-                LoggingUtils.logTranslated("coreprotect.unavailable");
                 LoggingUtils.logTranslated("plugin.separator");
+                LoggingUtils.logTranslated("coreprotect.unavailable");
                 coreProtectHandler = null;
             }
+        } catch (Exception e) {
+            LoggingUtils.logTranslated("coreprotect.error_initializing", e.getMessage());
+            coreProtectHandler = null;
+        }
+
+        LoggingUtils.logTranslated("plugin.separator");
+    }
+
+    private boolean isCoreProtectAvailable() {
+        if (Bukkit.getPluginManager().getPlugin("CoreProtect") == null) {
+            return false;
+        }
+
+        try {
+            Class.forName("net.coreprotect.CoreProtect");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    private boolean isFAWEAvailable() {
+        if (Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") == null) {
+            return false;
+        }
+
+        try {
+            Class.forName("com.fastasyncworldedit.core.FaweAPI");
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
         }
     }
 

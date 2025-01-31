@@ -48,17 +48,17 @@ public class UndoCommand {
         List<Integer> lastOperations = LightRegistry.getLastOperations(count);
 
         if (lastOperations.isEmpty()) {
-            LoggingUtils.sendAndLog(player,"command.undo.no_previous_operations");
+            LoggingUtils.sendAndLog(player, "command.undo.no_previous_operations");
             return 0;
         }
 
         int totalRemovedBlocks = removeLightBlocksByOperations(lastOperations, player);
 
         if (totalRemovedBlocks > 0) {
-            LoggingUtils.sendAndLog(player,"command.undo.success", totalRemovedBlocks, count);
+            LoggingUtils.sendAndLog(player, "command.undo.success", totalRemovedBlocks, count);
             return 1;
         } else {
-            LoggingUtils.sendAndLog(player,"command.undo.no_blocks", count);
+            LoggingUtils.sendAndLog(player, "command.undo.no_blocks", count);
             return 0;
         }
     }
@@ -69,18 +69,24 @@ public class UndoCommand {
 
         for (int operationId : operationIds) {
             List<Location> blocks = LightRegistry.getBlocksByOperationId(operationId);
+
             if (!blocks.isEmpty()) {
+                List<Location> removedBlocks = new ArrayList<>();
                 for (Location location : blocks) {
                     if (removeLightBlock(location)) {
-                        allRemovedBlocks.add(location); // Acumula las ubicaciones de los bloques eliminados
+                        removedBlocks.add(location);
                     }
                 }
-                // Marca la operación como eliminada en el registro
-                LightRegistry.softDeleteBlocksByOperationId(operationId);
+
+                // Solo marcar la operación como eliminada si se eliminaron bloques
+                if (!removedBlocks.isEmpty()) {
+                    LightRegistry.softDeleteBlocksByOperationId(operationId);
+                    allRemovedBlocks.addAll(removedBlocks);
+                }
             }
         }
 
-        // Registrar los bloques eliminados en CoreProtect en un único lote
+        // Registrar en CoreProtect solo si hay bloques eliminados
         if (!allRemovedBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
             coreProtectHandler.logRemoval(player.getName(), allRemovedBlocks, Material.LIGHT);
         }

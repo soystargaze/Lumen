@@ -18,6 +18,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,11 +37,13 @@ public class LumenItems {
         // Crear los objetos con texturas
         ItemStack lumenTorch = createLumenTorch(
                 TranslationHandler.get("items.torch.name"),
+                TranslationHandler.get("items.torch.lore"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzViNTFjYzJlOTlkMDhkZDI4NzlhNzkyZjA2MmUwNzc4MzJhMDE2M2YzZDg1YzI0NGUwYmExYzM5MmFiMDlkZSJ9fX0=",
                 "torch"
         );
         ItemStack lumenGuard = createLumenTorch(
                 TranslationHandler.get("items.guard.name"),
+                TranslationHandler.get("items.guard.lore"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg0NDE3MjViZDQzMDczNmNmNDBkNGNlOTVjYjVhNWUxMDMwNWI3OTVhYzRmZjg0NzRlMDUzNWRmN2FmMWRkNyJ9fX0=",
                 "guard"
         );
@@ -64,7 +67,7 @@ public class LumenItems {
         return lumenItems.getOrDefault(key, null);
     }
 
-    private ItemStack createLumenTorch(String name, String texture, String identifier) {
+    private ItemStack createLumenTorch(String name, String lore, String texture, String identifier) {
         // Crear la cabeza personalizada con la textura
         ItemStack head = getSkull(texture);
         ItemMeta meta = head.getItemMeta();
@@ -72,6 +75,11 @@ public class LumenItems {
         if (meta != null) {
             Component displayName = MiniMessage.miniMessage().deserialize(name).decoration(TextDecoration.ITALIC, false);
             meta.displayName(displayName);
+
+            List<Component> loreComponents = List.of(
+                    MiniMessage.miniMessage().deserialize(lore).decoration(TextDecoration.ITALIC, false)
+            );
+            meta.lore(loreComponents);
 
             // Agregar el identificador al PersistentDataContainer
             NamespacedKey key = new NamespacedKey(plugin, "lumen_id");

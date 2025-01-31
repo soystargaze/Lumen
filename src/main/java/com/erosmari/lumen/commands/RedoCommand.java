@@ -25,6 +25,7 @@ import java.util.*;
 public class RedoCommand {
 
     private final Lumen plugin;
+    private static final int MAX_RETRY_ATTEMPTS = 3; // Nuevo límite para intentos fallidos
 
     public RedoCommand(Lumen plugin) {
         this.plugin = plugin;
@@ -59,13 +60,11 @@ public class RedoCommand {
             return 0;
         }
 
-        // Si FAWE está disponible, usar RedoFAWEHandler
         if (isFAWEAvailable()) {
             RedoFAWEHandler.handleRedoWithFAWE(plugin, player, blocksWithLightLevels, operationId);
         } else {
-            // Si FAWE no está disponible, usar processBlock
             Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
-            Queue<Map.Entry<Location, Integer>> failedQueue = new LinkedList<>();
+            Map<Location, Integer> failedBlocks = new HashMap<>(); // Usamos Map para contar intentos
             List<Location> processedBlocks = new ArrayList<>();
             int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
             int totalBlocks = blockQueue.size();
@@ -79,21 +78,24 @@ public class RedoCommand {
                     if (entry != null) {
                         boolean success = processBlock(entry.getKey(), entry.getValue(), operationId, processedBlocks);
                         if (!success) {
-                            failedQueue.add(entry);
+                            int retryCount = failedBlocks.getOrDefault(entry.getKey(), 0);
+                            if (retryCount < MAX_RETRY_ATTEMPTS) {
+                                failedBlocks.put(entry.getKey(), retryCount + 1);
+                            }
                         }
                         processedCount++;
                     }
                 }
 
-                int remainingBlocks = blockQueue.size() + failedQueue.size();
+                int remainingBlocks = blockQueue.size() + failedBlocks.size();
                 double progress = 1.0 - (double) remainingBlocks / totalBlocks;
                 DisplayUtil.showBossBar(player, progress);
                 DisplayUtil.showActionBar(player, progress);
 
-                if (blockQueue.isEmpty() && failedQueue.isEmpty()) {
-                    // Registrar todos los bloques procesados en CoreProtect al final
+                if (blockQueue.isEmpty() && failedBlocks.isEmpty()) {
+                    // **Registrar en CoreProtect al final**
                     CoreProtectHandler coreProtectHandler = getCoreProtectHandler();
-                    if (!processedBlocks.isEmpty() && coreProtectHandler != null) {
+                    if (!processedBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
                         coreProtectHandler.logLightPlacement(player.getName(), processedBlocks, Material.LIGHT);
                     }
 
@@ -103,8 +105,11 @@ public class RedoCommand {
                     task.cancel();
                 } else if (blockQueue.isEmpty()) {
                     LoggingUtils.logTranslated("command.redo.retrying_failed_blocks");
-                    blockQueue.addAll(failedQueue);
-                    failedQueue.clear();
+
+                    // Solo reintentar bloques si aún no se han alcanzado los intentos máximos
+                    failedBlocks.entrySet().removeIf(entry -> entry.getValue() >= MAX_RETRY_ATTEMPTS);
+                    blockQueue.addAll(failedBlocks.entrySet());
+                    failedBlocks.clear();
                 }
             }, 0L, 1L);
         }
@@ -114,7 +119,12 @@ public class RedoCommand {
     }
 
     private boolean isFAWEAvailable() {
-        return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
+        try {
+            Class.forName("com.fastasyncworldedit.core.FaweAPI");
+            return Bukkit.getPluginManager().isPluginEnabled("FastAsyncWorldEdit");
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
     }
 
     private boolean processBlock(Location blockLocation, int lightLevel, int operationId, List<Location> processedBlocks) {
@@ -127,19 +137,15 @@ public class RedoCommand {
                 lightData.setLevel(lightLevel);
                 block.setBlockData(lightData, false);
 
-                // Agregar bloque procesado a la lista
                 processedBlocks.add(blockLocation);
-
-                // Registrar en la base de datos
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
                 return true;
             } catch (ClassCastException e) {
                 LoggingUtils.logTranslated("command.redo.light_level_error", blockLocation, e.getMessage());
-                return false;
             }
         } else {
             LoggingUtils.logTranslated("command.redo.cannot_set_light", blockLocation);
-            return false;
         }
+        return false;
     }
 }

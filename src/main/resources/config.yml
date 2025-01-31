@@ -22,6 +22,7 @@ settings:
 
   # Lumen Torch settings
   default_torch_radius: 20 # Radius of the torch
+  torch_light_level: 15 # Light level of the torch 0-15
   torch_lights_per_tick: 10 # Quantity of lights added per tick with the torch
   torch_tick_interval: 10 # Interval between torch ticks
 
