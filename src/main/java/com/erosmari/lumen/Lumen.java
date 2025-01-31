@@ -37,11 +37,18 @@ public class Lumen extends JavaPlugin implements Listener {
     private LumenItems lumenItems;
     private CoreProtectHandler coreProtectHandler;
     private static final Gson gson = new Gson();
+    private String licenseKey;
+    private String resourceId;
+    private String userId;
 
     @SuppressWarnings("CallToPrintStackTrace")
     @Override
     public void onEnable() {
         instance = this;
+
+        licenseKey = "%%__LICENSE__%%";
+        resourceId = "%%__RESOURCE__%%";
+        userId = "%%__USER__%%";
 
         try {
             initializePlugin();
@@ -273,54 +280,68 @@ public class Lumen extends JavaPlugin implements Listener {
             HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
-            String postData = "license=" + URLEncoder.encode("%%__LICENSE__%%", StandardCharsets.UTF_8) +
-                    "&resource_id=" + URLEncoder.encode("%%__RESOURCE__%%", StandardCharsets.UTF_8) +
-                    "&user_id=" + URLEncoder.encode("%%__USER__%%", StandardCharsets.UTF_8) +
+            connection.setConnectTimeout(5000);
+            connection.setReadTimeout(10000);
+
+            String postData = "license=" + URLEncoder.encode(licenseKey, StandardCharsets.UTF_8) +
+                    "&resource_id=" + URLEncoder.encode(resourceId, StandardCharsets.UTF_8) +
+                    "&user_id=" + URLEncoder.encode(userId, StandardCharsets.UTF_8) +
                     "&signature=" + URLEncoder.encode("%%__SIGNATURE__%%", StandardCharsets.UTF_8);
+
             try (OutputStream os = connection.getOutputStream()) {
                 os.write(postData.getBytes(StandardCharsets.UTF_8));
                 os.flush();
             }
+
             int responseCode = connection.getResponseCode();
             if (responseCode == 200) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
                     Map<?, ?> responseMap = gson.fromJson(reader, Map.class);
-                    boolean success = (Boolean) ((Map<?, ?>) responseMap.get("response")).get("success");
-                    if (success) {
-                        final String LICENSE_SUCCESS_KEY = "plugin.license_success";
-                        TranslationHandler.registerTemporaryTranslation(LICENSE_SUCCESS_KEY, "License verified successfully.");
-                        LoggingUtils.logTranslated(LICENSE_SUCCESS_KEY);
-                        validateResponse(responseMap);
-                    } else {
-                        final String LICENSE_ERROR_KEY = "plugin.license_error";
-                        TranslationHandler.registerTemporaryTranslation(LICENSE_ERROR_KEY, "License verification failed. Reason: {0}");
-                        LoggingUtils.logTranslated(LICENSE_ERROR_KEY, responseMap.get("error"));
-                    }
-                    return success;
+                    return validateResponse(responseMap);
                 }
             } else {
-                final String LICENSE_RESPONSE_CODE_KEY = "plugin.license_response_code_error";
-                TranslationHandler.registerTemporaryTranslation(LICENSE_RESPONSE_CODE_KEY, "License verification failed. Response code: {0}");
-                LoggingUtils.logTranslated(LICENSE_RESPONSE_CODE_KEY, responseCode);
+                LoggingUtils.logTranslated("plugin.license_response_code_error", responseCode);
             }
         } catch (Exception e) {
-            final String LICENSE_EXCEPTION_KEY = "plugin.license_exception";
-            TranslationHandler.registerTemporaryTranslation(LICENSE_EXCEPTION_KEY, "License verification failed due to an exception: {0}");
-            LoggingUtils.logTranslated(LICENSE_EXCEPTION_KEY, e.getMessage());
+            LoggingUtils.logTranslated("plugin.license_exception", e.getMessage());
         }
         return false;
     }
-    private void validateResponse(Map<?, ?> responseMap) {
+
+    private boolean validateResponse(Map<?, ?> responseMap) {
+        if (responseMap == null || !responseMap.containsKey("response")) {
+            throw new IllegalStateException("Invalid response from license verification API.");
+        }
+
         Map<?, ?> response = (Map<?, ?>) responseMap.get("response");
+
+        if (response == null) {
+            throw new IllegalStateException("No response object in API response.");
+        }
+
         String returnedLicense = (String) response.get("license");
         String returnedResourceId = (String) response.get("resource_id");
         String returnedUserId = (String) response.get("user_id");
-        if (!"%%__LICENSE__%%".equals(returnedLicense) ||
-                !"%%__RESOURCE__%%".equals(returnedResourceId) ||
-                !"%%__USER__%%".equals(returnedUserId)) {
+        String receivedSignature = (String) response.get("signature");
+
+        if (returnedLicense == null || returnedResourceId == null || returnedUserId == null || receivedSignature == null) {
+            throw new IllegalStateException("API response is missing required fields.");
+        }
+
+        if (!returnedLicense.equals(licenseKey) ||
+                !returnedResourceId.equals(resourceId) ||
+                !returnedUserId.equals(userId)) {
             throw new IllegalStateException("License verification response does not match expected values.");
         }
+
+        if (!receivedSignature.equals("%%__SIGNATURE__%%")) {
+            LoggingUtils.logTranslated("plugin.license_error", "Invalid response signature. Possible tampering detected.");
+            return false;
+        }
+
+        return true;
     }
+
     private void startLicenseVerificationTask() {
         if (isLocalTest()) {
             return;
@@ -346,9 +367,7 @@ public class Lumen extends JavaPlugin implements Listener {
         }
         getServer().getScheduler().runTaskAsynchronously(this, () -> {
             if (verifyPurchase()) {
-                final String LICENSE_VERIFIED_KEY = "plugin.license_verified";
-                TranslationHandler.registerTemporaryTranslation(LICENSE_VERIFIED_KEY, "License verified successfully.");
-                LoggingUtils.logTranslated(LICENSE_VERIFIED_KEY);
+                LoggingUtils.logTranslated("plugin.license_verified");
             } else {
                 handleLicenseFailure();
             }
