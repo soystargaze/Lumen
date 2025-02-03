@@ -33,12 +33,12 @@ dependencies {
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21)) // Usar Java 21
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
-    options.release.set(21) // Asegura compatibilidad con Java 21
+    options.release.set(21)
 }
 
 processResources {
