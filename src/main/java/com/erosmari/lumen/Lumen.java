@@ -15,18 +15,22 @@ import com.erosmari.lumen.utils.AsyncExecutor;
 import com.erosmari.lumen.utils.ConsoleUtils;
 import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
-import com.google.gson.Gson;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.crypto.Cipher;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Map;
 
@@ -36,20 +40,12 @@ public class Lumen extends JavaPlugin implements Listener {
     private LumenCommandManager commandManager;
     private LumenItems lumenItems;
     private CoreProtectHandler coreProtectHandler;
-    private static final Gson gson = new Gson();
-    private String licenseKey;
-    private String resourceId;
-    private String userId;
+    private static final String API_URL = "https://api.polymart.org/v1/verifyPurchase";
 
     @SuppressWarnings("CallToPrintStackTrace")
     @Override
     public void onEnable() {
         instance = this;
-
-        licenseKey = "%%__LICENSE__%%";
-        resourceId = "%%__RESOURCE__%%";
-        userId = "%%__USER__%%";
-
         try {
             initializePlugin();
         } catch (Exception e) {
@@ -58,7 +54,7 @@ public class Lumen extends JavaPlugin implements Listener {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        verifyLicense();
+        verifyLicenseTask();
     }
 
     @Override
@@ -115,14 +111,12 @@ public class Lumen extends JavaPlugin implements Listener {
 
     private void setupTranslations() {
         File translationsFolder = new File(getDataFolder(), "Translations");
-
         if (!translationsFolder.exists() && !translationsFolder.mkdirs()) {
             LoggingUtils.logTranslated("translations.folder_error");
             return;
         }
 
         String[] defaultLanguages = {"en_us.yml", "es_es.yml", "fr_fr.yml", "de_de.yml", "it_it.yml", "pt_br.yml", "es_andaluh.yml"};
-
         for (String languageFile : defaultLanguages) {
             saveDefaultTranslation(languageFile);
         }
@@ -147,7 +141,6 @@ public class Lumen extends JavaPlugin implements Listener {
 
     private void saveDefaultTranslation(String fileName) {
         File translationFile = new File(getDataFolder(), "Translations/" + fileName);
-
         if (!translationFile.exists()) {
             try {
                 saveResource("Translations/" + fileName, false);
@@ -202,14 +195,12 @@ public class Lumen extends JavaPlugin implements Listener {
 
         try {
             coreProtectHandler = new CoreProtectHandler();
-
             if (isFAWEAvailable()) {
                 ItemFAWEHandler.setCoreProtectHandler(coreProtectHandler);
             } else {
                 LoggingUtils.logTranslated("plugin.separator");
                 LoggingUtils.logTranslated("coreprotect.integration.no_fawe");
             }
-
             if (coreProtectHandler.isEnabled()) {
                 LoggingUtils.logTranslated("plugin.separator");
                 LoggingUtils.logTranslated("coreprotect.enabled");
@@ -222,7 +213,6 @@ public class Lumen extends JavaPlugin implements Listener {
             LoggingUtils.logTranslated("coreprotect.error_initializing", e.getMessage());
             coreProtectHandler = null;
         }
-
         LoggingUtils.logTranslated("plugin.separator");
     }
 
@@ -230,7 +220,6 @@ public class Lumen extends JavaPlugin implements Listener {
         if (Bukkit.getPluginManager().getPlugin("CoreProtect") == null) {
             return false;
         }
-
         try {
             Class.forName("net.coreprotect.CoreProtect");
             return true;
@@ -243,7 +232,6 @@ public class Lumen extends JavaPlugin implements Listener {
         if (Bukkit.getPluginManager().getPlugin("FastAsyncWorldEdit") == null) {
             return false;
         }
-
         try {
             Class.forName("com.fastasyncworldedit.core.FaweAPI");
             return true;
@@ -256,7 +244,6 @@ public class Lumen extends JavaPlugin implements Listener {
         try {
             ItemLightsHandler lightsHandler = new ItemLightsHandler(this);
             ItemMobsHandler mobsHandler = new ItemMobsHandler(this);
-
             getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems), this);
             getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler, lumenItems), this);
             getServer().getPluginManager().registerEvents(new CraftPermissionListener(this), this);
@@ -276,76 +263,98 @@ public class Lumen extends JavaPlugin implements Listener {
 
     private boolean verifyPurchase() {
         try {
-            URI uri = new URI("https://api.polymart.org/v1/verifyPurchase");
-            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            connection.setConnectTimeout(5000);
-            connection.setReadTimeout(10000);
+            String resource = "%%__RESOURCE__%%";
+            String user = "%%__USER__%%";
+            // Se obtiene el placeholder de la licencia
+            String license = "%%__LICENSE__%%";
 
-            String postData = "license=" + URLEncoder.encode(licenseKey, StandardCharsets.UTF_8) +
-                    "&resource_id=" + URLEncoder.encode(resourceId, StandardCharsets.UTF_8) +
-                    "&user_id=" + URLEncoder.encode(userId, StandardCharsets.UTF_8) +
-                    "&signature=" + URLEncoder.encode("%%__SIGNATURE__%%", StandardCharsets.UTF_8);
+            String params;
+            if (license != null && !license.contains("%%__LICENSE__%%")) {
+                // Modo premium: se envían license, resource_id, user_id y signature
+                String signature = "%%__SIGNATURE__%%";
+                params = "license=" + URLEncoder.encode(license, StandardCharsets.UTF_8) +
+                        "&resource_id=" + URLEncoder.encode(resource, StandardCharsets.UTF_8) +
+                        "&user_id=" + URLEncoder.encode(user, StandardCharsets.UTF_8) +
+                        "&signature=" + URLEncoder.encode(signature, StandardCharsets.UTF_8);
 
-            try (OutputStream os = connection.getOutputStream()) {
-                os.write(postData.getBytes(StandardCharsets.UTF_8));
-                os.flush();
-            }
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode == 200) {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                    Map<?, ?> responseMap = gson.fromJson(reader, Map.class);
-                    return validateResponse(responseMap);
+                // Intentamos descifrar el signature usando el RSA público
+                String rsaPublicKeyStr = "%%__RSA_PUBLIC_KEY__%%";
+                try {
+                    String decryptedSignature = decryptSignature(signature, rsaPublicKeyStr);
+                    getLogger().info("Signature descifrado: " + decryptedSignature);
+                } catch (Exception ex) {
+                    getLogger().warning("Error al descifrar el signature: " + ex.getMessage());
                 }
             } else {
-                final String LICENSE_FAILED_KEY = "plugin.license_response_code_error";
-                TranslationHandler.registerTemporaryTranslation(LICENSE_FAILED_KEY, "License response error: {0}");
-                LoggingUtils.logTranslated(LICENSE_FAILED_KEY, responseCode);
+                // Modo completo: se envían todos los parámetros requeridos
+                String downloadToken = "%%__VERIFY_TOKEN__%%";
+                String nonce = "%%__NONCE__%%";
+                String injectVersion = "%%__INJECT_VER__%%";
+                String downloadAgent = "%%__AGENT__%%";
+                String downloadTime = "%%__TIMESTAMP__%%";
+                params = "download_token=" + URLEncoder.encode(downloadToken, StandardCharsets.UTF_8) +
+                        "&user_id=" + URLEncoder.encode(user, StandardCharsets.UTF_8) +
+                        "&resource_id=" + URLEncoder.encode(resource, StandardCharsets.UTF_8) +
+                        "&nonce=" + URLEncoder.encode(nonce, StandardCharsets.UTF_8) +
+                        "&inject_version=" + URLEncoder.encode(injectVersion, StandardCharsets.UTF_8) +
+                        "&download_agent=" + URLEncoder.encode(downloadAgent, StandardCharsets.UTF_8) +
+                        "&download_time=" + URLEncoder.encode(downloadTime, StandardCharsets.UTF_8);
             }
-        } catch (Exception e) {
-            final String LICENSE_FAILED_KEY = "plugin.license_exception";
-            TranslationHandler.registerTemporaryTranslation(LICENSE_FAILED_KEY, "Invalid license response: {0}");
-            LoggingUtils.logTranslated(LICENSE_FAILED_KEY, e.getMessage());
-        }
-        return false;
-    }
-
-    private boolean validateResponse(Map<?, ?> responseMap) {
-        if (responseMap == null || !responseMap.containsKey("response")) {
-            throw new IllegalStateException("Invalid response from license verification API.");
-        }
-
-        Map<?, ?> response = (Map<?, ?>) responseMap.get("response");
-
-        if (response == null) {
-            throw new IllegalStateException("No response object in API response.");
-        }
-
-        String returnedLicense = (String) response.get("license");
-        String returnedResourceId = (String) response.get("resource_id");
-        String returnedUserId = (String) response.get("user_id");
-        String receivedSignature = (String) response.get("signature");
-
-        if (returnedLicense == null || returnedResourceId == null || returnedUserId == null || receivedSignature == null) {
-            throw new IllegalStateException("API response is missing required fields.");
-        }
-
-        if (!returnedLicense.equals(licenseKey) ||
-                !returnedResourceId.equals(resourceId) ||
-                !returnedUserId.equals(userId)) {
-            throw new IllegalStateException("License verification response does not match expected values.");
-        }
-
-        if (!receivedSignature.equals("%%__SIGNATURE__%%")) {
-            final String LICENSE_FAILED_KEY = "plugin.license_error";
-            TranslationHandler.registerTemporaryTranslation(LICENSE_FAILED_KEY, "Invalid response signature. Possible tampering detected.");
-            LoggingUtils.logTranslated(LICENSE_FAILED_KEY);
+            // Enviamos la solicitud POST y obtenemos la respuesta
+            String response = sendPostRequest(params);
+            getLogger().info("Respuesta de Polymart: " + response);
+            // Se espera un JSON en el que se indique {"response": {"success": true/false}}
+            return response.contains("\"success\":true");
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
+    }
 
-        return true;
+    /**
+     * Envía la solicitud POST con los parámetros proporcionados y retorna la respuesta como String.
+     */
+    private String sendPostRequest(String params) throws IOException {
+        URL url = URI.create(API_URL).toURL();
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = params.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+        }
+        return readResponse(connection);
+    }
+
+    /**
+     * Lee la respuesta del HttpURLConnection y la retorna como String.
+     */
+    private String readResponse(HttpURLConnection connection) throws IOException {
+        StringBuilder response = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                response.append(line);
+            }
+        }
+        return response.toString();
+    }
+
+    /**
+     * Tarea asíncrona que verifica la licencia y, en caso de fallo, desactiva el plugin.
+     */
+    private void verifyLicenseTask() {
+        if (isLocalTest()) {
+            return;
+        }
+        getServer().getScheduler().runTaskAsynchronously(this, () -> {
+            if (verifyPurchase()) {
+                LoggingUtils.logTranslated("plugin.license_verified");
+            } else {
+                handleLicenseFailure();
+            }
+        });
     }
 
     private void startLicenseVerificationTask() {
@@ -358,6 +367,7 @@ public class Lumen extends JavaPlugin implements Listener {
             }
         }, 0L, 72000L); // Reintento cada 72000 ticks (~1 hora)
     }
+
     private void handleLicenseFailure() {
         final String LICENSE_FAILED_KEY = "plugin.license_not_verified";
         TranslationHandler.registerTemporaryTranslation(LICENSE_FAILED_KEY, "License verification failed. Disabling plugin.");
@@ -365,18 +375,6 @@ public class Lumen extends JavaPlugin implements Listener {
         getServer().getScheduler().runTask(this, () -> {
             AsyncExecutor.shutdown();
             getServer().getPluginManager().disablePlugin(this);
-        });
-    }
-    private void verifyLicense() {
-        if (isLocalTest()) {
-            return;
-        }
-        getServer().getScheduler().runTaskAsynchronously(this, () -> {
-            if (verifyPurchase()) {
-                LoggingUtils.logTranslated("plugin.license_verified");
-            } else {
-                handleLicenseFailure();
-            }
         });
     }
 
@@ -415,17 +413,20 @@ public class Lumen extends JavaPlugin implements Listener {
             return false;
         }
     }
+
     private String generateServerKey() {
         try {
             String ip = getConfigValue("server-ip", "127.0.0.1");
             String seed = getConfigValue("level-seed", "default_seed");
             String payload = ip + ":" + seed;
-            byte[] hashBytes = java.security.MessageDigest.getInstance("SHA-256").digest(payload.getBytes(StandardCharsets.UTF_8));
+            byte[] hashBytes = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(payload.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hashBytes);
         } catch (Exception e) {
             return null;
         }
     }
+
     private String getConfigValue(String key, String defaultValue) {
         File propertiesFile = new File("server.properties");
         try (BufferedReader reader = new BufferedReader(new FileReader(propertiesFile))) {
@@ -439,5 +440,29 @@ public class Lumen extends JavaPlugin implements Listener {
             getLogger().severe("Error reading server.properties: " + e.getMessage());
         }
         return defaultValue;
+    }
+
+    /**
+     * Descifra el signature usando RSA con padding PKCS1.
+     *
+     * @param signatureStr La cadena del signature (web-safe base64).
+     * @param rsaPublicKeyStr El placeholder con la clave pública RSA.
+     * @return El JSON descifrado (como String).
+     * @throws Exception Si ocurre algún error durante el proceso de descifrado.
+     */
+    private String decryptSignature(String signatureStr, String rsaPublicKeyStr) throws Exception {
+        String publicKeyStandard = rsaPublicKeyStr.replace('-', '+').replace('_', '/');
+        byte[] publicKeyBytes = Base64.getDecoder().decode(publicKeyStandard);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicKeyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        PublicKey publicKey = keyFactory.generatePublic(keySpec);
+
+        String signatureStandard = signatureStr.replace('-', '+').replace('_', '/');
+        byte[] signatureBytes = Base64.getDecoder().decode(signatureStandard);
+
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        cipher.init(Cipher.DECRYPT_MODE, publicKey);
+        byte[] decryptedBytes = cipher.doFinal(signatureBytes);
+        return new String(decryptedBytes, StandardCharsets.UTF_8);
     }
 }
