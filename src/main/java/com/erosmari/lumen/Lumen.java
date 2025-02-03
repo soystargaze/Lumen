@@ -261,32 +261,29 @@ public class Lumen extends JavaPlugin implements Listener {
         initializeCoreProtectIntegration();
     }
 
+    @SuppressWarnings("ConstantConditions")
     private boolean verifyPurchase() {
         try {
             String resource = "%%__RESOURCE__%%";
             String user = "%%__USER__%%";
-            // Se obtiene el placeholder de la licencia
             String license = "%%__LICENSE__%%";
 
             String params;
             if (license != null && !license.contains("%%__LICENSE__%%")) {
-                // Modo premium: se envían license, resource_id, user_id y signature
                 String signature = "%%__SIGNATURE__%%";
                 params = "license=" + URLEncoder.encode(license, StandardCharsets.UTF_8) +
                         "&resource_id=" + URLEncoder.encode(resource, StandardCharsets.UTF_8) +
                         "&user_id=" + URLEncoder.encode(user, StandardCharsets.UTF_8) +
                         "&signature=" + URLEncoder.encode(signature, StandardCharsets.UTF_8);
 
-                // Intentamos descifrar el signature usando el RSA público
                 String rsaPublicKeyStr = "%%__RSA_PUBLIC_KEY__%%";
                 try {
                     String decryptedSignature = decryptSignature(signature, rsaPublicKeyStr);
-                    getLogger().info("Signature descifrado: " + decryptedSignature);
+                    getLogger().info("Signature: " + decryptedSignature);
                 } catch (Exception ex) {
-                    getLogger().warning("Error al descifrar el signature: " + ex.getMessage());
+                    getLogger().warning("Error: " + ex.getMessage());
                 }
             } else {
-                // Modo completo: se envían todos los parámetros requeridos
                 String downloadToken = "%%__VERIFY_TOKEN__%%";
                 String nonce = "%%__NONCE__%%";
                 String injectVersion = "%%__INJECT_VER__%%";
@@ -300,10 +297,8 @@ public class Lumen extends JavaPlugin implements Listener {
                         "&download_agent=" + URLEncoder.encode(downloadAgent, StandardCharsets.UTF_8) +
                         "&download_time=" + URLEncoder.encode(downloadTime, StandardCharsets.UTF_8);
             }
-            // Enviamos la solicitud POST y obtenemos la respuesta
             String response = sendPostRequest(params);
-            getLogger().info("Respuesta de Polymart: " + response);
-            // Se espera un JSON en el que se indique {"response": {"success": true/false}}
+            getLogger().info("Polymart response: " + response);
             return response.contains("\"success\":true");
         } catch (IOException e) {
             e.printStackTrace();
@@ -350,7 +345,9 @@ public class Lumen extends JavaPlugin implements Listener {
         }
         getServer().getScheduler().runTaskAsynchronously(this, () -> {
             if (verifyPurchase()) {
-                LoggingUtils.logTranslated("plugin.license_verified");
+                final String LICENSE_SUCCESS_KEY = "plugin.license_verified";
+                TranslationHandler.registerTemporaryTranslation(LICENSE_SUCCESS_KEY, "License verification successful.");
+                LoggingUtils.logTranslated(LICENSE_SUCCESS_KEY);
             } else {
                 handleLicenseFailure();
             }
