@@ -1,3 +1,16 @@
+import proguard.gradle.ProGuardTask
+
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+    }
+    dependencies {
+        classpath 'com.guardsquare:proguard-gradle:7.6.1'
+    }
+}
+
 plugins {
     id 'java'
     id 'com.gradleup.shadow' version '8.3.0'
@@ -25,7 +38,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     implementation("com.zaxxer:HikariCP:5.0.1")
     compileOnly files("libs/CoreProtect-23.2-RC3.jar")
-    implementation(platform("com.intellectualsites.bom:bom-newest:1.52")) // Ref: https://github.com/IntellectualSites/bom
+    implementation(platform("com.intellectualsites.bom:bom-newest:1.52"))
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") {
         transitive = false
@@ -47,12 +60,38 @@ processResources {
     }
 }
 
+// Tarea para generar el fat JAR usando Shadow.
 tasks.shadowJar {
-    archiveClassifier.set('') // Elimina el sufijo "-all" del JAR generado
-    relocate 'cloud.commandframework', 'com.erosmari.dicecraft.shaded.cloud' // Relocaliza paquetes para evitar conflictos
-    minimize() // Optimiza el tamaño del JAR final
+    archiveClassifier.set('') // Elimina el sufijo "-all" del JAR generado.
+    minimize() // Minimiza el tamaño del JAR final.
 }
 
+// Tarea ProGuard.
+tasks.register('proguard', ProGuardTask) {
+    dependsOn tasks.shadowJar, tasks.jar
+
+    injars(tasks.named('shadowJar', Jar).flatMap { it.archiveFile })
+    inputs.file(tasks.named('jar', Jar).flatMap { it.archiveFile })
+
+    if (System.getProperty('java.version').startsWith('1.')) {
+        libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+    } else {
+        libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.getProperty('java.home')}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+        libraryjars "${System.getProperty('java.home')}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+    }
+
+    // Usamos compileClasspath en lugar de compileOnly, ya que es resolvable.
+    libraryjars files(configurations.compileClasspath.files)
+
+    verbose()
+
+    outjars layout.buildDirectory.file("libs/${project.group}-${project.name}-${project.version}-minified.jar")
+
+    configuration file('proguard.pro')
+}
+
+// Hacer que la tarea build dependa de shadowJar y de proguard, de modo que se genere el JAR final ofuscado.
 tasks.build {
-    dependsOn tasks.shadowJar
+    dependsOn tasks.shadowJar, tasks.proguard
 }
