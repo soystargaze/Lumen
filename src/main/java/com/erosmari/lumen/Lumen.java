@@ -261,7 +261,7 @@ public class Lumen extends JavaPlugin implements Listener {
         initializeCoreProtectIntegration();
     }
 
-    @SuppressWarnings("ConstantConditions")
+    @SuppressWarnings({"ConstantConditions", "CallToPrintStackTrace"})
     private boolean verifyPurchase() {
         try {
             String resource = "%%__RESOURCE__%%";
@@ -298,7 +298,7 @@ public class Lumen extends JavaPlugin implements Listener {
                         "&download_time=" + URLEncoder.encode(downloadTime, StandardCharsets.UTF_8);
             }
             String response = sendPostRequest(params);
-            getLogger().info("Polymart response: " + response);
+            //getLogger().info("Polymart response: " + response);
             return response.contains("\"success\":true");
         } catch (IOException e) {
             e.printStackTrace();
