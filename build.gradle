@@ -43,6 +43,7 @@ dependencies {
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") {
         transitive = false
     }
+    implementation("org.bstats:bstats-bukkit:3.0.2")
 }
 
 java {

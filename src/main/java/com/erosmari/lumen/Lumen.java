@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerLoadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bstats.bukkit.Metrics;
 
 import javax.crypto.Cipher;
 import java.io.*;
@@ -38,6 +39,7 @@ public class Lumen extends JavaPlugin implements Listener {
     private LumenItems lumenItems;
     private CoreProtectHandler coreProtectHandler;
     private static final String API_URL = "https://api.polymart.org/v1/verifyPurchase";
+    private static final int BSTATS_PLUGIN_ID = 24638;
 
     @SuppressWarnings("CallToPrintStackTrace")
     @Override
@@ -66,6 +68,7 @@ public class Lumen extends JavaPlugin implements Listener {
     private void initializePlugin() {
         startLicenseVerificationTask();
         LumenConstants.init(this);
+        initializeMetrics();
         loadConfigurations();
 
         ConsoleUtils.displayAsciiArt(this);
@@ -254,6 +257,16 @@ public class Lumen extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
     }
 
+    private void initializeMetrics() {
+        try {
+            new Metrics(this, BSTATS_PLUGIN_ID);
+        } catch (Exception e) {
+            final String BSTATS_ERROR = "bstats.error";
+            TranslationHandler.registerTemporaryTranslation(BSTATS_ERROR, "BStats error: {0}");
+            LoggingUtils.logTranslated(BSTATS_ERROR, e.getMessage());
+        }
+    }
+
     @EventHandler
     public void onServerLoad(ServerLoadEvent event) {
         initializeCoreProtectIntegration();
@@ -296,7 +309,7 @@ public class Lumen extends JavaPlugin implements Listener {
                         "&download_time=" + URLEncoder.encode(downloadTime, StandardCharsets.UTF_8);
             }
             String response = sendPostRequest(params);
-            //getLogger().info("Polymart response: " + response);
+            getLogger().info("Polymart response: " + response);
             return response.contains("\"success\":true");
         } catch (IOException e) {
             e.printStackTrace();
