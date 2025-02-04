@@ -4,6 +4,7 @@ import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
 import com.erosmari.lumen.utils.LoggingUtils;
+import com.erosmari.lumen.utils.LumenConstants;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -16,7 +17,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
 
 import java.util.Objects;
 
@@ -26,10 +26,10 @@ public class MobListener implements Listener {
     private final LumenItems lumenItems;
     private final NamespacedKey lumenIdKey;
 
-    public MobListener(Plugin plugin, ItemMobsHandler mobsHandler, LumenItems lumenItems) {
+    public MobListener(ItemMobsHandler mobsHandler, LumenItems lumenItems) {
         this.mobsHandler = mobsHandler;
         this.lumenItems = lumenItems;
-        this.lumenIdKey = new NamespacedKey(plugin, "lumen_id");
+        this.lumenIdKey = LumenConstants.getLumenIdKey();
     }
 
     @EventHandler

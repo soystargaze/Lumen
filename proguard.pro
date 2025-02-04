@@ -4,7 +4,10 @@
 -keep class com.zaxxer.hikari.** { *; }
 -keep class org.slf4j.** { *; }
 -dontwarn com.zaxxer.hikari.**
-
+-keepclassmembers class * implements org.bukkit.event.Listener {
+    @org.bukkit.event.EventHandler public *;
+}
+-keep class com.erosmari.lumen.g.** { *; }
 # Conservar atributos importantes (anotaciones, nombres de archivo fuente, números de línea)
 -keepattributes *Annotation*,Signature,EnclosingMethod,SourceFile,LineNumberTable
 

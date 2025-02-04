@@ -2,6 +2,7 @@ package com.erosmari.lumen.items;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import com.erosmari.lumen.utils.LumenConstants;
 import com.erosmari.lumen.utils.TranslationHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -82,9 +83,8 @@ public class LumenItems {
             meta.lore(loreComponents);
 
             // Agregar el identificador al PersistentDataContainer
-            NamespacedKey key = new NamespacedKey(plugin, "lumen_id");
             PersistentDataContainer container = meta.getPersistentDataContainer();
-            container.set(key, PersistentDataType.STRING, identifier);
+            container.set(LumenConstants.getLumenIdKey(), PersistentDataType.STRING, identifier);
 
             head.setItemMeta(meta);
         }

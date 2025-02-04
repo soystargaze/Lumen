@@ -11,10 +11,7 @@ import com.erosmari.lumen.listeners.CraftPermissionListener;
 import com.erosmari.lumen.listeners.MobListener;
 import com.erosmari.lumen.listeners.TorchListener;
 import com.erosmari.lumen.mobs.ItemMobsHandler;
-import com.erosmari.lumen.utils.AsyncExecutor;
-import com.erosmari.lumen.utils.ConsoleUtils;
-import com.erosmari.lumen.utils.LoggingUtils;
-import com.erosmari.lumen.utils.TranslationHandler;
+import com.erosmari.lumen.utils.*;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -68,6 +65,7 @@ public class Lumen extends JavaPlugin implements Listener {
     @SuppressWarnings("UnstableApiUsage")
     private void initializePlugin() {
         startLicenseVerificationTask();
+        LumenConstants.init(this);
         loadConfigurations();
 
         ConsoleUtils.displayAsciiArt(this);
@@ -245,8 +243,8 @@ public class Lumen extends JavaPlugin implements Listener {
             ItemLightsHandler lightsHandler = new ItemLightsHandler(this);
             ItemMobsHandler mobsHandler = new ItemMobsHandler(this);
             getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems), this);
-            getServer().getPluginManager().registerEvents(new MobListener(this, mobsHandler, lumenItems), this);
-            getServer().getPluginManager().registerEvents(new CraftPermissionListener(this), this);
+            getServer().getPluginManager().registerEvents(new MobListener(mobsHandler, lumenItems), this);
+            getServer().getPluginManager().registerEvents(new CraftPermissionListener(), this);
         } catch (Exception e) {
             LoggingUtils.logTranslated("events.register_error", e.getMessage());
         }

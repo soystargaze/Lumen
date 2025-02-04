@@ -31,7 +31,7 @@ public class ConfigHandler {
         config = YamlConfiguration.loadConfiguration(configFile);
 
         // Cargar el idioma configurado
-        language = config.getString("language", "es_es"); // Idioma predeterminado: es_es
+        language = config.getString("language", "en_us");
     }
 
     /**
@@ -69,7 +69,7 @@ public class ConfigHandler {
     }
 
     public static String getBossBarMessage() {
-        return Lumen.getInstance().getConfig().getString("display.bossbar.message", "Progreso: {progress}% completado");
+        return Lumen.getInstance().getConfig().getString("display.bossbar.message", "Progress: {progress}% completed");
     }
 
     public static BarColor getBossBarColor() {

@@ -5,6 +5,7 @@ import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
 import com.erosmari.lumen.utils.LoggingUtils;
+import com.erosmari.lumen.utils.LumenConstants;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -33,7 +34,7 @@ public class TorchListener implements Listener {
         this.plugin = plugin;
         this.lightsHandler = lightsHandler;
         this.lumenItems = lumenItems;
-        this.lumenIdKey = new NamespacedKey(plugin, "lumen_id");
+        this.lumenIdKey = LumenConstants.getLumenIdKey();
     }
 
     @EventHandler

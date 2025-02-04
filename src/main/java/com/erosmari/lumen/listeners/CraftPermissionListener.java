@@ -1,6 +1,6 @@
 package com.erosmari.lumen.listeners;
 
-import com.erosmari.lumen.Lumen;
+import com.erosmari.lumen.utils.LumenConstants;
 import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -14,10 +14,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 public class CraftPermissionListener implements Listener {
 
-    private final Lumen plugin;
-
-    public CraftPermissionListener(Lumen plugin) {
-        this.plugin = plugin;
+    public CraftPermissionListener() {
     }
 
     @EventHandler
@@ -31,7 +28,7 @@ public class CraftPermissionListener implements Listener {
 
         ItemMeta meta = result.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        NamespacedKey key = new NamespacedKey(plugin, "lumen_id");
+        NamespacedKey key = LumenConstants.getLumenIdKey();
 
         if (container.has(key, PersistentDataType.STRING)) {
             String itemId = container.get(key, PersistentDataType.STRING);
