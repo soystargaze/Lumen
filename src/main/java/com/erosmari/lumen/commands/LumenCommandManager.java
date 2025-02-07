@@ -25,72 +25,37 @@ public class LumenCommandManager {
         this.redoCommand = new RedoCommand(plugin);
     }
 
-    /**
-     * Registra todos los comandos principales y sus subcomandos.
-     */
     public void registerCommands() {
         LifecycleEventManager<@org.jetbrains.annotations.NotNull Plugin> manager = plugin.getLifecycleManager();
-        // Registrar comandos usando el evento COMMANDS
+
         manager.registerEventHandler(LifecycleEvents.COMMANDS, event -> {
             Commands commands = event.registrar();
 
-            commands.register(
-                    Commands.literal("lumen")
-                            .requires(source -> source.getSender().hasPermission("lumen.use"))
-                            .executes(ctx -> {
-                                CommandSourceStack source = ctx.getSource();
-                                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
-                                return 1;
-                            })
-                            .then(LangCommand.register(plugin))
-                            .then(LightCommand.register())
-                            .then(CancelCommand.register())
-                            .then(undoCommand.register())
-                            .then(redoCommand.register())
-                            .then(clearCommand.register())
-                            .then(removeCommand.register())
-                            .then(GiveCommand.register())
-                            .then(ReloadCommand.register(plugin))
-                            .build()
-            );
-            commands.register(
-                    Commands.literal("l")
-                            .requires(source -> source.getSender().hasPermission("lumen.use"))
-                            .executes(ctx -> {
-                                CommandSourceStack source = ctx.getSource();
-                                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
-                                return 1;
-                            })
-                            .then(LangCommand.register(plugin))
-                            .then(LightCommand.register())
-                            .then(CancelCommand.register())
-                            .then(undoCommand.register())
-                            .then(redoCommand.register())
-                            .then(clearCommand.register())
-                            .then(removeCommand.register())
-                            .then(GiveCommand.register())
-                            .then(ReloadCommand.register(plugin))
-                            .build()
-            );
-            commands.register(
-                    Commands.literal("lu")
-                            .requires(source -> source.getSender().hasPermission("lumen.use"))
-                            .executes(ctx -> {
-                                CommandSourceStack source = ctx.getSource();
-                                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
-                                return 1;
-                            })
-                            .then(LangCommand.register(plugin))
-                            .then(LightCommand.register())
-                            .then(CancelCommand.register())
-                            .then(undoCommand.register())
-                            .then(redoCommand.register())
-                            .then(clearCommand.register())
-                            .then(removeCommand.register())
-                            .then(GiveCommand.register())
-                            .then(ReloadCommand.register(plugin))
-                            .build()
-            );
+            registerCommand(commands, "lumen");
+            registerCommand(commands, "lu");
+            registerCommand(commands, "l");
         });
+    }
+
+    private void registerCommand(Commands commands, String commandName) {
+        commands.register(
+                Commands.literal(commandName)
+                        .requires(source -> source.getSender().hasPermission("lumen.use"))
+                        .executes(ctx -> {
+                            CommandSourceStack source = ctx.getSource();
+                            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.usage"));
+                            return 1;
+                        })
+                        .then(LangCommand.register(plugin))
+                        .then(LightCommand.register())
+                        .then(CancelCommand.register())
+                        .then(undoCommand.register())
+                        .then(redoCommand.register())
+                        .then(clearCommand.register())
+                        .then(removeCommand.register())
+                        .then(GiveCommand.register())
+                        .then(ReloadCommand.register(plugin))
+                        .build()
+        );
     }
 }
