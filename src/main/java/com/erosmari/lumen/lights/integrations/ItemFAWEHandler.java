@@ -84,15 +84,13 @@ public class ItemFAWEHandler {
                 return;
             }
 
-            // Crear un BlockState con el nivel de luz personalizado
+            // Create a BlockState with the custom light level
             BlockState lightState = lightType.getDefaultState();
             Property<Integer> levelProperty = lightType.getProperty("level");
-            if (levelProperty != null) {
-                lightState = lightState.with(levelProperty, lightLevel);
-            }
+            BlockState customLightState = lightState.with(levelProperty, lightLevel);
 
             // Establecer bloques usando FAWE
-            List<Location> placedLocations = FAWEHandler.processLocations(editSession, locations, lightState);
+            List<Location> placedLocations = FAWEHandler.processLocations(editSession, locations, customLightState);
 
             // Registrar bloques en la base de datos
             LightRegistry.addBlocksAsync(placedLocations, lightLevel, operationId);
@@ -100,11 +98,7 @@ public class ItemFAWEHandler {
             // Registrar en CoreProtect solo si la integración está habilitada
             if (coreProtectHandler != null && coreProtectHandler.isEnabled()) {
                 try {
-                    coreProtectHandler.logLightPlacement(
-                            player.getName(),
-                            placedLocations,
-                            Material.LIGHT
-                    );
+                    coreProtectHandler.logLightPlacement(player.getName(), placedLocations, Material.LIGHT);
                 } catch (Exception ex) {
                     LoggingUtils.logTranslated("coreprotect.placement.error", ex.getMessage());
                 }
