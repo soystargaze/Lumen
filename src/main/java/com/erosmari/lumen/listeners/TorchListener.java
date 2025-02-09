@@ -1,21 +1,28 @@
 package com.erosmari.lumen.listeners;
 
+import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
 import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.LumenConstants;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -55,6 +62,12 @@ public class TorchListener implements Listener {
                     // Generar un ID incremental para la operación
                     int incrementalId = LightRegistry.registerOperation(UUID.randomUUID(), "Lumen Torch placed at " + placedLocation);
 
+                    // Obtener el nivel de luz desde la antorcha o usar el de configuración
+                    NamespacedKey lightLevelKey = new NamespacedKey(plugin, "custom_light_level");
+                    int lightLevel = itemContainer.has(lightLevelKey, PersistentDataType.INTEGER)
+                            ? Objects.requireNonNullElse(itemContainer.get(lightLevelKey, PersistentDataType.INTEGER), 15)
+                            : ConfigHandler.getInt("settings.torch_light_level", 15);
+
                     // Transfiere el ID al bloque colocado si es compatible con TileState
                     if (placedBlock.getState() instanceof TileState tileState) {
                         PersistentDataContainer container = tileState.getPersistentDataContainer();
@@ -64,7 +77,7 @@ public class TorchListener implements Listener {
                     }
 
                     // Lógica para el Lumen Torch (luz)
-                    lightsHandler.placeLights(player, placedLocation, incrementalId);
+                    lightsHandler.placeLights(player, placedLocation, incrementalId, lightLevel);
 
                     // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "torch");
@@ -127,6 +140,62 @@ public class TorchListener implements Listener {
         for (NamespacedKey key : source.getKeys()) {
             if (source.has(key, PersistentDataType.STRING)) {
                 target.set(key, PersistentDataType.STRING, Objects.requireNonNull(source.get(key, PersistentDataType.STRING)));
+            }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerRightClickAir(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_AIR) return;
+
+        Player player = event.getPlayer();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+
+        if (itemInHand.getType() == Material.PLAYER_HEAD && itemInHand.getItemMeta() != null) {
+            PersistentDataContainer container = itemInHand.getItemMeta().getPersistentDataContainer();
+
+            if (container.has(lumenIdKey, PersistentDataType.STRING) &&
+                    "torch".equals(container.get(lumenIdKey, PersistentDataType.STRING))) {
+
+                player.sendMessage("§eEscribe un valor de luz entre 0 y 15 en el chat.");
+
+                plugin.getServer().getPluginManager().registerEvents(new Listener() {
+                    @EventHandler
+                    public void onChat(AsyncChatEvent chatEvent) {
+                        if (!chatEvent.getPlayer().equals(player)) return;
+
+                        chatEvent.setCancelled(true);
+                        String message = PlainTextComponentSerializer.plainText().serialize(chatEvent.message());
+
+                        try {
+                            int lightLevel = Integer.parseInt(message);
+                            if (lightLevel < 0 || lightLevel > 15) {
+                                player.sendMessage("§cEl valor debe estar entre 0 y 15.");
+                                return;
+                            }
+
+                            // Verificar si el jugador aún tiene la antorcha en la mano
+                            ItemStack currentItem = player.getInventory().getItemInMainHand();
+                            if (currentItem.getType() != Material.PLAYER_HEAD || currentItem.getItemMeta() == null) {
+                                player.sendMessage("§cNo tienes la antorcha en la mano.");
+                                return;
+                            }
+
+                            // Guardar el valor en la antorcha
+                            ItemMeta meta = currentItem.getItemMeta();
+                            PersistentDataContainer metaContainer = meta.getPersistentDataContainer();
+                            metaContainer.set(new NamespacedKey(plugin, "custom_light_level"), PersistentDataType.INTEGER, lightLevel);
+                            currentItem.setItemMeta(meta);
+
+                            player.sendMessage("§aLa antorcha ahora usará el nivel de luz " + lightLevel + " temporalmente.");
+                        } catch (NumberFormatException e) {
+                            player.sendMessage("§cPor favor, ingresa un número válido entre 0 y 15.");
+                        }
+
+                        // Desinscribir el listener correctamente
+                        AsyncChatEvent.getHandlerList().unregister(this);
+                    }
+                }, plugin);
             }
         }
     }

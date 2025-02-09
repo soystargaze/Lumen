@@ -26,7 +26,6 @@ public class ItemLightsHandler {
     private final Lumen plugin;
     private final Executor executor = AsyncExecutor.getExecutor();
     private final CoreProtectHandler coreProtectHandler;
-    private static int lightLevel;
     private static int radius;
     private static int lightsPerTick;
     private static int tickInterval;
@@ -39,20 +38,17 @@ public class ItemLightsHandler {
 
     public static void reloadSettings() {
         radius = ConfigHandler.getInt("settings.default_torch_radius", 20);
-        lightLevel = ConfigHandler.getInt("settings.torch_light_level", 15);
         lightsPerTick = ConfigHandler.getInt("settings.torch_lights_per_tick", 10);
         tickInterval = ConfigHandler.getInt("settings.torch_tick_interval", 10);
     }
 
-    public void placeLights(Player player, Location center, int operationId) {
+    public void placeLights(Player player, Location center, int operationId, int lightLevel) {
         World world = center.getWorld();
 
         if (world == null) {
             LoggingUtils.sendAndLog(player, "light.error.no_world");
             return;
         }
-
-//        playerLightLevel = ConfigHandler.getInt("settings.torch_light_level", 15);
 
         // Calcular posiciones de bloques de luz de manera asíncrona
         CompletableFuture.supplyAsync(() -> calculateLightPositions(center, radius), executor)
@@ -134,7 +130,6 @@ public class ItemLightsHandler {
             return;
         }
 
-        // Lógica original si FAWE no está disponible
         LoggingUtils.logTranslated("light.info.fawe_not_found");
         Queue<Location> blockQueue = new LinkedList<>(blocks);
         final BukkitTask[] taskHolder = new BukkitTask[1];
@@ -154,9 +149,12 @@ public class ItemLightsHandler {
 
             while (!blockQueue.isEmpty() && processed < lightsPerTick) {
                 Location blockLocation = blockQueue.poll();
-                if (blockLocation != null && placeLight(blockLocation, lightLevel, operationId)) {
-                    placedBlocks.add(blockLocation);
-                    processed++;
+                if (blockLocation != null) {
+                    int validLightLevel = Math.max(0, Math.min(15, lightLevel)); // Limitar a 0-15
+                    if (placeLight(blockLocation, validLightLevel, operationId)) {
+                        placedBlocks.add(blockLocation);
+                        processed++;
+                    }
                 }
             }
 
@@ -193,7 +191,7 @@ public class ItemLightsHandler {
         if (block.getType() == Material.LIGHT) {
             try {
                 Levelled lightData = (Levelled) block.getBlockData();
-                lightData.setLevel(lightLevel);
+                lightData.setLevel(lightLevel); // Se usa el nivel de luz correcto
                 block.setBlockData(lightData, false);
                 LightRegistry.addBlockAsync(location, lightLevel, operationId);
                 return true;
