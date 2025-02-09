@@ -1,5 +1,7 @@
 package com.erosmari.lumen.commands;
 
+import com.erosmari.lumen.config.ConfigHandler;
+import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
@@ -38,6 +40,10 @@ public class ReloadCommand {
 
     private void reloadConfig() {
         plugin.reloadConfig();
+
+        // Forzar la recarga de valores en otras clases que usan la configuración
+        ConfigHandler.reload();
+        ItemLightsHandler.reloadSettings();
     }
 
     private int reloadTranslations() {

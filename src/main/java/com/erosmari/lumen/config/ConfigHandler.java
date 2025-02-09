@@ -44,6 +44,12 @@ public class ConfigHandler {
         return config;
     }
 
+    public static void reload() {
+        JavaPlugin plugin = Lumen.getInstance();
+        plugin.reloadConfig();
+        config = plugin.getConfig();
+    }
+
     /**
      * Retorna el idioma configurado en config.yml.
      *

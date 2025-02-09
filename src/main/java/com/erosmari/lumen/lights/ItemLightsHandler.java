@@ -26,11 +26,22 @@ public class ItemLightsHandler {
     private final Lumen plugin;
     private final Executor executor = AsyncExecutor.getExecutor();
     private final CoreProtectHandler coreProtectHandler;
-
+    private static int lightLevel;
+    private static int radius;
+    private static int lightsPerTick;
+    private static int tickInterval;
 
     public ItemLightsHandler(Lumen plugin) {
         this.plugin = plugin;
         this.coreProtectHandler = plugin.getCoreProtectHandler();
+        reloadSettings();
+    }
+
+    public static void reloadSettings() {
+        radius = ConfigHandler.getInt("settings.default_torch_radius", 20);
+        lightLevel = ConfigHandler.getInt("settings.torch_light_level", 15);
+        lightsPerTick = ConfigHandler.getInt("settings.torch_lights_per_tick", 10);
+        tickInterval = ConfigHandler.getInt("settings.torch_tick_interval", 10);
     }
 
     public void placeLights(Player player, Location center, int operationId) {
@@ -41,10 +52,7 @@ public class ItemLightsHandler {
             return;
         }
 
-        int radius = ConfigHandler.getInt("settings.default_torch_radius", 20);
-        int lightLevel = ConfigHandler.getInt("settings.torch_light_level", 15);
-        int lightsPerTick = ConfigHandler.getInt("settings.torch_lights_per_tick", 10);
-        int tickInterval = ConfigHandler.getInt("settings.torch_tick_interval", 10);
+//        playerLightLevel = ConfigHandler.getInt("settings.torch_light_level", 15);
 
         // Calcular posiciones de bloques de luz de manera asíncrona
         CompletableFuture.supplyAsync(() -> calculateLightPositions(center, radius), executor)
