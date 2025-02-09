@@ -141,6 +141,9 @@ torch:
   guard_placed: "Lumen Guard colocada em: {0}."
   light_broken: "Lumen Torch quebrada. Luzes removidas: {0}."
   guard_broken: "Lumen Guard quebrada. Área de proteção removida em: {0}."
+  light_level_set: "Nível de luz definido em: {0}."
+  error:
+    invalid_light_level: "Digite um número válido entre 0 e 15"
 
 light:
   error:

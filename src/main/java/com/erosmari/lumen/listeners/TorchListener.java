@@ -187,9 +187,9 @@ public class TorchListener implements Listener {
                             metaContainer.set(new NamespacedKey(plugin, "custom_light_level"), PersistentDataType.INTEGER, lightLevel);
                             currentItem.setItemMeta(meta);
 
-                            player.sendMessage("§aLa antorcha ahora usará el nivel de luz " + lightLevel + " temporalmente.");
+                            LoggingUtils.sendAndLog(player, "torch.light_level_set", lightLevel);
                         } catch (NumberFormatException e) {
-                            player.sendMessage("§cPor favor, ingresa un número válido entre 0 y 15.");
+                            LoggingUtils.sendAndLog(player, "torch.error.invalid_light_level");
                         }
 
                         // Desinscribir el listener correctamente

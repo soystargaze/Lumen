@@ -141,6 +141,9 @@ torch:
   guard_placed: "Lumen Guard placed at: {0}."
   light_broken: "Lumen Torch broken. Lights removed: {0}."
   guard_broken: "Lumen Guard broken. Protection area removed at: {0}."
+  light_level_set: "Light level set to: {0}"
+  error:
+    invalid_light_level: "Please specify a valid light level between 0 and 15."
 
 light:
   error:

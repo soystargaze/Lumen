@@ -140,6 +140,9 @@ torch:
   guard_placed: "Lumen Wächter platziert bei: {0}."
   light_broken: "Lumen Fackel zerstört. Entfernte Lichter: {0}."
   guard_broken: "Lumen Wächter zerstört. Schutzbereich bei: {0} entfernt."
+  light_level_set: "Die Lichtstärke ist auf: {0}."
+  error:
+    invalid_light_level: "Bitte geben Sie eine gültige Zahl zwischen 0 und 15 ein."
 
 light:
   error:
