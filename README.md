@@ -317,7 +317,7 @@ Luemen también ofrece una variedad de alias para cada comando `/lumen`, `/lu`, 
 ### Para Jugadores
 - La `Lumen Torch` ilumina automáticamente áreas cercanas.
 - La `Lumen Guard` bloquea el spawn de mobs hostiles en su radio de acción.
-- Las antorchas pueden retirarse sin perderlas, y sus efectos desaparecen al hacerl.
+- Las antorchas pueden retirarse sin perderlas, y sus efectos desaparecen al hacerlo.
 - Para fabricarlas, es necesario tener los permisos `lumen.craft.torch` y `lumen.craft.guard`.
 
 **Recetas de Crafteo**
