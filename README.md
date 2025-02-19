@@ -13,7 +13,7 @@
 
 ---
 
-## Características
+## ⚡️ Características
 
 - Iluminación dinámica** mediante **comandos** y **objetos personalizables** (no necesita paquete de recursos).
 - Antorchas de iluminación automática con nivel de luz personalizado (Antorcha Lumen).
@@ -23,7 +23,7 @@
 
 ---
 
-## Integraciones Compatibles
+## 🛠️ Integraciones Compatibles
 
 Lumen puede aprovechar otras herramientas para mejorar su rendimiento y funcionalidad:
 
@@ -37,7 +37,7 @@ Estas integraciones son opcionales, pero recomendadas para un mejor control y ef
 
 ---
 
-## Guía de Instalación
+## 📌 Guía de Instalación
 
 <details><summary>Instalación</summary>
 
@@ -53,7 +53,7 @@ Antes de instalar Lumen, asegúrate de que tu servidor cumple con los siguientes
 ---
 
 ## **Paso 1: Descargar el Plugin**
-Descarga la última versión de Lumen desde [Modrinth](https://modrinth.com/plugin/lumen) y asegúrate de obtener un archivo `.jar` válido.
+Descarga la última versión de **Lumen** desde [Modrinth](https://modrinth.com/plugin/lumen) y asegúrate de obtener un archivo `.jar` válido.
 
 ---
 
@@ -78,7 +78,6 @@ Descarga la última versión de Lumen desde [Modrinth](https://modrinth.com/plug
 
 ## **Paso 4: Solución de Problemas**
 - **El plugin no se carga:** Se recomienda usar **PaperMC 1.21.4**, la última versión estable. Asegúrate también de estar utilizando Java 21 o superior.
-- **No se puede verificar la licencia:** Confirma que el servidor tiene acceso a Internet y revisa la consola para mensajes de error.
 - **Errores con CoreProtect:** Revisa la consola al iniciar el servidor. Si la integración no se activa, asegúrate de que CoreProtect está correctamente instalado.
 - **Bajo rendimiento al colocar luces:** Ajusta los valores en `config.yml` y/o instala **FastAsyncWorldEdit** para optimizar el procesamiento de grandes cantidades de bloques.
 - Solo las **nuevas** `Lumen Torch` y `Lumen Guard` colocadas tendrán efecto con los cambios realizados en `config.yml`. Las antorchas previamente colocadas no se verán afectadas a menos que se eliminen y se vuelvan a colocar.
@@ -92,7 +91,7 @@ Si tienes problemas o dudas, contacta con el soporte en **[Discord](https://eros
 
 ---
 
-## Comandos y Permisos
+## 🔐 Comandos y Permisos
 
 <details>
 <summary>Comandos</summary>
@@ -165,9 +164,11 @@ Luemen también ofrece una variedad de alias para cada comando `/lumen`, `/lu`, 
 
 ---
 
-## Soporte
+## 💬 Soporte y contacto
 
 Si tienes dudas o encuentras algún problema, contáctanos por [Discord](https://erosmari.com/discord)
+
+![bstats](https://bstats.org/signatures/bukkit/Lumen%20-%20Ultimate%20Lightning.svg)
 
 </details>
 
@@ -184,7 +185,7 @@ Si tienes dudas o encuentras algún problema, contáctanos por [Discord](https:/
 
 ---
 
-## Features
+## ⚡️ Features
 
 - **Dynamic lighting** using **commands** and **custom crafteable items** (No resource pack needed).
 - **Auto-lighting** torches with custom light level (Lumen Torch).
@@ -194,7 +195,7 @@ Si tienes dudas o encuentras algún problema, contáctanos por [Discord](https:/
 
 ---
 
-## Compatible Integrations
+## 🛠️ Compatible Integrations
 
 Lumen can leverage other tools to enhance performance and functionality:
 
@@ -208,7 +209,7 @@ These integrations are optional but recommended for better control and efficienc
 
 ---
 
-## Installation Guide
+## 📌 Installation Guide
 
 <details><summary>Installation</summary>
 
@@ -224,7 +225,7 @@ Before installing Lumen, make sure your server meets the following requirements:
 ---
 
 ## **Step 1: Download the Plugin**
-Download the latest version of Lumen from [Modrinth](https://modrinth.com/plugin/lumen) and ensure you obtain a valid `.jar` file.
+Download the latest version of **Lumen** from [Modrinth](https://modrinth.com/plugin/lumen) and ensure you obtain a valid `.jar` file.
 
 ---
 
@@ -249,7 +250,6 @@ Download the latest version of Lumen from [Modrinth](https://modrinth.com/plugin
 
 ## **Step 4: Troubleshooting**
 - **The plugin does not load:** It is recommended to use **PaperMC 1.21.4**, the latest stable version. Also, ensure you are using Java 21 or higher.
-- **License verification failed:** Confirm that the server has internet access and check the console for error messages.
 - **CoreProtect errors:** Check the console when starting the server. If integration does not activate, ensure CoreProtect is correctly installed.
 - **Low performance when placing lights:** Adjust values in `config.yml` and/or install **FastAsyncWorldEdit** to optimize large-scale block processing.
 - Only newly placed `Lumen Torch` and `Lumen Guard` will have effects of changes in config.yml. Previously placed torches will not be affected unless removed and placed again.
@@ -263,7 +263,7 @@ If you encounter issues or have questions, contact support on **[Discord](https:
 
 ---
 
-## Commands & Permissions
+## 🔐 Commands & Permissions
 
 <details>
 <summary>Commands</summary>
@@ -336,6 +336,8 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
 
 ---
 
-## Support
+## 💬 Support & Contact
 
 If you have any questions or encounter issues, feel free to contact us on [Discord](https://erosmari.com/discord)
+
+![bstats](https://bstats.org/signatures/bukkit/Lumen%20-%20Ultimate%20Lightning.svg)
