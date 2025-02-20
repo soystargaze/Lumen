@@ -1,0 +1,228 @@
+#  _
+# | |   _   _ _ __ ___   ___ _ __
+# | |  | | | | '_ ` _ \ / _ \ '_ \
+# | |__| |_| | | | | | |  __/ | | |
+# |_____\__,_|_| |_| |_|\___|_| |_|
+
+# You can use MiniMessage, (&6, &a...) and (§b, §c...) for styles and colors in translations.
+
+plugin:
+  prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
+  dynamic_color: "<color:#21FFCE>" # 应用于 {0}、{1} 等的颜色
+  separator: "<gradient:#21FFCE:#D3FFAD><bold>--------------------------------------------</gradient>"
+  name: "<gradient:#21FFCE:#D3FFAD>Lumen</gradient>"
+  version: "版本: {0}"
+  author: "作者: {0}"
+  enabled: "Lumen 启用成功。"
+  disabled: "Lumen 禁用成功。"
+  enable_error: "启用插件时出错。请检查控制台以获取更多详情。"
+  language_loaded: "语言加载成功：{0}.yml（{1} 条翻译）"
+
+translations:
+  folder_error: "错误：无法创建翻译文件夹。"
+  file_error: "错误：无法创建翻译文件。"
+
+database:
+  init_error: "初始化数据库时出错。"
+  init_fatal_error: "数据库初始化失败。插件已禁用。"
+  initialized: "数据库初始化成功。"
+  init:
+    already_initialized: "数据库已经初始化。"
+    error: "初始化数据库时发生错误。"
+    failed: "无法初始化数据库。请检查日志以获取详情。"
+    sqlite:
+      error_directory: "无法为 SQLite 创建目录：{0}。"
+  tables:
+    error: "创建数据库表时发生错误。"
+    connection:
+      uninitialized: "连接池未初始化。请先初始化数据库。"
+  close:
+    success: "数据库连接池关闭成功。"
+  operation:
+    register:
+      error: "注册操作时出错。"
+      failed: "无法注册操作。"
+    get_uuid:
+      error: "从ID中获取UUID时出错。"
+      failed: "无法为ID {0} 获取UUID。"
+    get_id:
+      error: "从UUID中获取ID时出错。"
+      failed: "无法为UUID {0} 获取ID。"
+
+commandmanager:
+  init_error: "初始化 CommandManager 时出错：{0}"
+  init_failure: "CommandManager 初始化失败。"
+
+command:
+  no_permission: "您无权使用此命令。"
+  registered: "命令注册成功。"
+  usage: "用法：/lumen <子命令>"
+  only_players: "只有玩家才能使用此命令。"
+  register_error: "注册命令时出错。插件已禁用。"
+  lang:
+    success: "语言已更改为 {0}。已加载 {1} 条翻译。"
+    file_not_found: "在翻译文件夹中未找到语言文件 {0}。"
+    error: "无法将语言更改为 {0}。请检查控制台以获取更多详情。"
+  undo:
+    only_players: "只有玩家才能执行此命令！"
+    no_previous_operations: "没有可撤销的操作。"
+    no_blocks: "在最近 {0} 次操作中未找到可撤销的方块。"
+    success: "成功撤销最近 {1} 次操作中的 {0} 个光照方块。"
+  redo:
+    no_previous_operations: "没有可恢复的操作。"
+    no_blocks_found: "未找到与操作 {0} 相关的方块。"
+    restoration_started: "正在开始恢复 {0} 个方块..."
+    restoration_completed: "操作 {0} 的恢复已成功完成。"
+    restoration_completed_log: "操作 {0} 的恢复已结束。"
+    retrying_failed_blocks: "正在重试失败的方块..."
+    cannot_set_light: "无法在 {0} 处设置光照方块。"
+    light_level_error: "在 {0} 设置光照等级时出错：{1}。"
+  remove:
+    coreprotect_not_available: "CoreProtect 功能不可用或未启用。"
+    coreprotect_disabled_log: "CoreProtect 未启用或不可用，方块移除操作将不会被记录。"
+    area:
+      success: "成功移除范围内 {1} 个方块中的 {0} 个光照方块。"
+      success_log: "玩家 {0} 在范围 {2} 内移除了 {1} 个光照方块。"
+      no_blocks: "在范围 {0} 内未找到可移除的光照方块。"
+      no_blocks_log: "玩家 {0} 试图在范围 {1} 内移除光照方块，但未找到任何方块。"
+  light:
+    usage: "用法：/lumen light <范围> <等级> <是否包括天光>"
+    invalid_level: "光照等级必须在 0 到 15 之间。"
+    success: "已放置光照等级为 {0} 的光照方块。操作ID: {1}。"
+  cancel:
+    success: "您的照明任务已取消。"
+    no_task: "您没有任何正在进行的任务可取消。"
+  clear:
+    request: "您确定要移除所有已点亮的方块吗？请输入 /lumen clear confirm 以确认。您有 30 秒时间。"
+    no_request: "您没有任何正在等待确认的请求。"
+    expired: "您的确认请求已过期。"
+    success: "所有已点亮的方块已被移除。"
+  reload:
+    no_permission: "您无权使用此命令。"
+    success: "配置已重新加载。已加载 {0} 条翻译。"
+    error: "重新加载配置时出错。"
+    success_log: "/reload 命令由 {0} 成功执行。已加载 {1} 条翻译。"
+    error_log: "/reload 命令由 {0} 执行失败。"
+  give:
+    invalid_amount: "数量必须大于 0！"
+    invalid_torch: "无效的火把类型！请使用 'torch' 或 'guard'。"
+    invalid_player: "未找到玩家或玩家离线！"
+    success_one: "您给 {0} 赠送了 {1} 个 '{2}' 火把。"
+    success_all: "您给所有玩家赠送了 {0} 个 '{1}' 火把。"
+    received: "您收到了 {0} 个 '{1}' 火把。"
+
+items:
+  registered: "自定义物品注册成功。"
+  init_error: "初始化自定义物品时出错。"
+  torch:
+    name: "<yellow><bold>Lumen 火把</yellow>"
+    lore: "<white>放置此火把以照亮周围区域。</white>"
+    no-permission: "您没有权限制作 Lumen 火把。"
+  guard:
+    name: "<blue><bold>Lumen 护卫</blue>"
+    lore: "<white>放置此护卫以防御敌对生物侵袭区域。</white>"
+    no-permission: "您没有权限制作 Lumen 护卫。"
+  recipe_registered: "配方注册成功：{0}。"
+
+events:
+  registered: "事件注册成功。"
+  register_error: "注册事件时出错。"
+
+mobs:
+  protected_areas_loaded: "从数据库加载了受保护区域。"
+  area_created: "在 {0} 创建了半径为 {1} 的防御敌对生物的受保护区域。"
+  area_removed: "在 {0} 移除了防御敌对生物的受保护区域。"
+  spawn_cancelled: "在 {0} 取消了敌对生物的生成。"
+  area_created_by_player: "玩家 {1} 在 {0} 创建了防御敌对生物的受保护区域。"
+
+torch:
+  light_placed: "Lumen 火把已在 {0} 放置。操作ID: {1}。"
+  guard_placed: "Lumen 护卫已在 {0} 放置。"
+  light_broken: "Lumen 火把被破坏。移除的光照方块：{0}。"
+  guard_broken: "Lumen 护卫被破坏。在 {0} 的防护区域已移除。"
+  light_level_set: "光照等级设定为：{0}"
+  error:
+    invalid_light_level: "请指定一个有效的光照等级，范围在 0 到 15 之间。"
+
+light:
+  error:
+    batch_failed: "处理光照方块时发生错误：{0}。"
+    no_world: "未找到世界。请确保世界已加载。"
+    no_blocks_found: "在指定区域内未找到有效的方块进行照明。"
+    calculating_positions: "计算光照方块位置时发生错误：{0}。"
+    fawe_failed: "使用 FAWE 放置方块时发生错误。"
+    setting_level: "在 {0} 设置光照等级时出错：{1}。"
+    setting_level_torch: "在 {0} 设置火把光照等级时出错：{1}。"
+    no_lights_to_remove: "在操作 {0} 中未找到可移除的光照。"
+    add_block_failed: "无法将 {0} 处的方块添加到操作 '{1}'。"
+  warning:
+    invalid_block_data: "操作 {0} 在位置 {1} 的方块数据无效。"
+    no_world: "未找到世界 '{0}'。请确保世界已正确加载。"
+  success:
+    completed: "操作 '{1}' 的 {0} 个光照方块放置已成功完成。"
+    fawe: "使用 FAWE 成功放置了 {0} 个光照方块。"
+    placed: "操作 '{0}' 的所有光照已成功放置。"
+    removed: "操作 '{0}' 的所有光照已被移除。"
+  info:
+    blocks_registered: "操作 '{1}' 的 {0} 个光照方块已注册。"
+    batch_processed: "操作 '{1}' 中已处理 {0} 个方块。"
+    calculated_blocks: "已计算 {0} 个用于照明的方块。"
+    fawe_found: "检测到 FastAsyncWorldEdit (FAWE)。使用高级集成。"
+    fawe_not_found: "FAWE 不可用。使用默认的方块放置系统。"
+    completed_operation: "操作 '{0}' 已成功完成。"
+    removed_lights: "与操作 '{0}' 相关的所有光照已被移除。"
+    operation_cancelled: "操作 '{0}' 已被取消。"
+
+mob_registry:
+  protected_area_added: "在 {0} 添加了半径为 {1} 个方块的受保护区域。"
+  protected_area_removed: "在 {0} 移除了受保护区域。"
+  error:
+    adding_area: "在 {0} 添加受保护区域时发生错误。"
+    removing_area: "在 {0} 移除受保护区域时发生错误。"
+    fetching_areas: "获取受保护区域时发生错误。"
+  warning:
+    world_not_found: "未找到世界 '{0}'。请确保世界已正确加载。"
+
+light_registry:
+  error:
+    invalid_light_level: "在 {1} 的光照等级 {0} 无效。必须在 1 到 15 之间。"
+    add_block: "尝试将方块添加到数据库时发生错误。"
+    soft_delete: "尝试将操作 {0} 中的方块标记为已删除时发生错误。"
+    restore: "尝试恢复操作 {0} 中的方块时发生错误。"
+    fetch_soft_deleted: "尝试获取操作 {0} 中已软删除的方块时发生错误。"
+    fetch_blocks_by_operation: "尝试获取操作 {0} 中的方块时发生错误。"
+    remove_blocks: "尝试移除操作 {0} 中的方块时发生错误。"
+    fetch_blocks_in_range: "尝试获取指定范围内的方块时发生错误。"
+    fetch_all_blocks: "尝试获取所有方块时发生错误。"
+    fetch_last_operations: "尝试获取最近 {0} 次操作时发生错误。"
+    clear_all_blocks: "尝试清除所有方块时发生错误。"
+  warning:
+    world_not_found: "未找到世界 '{0}'。请确认世界已正确加载。"
+  info:
+    blocks_soft_deleted: "操作 {0} 中的方块已标记为删除。"
+    blocks_restored: "操作 {0} 中的方块已恢复。"
+    blocks_removed: "操作 {0} 中的方块已被移除。"
+    blocks_added: "操作 {1} 中已添加 {0} 个光照方块。"
+    all_blocks_removed: "所有注册的方块已被移除。"
+    batch_processed: "操作 '{1}' 中已处理 {0} 个方块。"
+
+coreprotect:
+  enabled: "CoreProtect 已启用并可用。"
+  unavailable: "CoreProtect 不可用。"
+  disabled: "CoreProtect 未启用，无法注册该操作。"
+  api_null: "CoreProtect API 不可用，无法注册该操作。"
+  placement:
+    error: "在 {0} 注册方块放置时出错：{1}。"
+    errors: "在 {1} 的 CoreProtect 中注册方块时发生了 {0} 个错误。"
+    success: "{1} 放置的 {0} 个方块已在 CoreProtect 中注册。"
+    none: "对于 {0}，没有注册任何放置的方块到 CoreProtect。"
+  removal:
+    error: "在 {0} 注册方块移除时出错：{1}。"
+    errors: "在 {1} 的 CoreProtect 中移除方块时发生了 {0} 个错误。"
+    success: "{1} 移除的 {0} 个方块已在 CoreProtect 中注册。"
+    none: "对于 {0}，没有注册任何移除的方块到 CoreProtect。"
+  integration:
+    success: "集成成功。"
+    api_disabled: "CoreProtect API 已禁用，无法进行集成。"
+    not_found: "未找到 CoreProtect 插件或其未启用。"
+    no_fawe: "FastAsyncWorldEdit (FAWE) 不可用，CoreProtect 与 FAWE 的集成将无法工作。"
