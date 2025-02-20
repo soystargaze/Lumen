@@ -19,7 +19,7 @@
 - Antorchas de iluminación automática con nivel de luz personalizado (Antorcha Lumen).
 - Prevención de aparición de mobs (Lumen Guard).
 - Integración** con **CoreProtect & FAWE**. (Recomendado)
-- Soporte multilingüe** - Traducciones disponibles: `es_es.yml`, `en_en.yml`, `fr_fr.yml`, `de_de.yml`, `it_it.yml`, `pt_br.yml`. Se pueden añadir idiomas personalizados.
+- Soporte multilingüe** - Traducciones disponibles: `es_es.yml`, `zh_cn.yml`, `en_en.yml`, `fr_fr.yml`, `de_de.yml`, `it_it.yml`, `pt_br.yml`. Se pueden añadir idiomas personalizados.
 
 ---
 
@@ -191,7 +191,7 @@ Si tienes dudas o encuentras algún problema, contáctanos por [Discord](https:/
 - **Auto-lighting** torches with custom light level (Lumen Torch).
 - Mob spawn prevention (Lumen Guard).
 - **Integration** with **CoreProtect & FAWE**. (Recommended)
-- **Multilingual Support** – Available translations: `es_es.yml`, `en_en.yml`, `fr_fr.yml`, `de_de.yml`, `it_it.yml`, `pt_br.yml`. Custom languages can be added.
+- **Multilingual Support** – Available translations: `es_es.yml`, `zh_cn.yml`, `en_en.yml`, `fr_fr.yml`, `de_de.yml`, `it_it.yml`, `pt_br.yml`. Custom languages can be added.
 
 ---
 
