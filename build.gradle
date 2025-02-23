@@ -61,13 +61,11 @@ processResources {
     }
 }
 
-// Tarea para generar el fat JAR usando Shadow.
 tasks.shadowJar {
-    archiveClassifier.set('') // Elimina el sufijo "-all" del JAR generado.
-    minimize() // Minimiza el tamaño del JAR final.
+    archiveClassifier.set('')
+    minimize()
 }
 
-// Tarea ProGuard.
 tasks.register('proguard', ProGuardTask) {
     dependsOn tasks.shadowJar, tasks.jar
 
@@ -82,7 +80,6 @@ tasks.register('proguard', ProGuardTask) {
         libraryjars "${System.getProperty('java.home')}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
     }
 
-    // Usamos compileClasspath en lugar de compileOnly, ya que es resolvable.
     libraryjars files(configurations.compileClasspath.files)
 
     verbose()
@@ -92,7 +89,6 @@ tasks.register('proguard', ProGuardTask) {
     configuration file('proguard.pro')
 }
 
-// Hacer que la tarea build dependa de shadowJar y de proguard, de modo que se genere el JAR final ofuscado.
 tasks.build {
-    dependsOn tasks.shadowJar, tasks.proguard
+    dependsOn tasks.shadowJar
 }
