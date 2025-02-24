@@ -47,16 +47,13 @@ public class MobListener implements Listener {
                     Player player = event.getPlayer();
                     Location placedLocation = placedBlock.getLocation();
 
-                    // Transfiere el ID al bloque si es compatible con TileState
                     if (placedBlock.getState() instanceof TileState tileState) {
                         transferPersistentData(itemContainer, tileState.getPersistentDataContainer());
-                        tileState.update(); // Aplica los cambios al bloque
+                        tileState.update();
                     }
 
-                    // Registra el área protegida
                     mobsHandler.registerAntiMobArea(player, placedLocation);
 
-                    // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "guard");
 
                     LoggingUtils.sendAndLog(player,"torch.guard_placed", placedLocation);
@@ -79,17 +76,13 @@ public class MobListener implements Listener {
                 if ("guard".equals(id)) {
                     Location brokenLocation = brokenBlock.getLocation();
 
-                    // Elimina el área protegida
                     mobsHandler.unregisterAntiMobArea(brokenLocation);
 
-                    // Obtener el ítem original desde LumenItems
                     ItemStack customItem = lumenItems.getLumenItem(id);
 
                     if (customItem != null) {
-                        // Drop del ítem con todas sus propiedades intactas
                         brokenBlock.getWorld().dropItemNaturally(brokenBlock.getLocation(), customItem.clone());
 
-                        // Evitar el drop predeterminado
                         event.setDropItems(false);
 
                         LoggingUtils.sendAndLog(player,"torch.guard_broken", brokenLocation);

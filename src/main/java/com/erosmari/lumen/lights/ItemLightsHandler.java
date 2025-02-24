@@ -50,7 +50,6 @@ public class ItemLightsHandler {
             return;
         }
 
-        // Calcular posiciones de bloques de luz de manera asíncrona
         CompletableFuture.supplyAsync(() -> calculateLightPositions(center, radius), executor)
                 .thenAcceptAsync(blocksToLight -> {
                     if (blocksToLight.isEmpty()) {
@@ -58,11 +57,9 @@ public class ItemLightsHandler {
                         return;
                     }
 
-                    // Mostrar BossBar inicial
                     DisplayUtil.showBossBar(player, 0);
                     DisplayUtil.showActionBar(player, 0);
 
-                    // Procesar los bloques (FAWE o colocación normal)
                     processBlocksAsync(player, blocksToLight, lightLevel, lightsPerTick, tickInterval, operationId);
                 }, runnable -> Bukkit.getScheduler().runTask(plugin, runnable))
                 .exceptionally(ex -> {
@@ -227,15 +224,12 @@ public class ItemLightsHandler {
     }
 
     public void cancelOperation(Player player, int operationId) {
-        // Cancelar la tarea activa (si existe)
         if (TaskManager.hasActiveTask(player.getUniqueId())) {
             TaskManager.cancelTask(player.getUniqueId());
         }
 
-        // Eliminar luces asociadas a la operación
         removeLights(player, operationId);
 
-        // Mensajes de feedback
         DisplayUtil.hideBossBar(player);
         LoggingUtils.sendAndLog(player,"light.success.removed", operationId);
     }

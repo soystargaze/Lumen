@@ -13,11 +13,6 @@ public class DatabaseHandler {
 
     private static HikariDataSource dataSource;
 
-    /**
-     * Inicializa la conexión con SQLite.
-     *
-     * @param plugin El plugin principal.
-     */
     public static void initialize(JavaPlugin plugin) {
         if (dataSource != null) {
             LoggingUtils.logTranslated("database.init.already_initialized");
@@ -33,12 +28,6 @@ public class DatabaseHandler {
         }
     }
 
-    /**
-     * Configura y conecta con SQLite.
-     *
-     * @param plugin El plugin principal.
-     * @throws SQLException Si ocurre un error al configurar SQLite.
-     */
     private static void initializeSQLite(JavaPlugin plugin) throws SQLException {
         File dbFolder = new File(plugin.getDataFolder(), "Data");
         if (!dbFolder.exists() && !dbFolder.mkdirs()) {
@@ -54,12 +43,8 @@ public class DatabaseHandler {
         dataSource = new HikariDataSource(hikariConfig);
     }
 
-    /**
-     * Crea las tablas necesarias para almacenar bloques iluminados.
-     */
     private static void createTables() {
         try (Connection connection = getConnection(); Statement stmt = connection.createStatement()) {
-            // Crear tabla illuminated_blocks
             String createIlluminatedBlocksTable = "CREATE TABLE IF NOT EXISTS illuminated_blocks (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "world TEXT NOT NULL," +
@@ -96,12 +81,6 @@ public class DatabaseHandler {
         }
     }
 
-    /**
-     * Retorna una conexión del pool.
-     *
-     * @return Conexión activa.
-     * @throws SQLException Si ocurre un error al obtener la conexión.
-     */
     public static Connection getConnection() throws SQLException {
         if (dataSource == null) {
             throw new IllegalStateException(TranslationHandler.get("database.connection.uninitialized"));
@@ -109,9 +88,6 @@ public class DatabaseHandler {
         return dataSource.getConnection();
     }
 
-    /**
-     * Cierra el pool de conexiones.
-     */
     public static void close() {
         if (dataSource != null) {
             dataSource.close();

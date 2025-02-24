@@ -11,7 +11,6 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
-@SuppressWarnings("CommentedOutCode")
 public class LightRegistry {
 
     public static void addBlockAsync(Location location, int lightLevel, int operationId) {
@@ -54,42 +53,6 @@ public class LightRegistry {
         }
         throw new IllegalStateException(TranslationHandler.get("database.operation.register.failed"));
     }
-
-//    public static UUID getOperationUUID(int id) {
-//        String sql = "SELECT operation_uuid FROM operations WHERE id = ?";
-//
-//        try (Connection connection = DatabaseHandler.getConnection();
-//             PreparedStatement stmt = connection.prepareStatement(sql)) {
-//            stmt.setInt(1, id);
-//
-//            try (ResultSet resultSet = stmt.executeQuery()) {
-//                if (resultSet.next()) {
-//                    return UUID.fromString(resultSet.getString("operation_uuid"));
-//                }
-//            }
-//        } catch (SQLException e) {
-//            logger.log(Level.SEVERE, TranslationHandler.get("database.operation.get_uuid.error"), e);
-//        }
-//        throw new IllegalStateException(TranslationHandler.getFormatted("database.operation.get_uuid.failed", id));
-//    }
-//
-//    public static int getOperationId(UUID operationUuid) {
-//        String sql = "SELECT id FROM operations WHERE operation_uuid = ?";
-//
-//        try (Connection connection = DatabaseHandler.getConnection();
-//             PreparedStatement stmt = connection.prepareStatement(sql)) {
-//            stmt.setString(1, operationUuid.toString());
-//
-//            try (ResultSet resultSet = stmt.executeQuery()) {
-//                if (resultSet.next()) {
-//                    return resultSet.getInt("id");
-//                }
-//            }
-//        } catch (SQLException e) {
-//            logger.log(Level.SEVERE, TranslationHandler.get("database.operation.get_id.error"), e);
-//        }
-//        throw new IllegalStateException(TranslationHandler.getFormatted("database.operation.get_id.failed", operationUuid));
-//    }
 
     public static void softDeleteBlocksByOperationId(int operationId) {
         String query = "UPDATE illuminated_blocks SET is_deleted = 1 WHERE operation_id = ?;";
@@ -335,7 +298,7 @@ public class LightRegistry {
             try (Connection connection = DatabaseHandler.getConnection();
                  PreparedStatement statement = connection.prepareStatement(query)) {
 
-                connection.setAutoCommit(false); // Inicia la transacción
+                connection.setAutoCommit(false);
 
                 for (Location location : locations) {
                     if (lightLevel <= 0 || lightLevel > 15) {

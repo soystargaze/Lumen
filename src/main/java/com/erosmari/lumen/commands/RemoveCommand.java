@@ -77,7 +77,6 @@ public class RemoveCommand {
             }
         }
 
-        // Registrar la eliminación en CoreProtect solo si hay bloques eliminados
         if (removedCount > 0 && coreProtectHandler != null) {
             coreProtectHandler.logRemoval(player.getName(), blocks, Material.LIGHT);
         }

@@ -81,7 +81,7 @@ public class CoreProtectHandler {
     }
 
     private int processLocations(String playerName, List<Location> locations, Material material, boolean isPlacement) {
-        if (!isEnabled()) return 0; // Evita llamadas si CoreProtect no está disponible
+        if (!isEnabled()) return 0;
 
         int successCount = 0;
 

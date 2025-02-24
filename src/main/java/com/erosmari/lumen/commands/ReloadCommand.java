@@ -41,7 +41,6 @@ public class ReloadCommand {
     private void reloadConfig() {
         plugin.reloadConfig();
 
-        // Forzar la recarga de valores en otras clases que usan la configuración
         ConfigHandler.reload();
         ItemLightsHandler.reloadSettings();
     }

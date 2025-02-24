@@ -70,7 +70,6 @@ public class LightHandler {
                 for (int z = -areaBlocks; z <= areaBlocks; z++) {
                     Location location = new Location(world, center.getBlockX() + x, y, center.getBlockZ() + z);
 
-                    // Verificar si la posición es válida
                     if (isValidLightPosition(location, center, areaBlocks, includeSkylight)) {
                         positions.add(location);
                     }
@@ -92,7 +91,6 @@ public class LightHandler {
             return false;
         }
 
-        // Respetar el rango cúbico definido por "maxDistance"
         if (location.getBlockX() < center.getBlockX() - maxDistance
                 || location.getBlockX() > center.getBlockX() + maxDistance
                 || location.getBlockY() < center.getBlockY() - maxDistance

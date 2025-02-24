@@ -49,41 +49,6 @@ public class MobRegistry {
         }
     }
 
-@SuppressWarnings("unused")
-//    public static Map<Location, Integer> getNearbyProtectedAreas(Location location, int range) {
-//        String query = "SELECT world, x, y, z, radius " +
-//                "FROM protected_areas " +
-//                "WHERE world = ? " +
-//                "AND x BETWEEN ? AND ? " +
-//                "AND z BETWEEN ? AND ?;";
-//
-//        Map<Location, Integer> areas = new HashMap<>();
-//
-//        try (Connection connection = DatabaseHandler.getConnection();
-//             PreparedStatement stmt = connection.prepareStatement(query)) {
-//
-//            int minX = location.getBlockX() - range;
-//            int maxX = location.getBlockX() + range;
-//            int minZ = location.getBlockZ() - range;
-//            int maxZ = location.getBlockZ() + range;
-//
-//            stmt.setString(1, location.getWorld().getName());
-//            stmt.setInt(2, minX);
-//            stmt.setInt(3, maxX);
-//            stmt.setInt(4, minZ);
-//            stmt.setInt(5, maxZ);
-//
-//            try (ResultSet rs = stmt.executeQuery()) {
-//                areas.putAll(processResultSet(rs));
-//            }
-//
-//        } catch (SQLException e) {
-//            logger.log(Level.SEVERE, TranslationHandler.get("mob_registry.error.fetching_areas"), e);
-//        }
-//
-//        return areas;
-//    }
-
     public static Map<Location, Integer> getProtectedAreas() {
         String query = "SELECT world, x, y, z, radius FROM protected_areas;";
         Map<Location, Integer> areas = new HashMap<>();

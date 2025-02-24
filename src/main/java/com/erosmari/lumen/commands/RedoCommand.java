@@ -25,7 +25,7 @@ import java.util.*;
 public class RedoCommand {
 
     private final Lumen plugin;
-    private static final int MAX_RETRY_ATTEMPTS = 3; // Nuevo límite para intentos fallidos
+    private static final int MAX_RETRY_ATTEMPTS = 3;
 
     public RedoCommand(Lumen plugin) {
         this.plugin = plugin;
@@ -64,7 +64,7 @@ public class RedoCommand {
             RedoFAWEHandler.handleRedoWithFAWE(plugin, player, blocksWithLightLevels, operationId);
         } else {
             Queue<Map.Entry<Location, Integer>> blockQueue = new LinkedList<>(blocksWithLightLevels.entrySet());
-            Map<Location, Integer> failedBlocks = new HashMap<>(); // Usamos Map para contar intentos
+            Map<Location, Integer> failedBlocks = new HashMap<>();
             List<Location> processedBlocks = new ArrayList<>();
             int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
             int totalBlocks = blockQueue.size();
@@ -93,7 +93,6 @@ public class RedoCommand {
                 DisplayUtil.showActionBar(player, progress);
 
                 if (blockQueue.isEmpty() && failedBlocks.isEmpty()) {
-                    // **Registrar en CoreProtect al final**
                     CoreProtectHandler coreProtectHandler = getCoreProtectHandler();
                     if (!processedBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
                         coreProtectHandler.logLightPlacement(player.getName(), processedBlocks, Material.LIGHT);
@@ -106,7 +105,6 @@ public class RedoCommand {
                 } else if (blockQueue.isEmpty()) {
                     LoggingUtils.logTranslated("command.redo.retrying_failed_blocks");
 
-                    // Solo reintentar bloques si aún no se han alcanzado los intentos máximos
                     failedBlocks.entrySet().removeIf(entry -> entry.getValue() >= MAX_RETRY_ATTEMPTS);
                     blockQueue.addAll(failedBlocks.entrySet());
                     failedBlocks.clear();

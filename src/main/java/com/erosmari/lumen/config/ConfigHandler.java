@@ -6,23 +6,14 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.Map;
 
 public class ConfigHandler {
 
-    private static FileConfiguration config; // Configuración general (config.yml)
-    private static String language; // Idioma seleccionado (es_es, en_us, etc.)
+    private static FileConfiguration config;
+    private static String language;
 
-    /**
-     * Configura y carga los archivos de configuración.
-     *
-     * @param plugin El plugin principal.
-     */
     public static void setup(JavaPlugin plugin) {
         File configFile = new File(plugin.getDataFolder(), "config.yml");
         if (!configFile.exists()) {
@@ -30,15 +21,9 @@ public class ConfigHandler {
         }
         config = YamlConfiguration.loadConfiguration(configFile);
 
-        // Cargar el idioma configurado
         language = config.getString("language", "en_us");
     }
 
-    /**
-     * Retorna la configuración general (config.yml).
-     *
-     * @return Configuración general.
-     */
     @SuppressWarnings("unused")
     public static FileConfiguration getConfig() {
         return config;
@@ -50,22 +35,10 @@ public class ConfigHandler {
         config = plugin.getConfig();
     }
 
-    /**
-     * Retorna el idioma configurado en config.yml.
-     *
-     * @return Idioma configurado.
-     */
     public static String getLanguage() {
         return language;
     }
 
-    /**
-     * Obtiene un valor entero de la configuración.
-     *
-     * @param path La ruta de la clave en el archivo de configuración.
-     * @param def  El valor predeterminado si no existe la clave.
-     * @return El valor entero obtenido de la configuración.
-     */
     public static int getInt(String path, int def) {
         return config.getInt(path, def);
     }
@@ -102,12 +75,5 @@ public class ConfigHandler {
 
     public static String getActionBarMessage() {
         return Lumen.getInstance().getConfig().getString("display.actionbar.message", "Progreso: {progress}% completado");
-    }
-
-    public static Map<String, Object> loadYaml(File file) throws Exception {
-        Yaml yaml = new Yaml();
-        try (InputStream inputStream = new FileInputStream(file)) {
-            return yaml.load(inputStream);
-        }
     }
 }

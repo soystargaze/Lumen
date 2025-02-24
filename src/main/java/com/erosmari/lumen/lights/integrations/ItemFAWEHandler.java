@@ -28,9 +28,6 @@ public class ItemFAWEHandler {
         coreProtectHandler = handler;
     }
 
-    /**
-     * Verifica si FAWE y WorldEdit están disponibles en el servidor.
-     */
     public static boolean isFAWEAvailable() {
         try {
             Class.forName("com.fastasyncworldedit.core.FaweAPI");
@@ -41,14 +38,6 @@ public class ItemFAWEHandler {
         }
     }
 
-    /**
-     * Coloca bloques de luz usando FAWE.
-     *
-     * @param player      Jugador que ejecuta la acción.
-     * @param locations   Lista de ubicaciones donde se colocarán los bloques.
-     * @param lightLevel  Nivel de luz de los bloques.
-     * @param operationId Identificador de la operación.
-     */
     public static void placeLightsWithFAWE(Player player, List<Location> locations, int lightLevel, int operationId) {
         if (!isFAWEAvailable()) {
             LoggingUtils.sendAndLog(player, "light.error.fawe_not_found");
@@ -84,18 +73,14 @@ public class ItemFAWEHandler {
                 return;
             }
 
-            // Create a BlockState with the custom light level
             BlockState lightState = lightType.getDefaultState();
             Property<Integer> levelProperty = lightType.getProperty("level");
             BlockState customLightState = lightState.with(levelProperty, lightLevel);
 
-            // Establecer bloques usando FAWE
             List<Location> placedLocations = FAWEHandler.processLocations(editSession, locations, customLightState);
 
-            // Registrar bloques en la base de datos
             LightRegistry.addBlocksAsync(placedLocations, lightLevel, operationId);
 
-            // Registrar en CoreProtect solo si la integración está habilitada
             if (coreProtectHandler != null && coreProtectHandler.isEnabled()) {
                 try {
                     coreProtectHandler.logLightPlacement(player.getName(), placedLocations, Material.LIGHT);

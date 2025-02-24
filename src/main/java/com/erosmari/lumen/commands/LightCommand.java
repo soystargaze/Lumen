@@ -52,7 +52,6 @@ public class LightCommand {
             return 0;
         }
 
-        // Verificar si el jugador tiene permiso
         if (!player.hasPermission("lumen.light")) {
             LoggingUtils.sendAndLog(player,"command.no_permission");
             return 0;
@@ -63,7 +62,6 @@ public class LightCommand {
             return 0;
         }
 
-        // Registrar la operación en la base de datos y obtener el ID incremental
         int operationId = LightRegistry.registerOperation(java.util.UUID.randomUUID(), "Generación de luces");
 
 

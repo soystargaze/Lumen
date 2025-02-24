@@ -23,13 +23,6 @@ public class BatchProcessor {
         }, 0, BATCH_DELAY_MS, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * Agrega un bloque al lote.
-     *
-     * @param location   Ubicación del bloque.
-     * @param lightLevel Nivel de luz.
-     * @param operationId ID de la operación.
-     */
     public static void addBlockToBatch(Location location, int lightLevel, int operationId) {
         boolean success = batchQueue.offer(new BatchEntry(location, lightLevel, operationId));
         if (!success) {
@@ -38,9 +31,6 @@ public class BatchProcessor {
         }
     }
 
-    /**
-     * Procesa los bloques acumulados en la cola.
-     */
     private static void processBatch() {
         List<BatchEntry> batch = new ArrayList<>();
         batchQueue.drainTo(batch, BATCH_SIZE); // Extrae hasta BATCH_SIZE elementos de la cola
@@ -59,9 +49,6 @@ public class BatchProcessor {
         }
     }
 
-    /**
-     * Clase interna para representar entradas de lotes.
-     */
     private record BatchEntry(Location location, int lightLevel, int operationId) {
     }
 }

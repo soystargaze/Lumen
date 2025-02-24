@@ -7,10 +7,8 @@ import org.bukkit.entity.Player;
 public class LoggingUtils {
 
     public static void logTranslated(String key, Object... args) {
-        // Obtener el mensaje traducido como componente
         Component translatedMessage = TranslationHandler.getLogMessage(key, args);
 
-        // Mostrar gradientes en la consola con Adventure
         Bukkit.getConsoleSender().sendMessage(translatedMessage);
     }
 

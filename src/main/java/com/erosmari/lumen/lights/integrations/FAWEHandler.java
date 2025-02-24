@@ -19,9 +19,6 @@ import java.util.List;
 
 public class FAWEHandler {
 
-    /**
-     * Verifica si FAWE y WorldEdit están disponibles en el servidor.
-     */
     public static boolean isFAWEAvailable() {
         try {
             Class.forName("com.fastasyncworldedit.core.FaweAPI");
@@ -32,11 +29,6 @@ public class FAWEHandler {
         }
     }
 
-    /**
-     * Places light blocks using FAWE.
-     *
-     * @param locations List of locations where blocks should be placed.
-     */
     public static void placeLightBlocks(List<Location> locations, int lightLevel, Player player, CoreProtectHandler coreProtectHandler) {
         if (isFAWEAvailable()) {
             LoggingUtils.logTranslated("light.error.fawe_not_found");
@@ -68,15 +60,12 @@ public class FAWEHandler {
                 return;
             }
 
-            // Create a BlockState with the custom light level
             BlockState lightState = lightType.getDefaultState();
             Property<Integer> levelProperty = lightType.getProperty("level");
             BlockState customLightState = lightState.with(levelProperty, lightLevel);
 
-            // Use the new method to process the locations
             List<Location> placedLocations = processLocations(editSession, locations, customLightState);
 
-            // Registrar todas las ubicaciones colocadas en CoreProtect
             if (coreProtectHandler != null) {
                 try {
                     coreProtectHandler.logLightPlacement(player.getName(), placedLocations, Material.LIGHT);
@@ -88,7 +77,6 @@ public class FAWEHandler {
                 LoggingUtils.logTranslated("coreprotect.integration.not_found");
             }
 
-            // Finalizar operaciones
             editSession.flushQueue();
 
         } catch (Exception e) {
@@ -96,14 +84,6 @@ public class FAWEHandler {
         }
     }
 
-    /**
-     * Procesa una lista de ubicaciones y coloca bloques usando FAWE.
-     *
-     * @param editSession    La sesión de edición de WorldEdit.
-     * @param locations      Lista de ubicaciones donde se colocarán los bloques.
-     * @param customLightState Estado personalizado del bloque a colocar.
-     * @return Lista de ubicaciones donde se colocaron bloques.
-     */
     public static List<Location> processLocations(EditSession editSession, List<Location> locations, BlockState customLightState) {
         List<Location> placedLocations = new ArrayList<>();
         for (Location loc : locations) {

@@ -59,16 +59,13 @@ public class TorchListener implements Listener {
                     Player player = event.getPlayer();
                     Location placedLocation = placedBlock.getLocation();
 
-                    // Generar un ID incremental para la operación
                     int incrementalId = LightRegistry.registerOperation(UUID.randomUUID(), "Lumen Torch placed at " + placedLocation);
 
-                    // Obtener el nivel de luz desde la antorcha o usar el de configuración
                     NamespacedKey lightLevelKey = new NamespacedKey(plugin, "custom_light_level");
                     int lightLevel = itemContainer.has(lightLevelKey, PersistentDataType.INTEGER)
                             ? Objects.requireNonNullElse(itemContainer.get(lightLevelKey, PersistentDataType.INTEGER), 15)
                             : ConfigHandler.getInt("settings.torch_light_level", 15);
 
-                    // Transfiere el ID al bloque colocado si es compatible con TileState
                     if (placedBlock.getState() instanceof TileState tileState) {
                         PersistentDataContainer container = tileState.getPersistentDataContainer();
                         transferPersistentData(itemContainer, container);
@@ -76,10 +73,8 @@ public class TorchListener implements Listener {
                         tileState.update();
                     }
 
-                    // Lógica para el Lumen Torch (luz)
                     lightsHandler.placeLights(player, placedLocation, incrementalId, lightLevel);
 
-                    // Efecto visual y sonoro
                     ItemEffectUtil.playEffect(placedLocation, "torch");
 
                     LoggingUtils.sendAndLog(player,"torch.light_placed", placedLocation, incrementalId);
@@ -101,24 +96,19 @@ public class TorchListener implements Listener {
 
                 if ("torch".equals(id)) {
                     try {
-                        // Recuperar el ID incremental del bloque
                         NamespacedKey operationKey = new NamespacedKey(plugin, "operation_id");
                         if (blockContainer.has(operationKey, PersistentDataType.INTEGER)) {
                             Integer incrementalId = blockContainer.get(operationKey, PersistentDataType.INTEGER);
                             if (incrementalId != null) {
 
-                            // Cancelar operaciones asociadas con este ID
                             lightsHandler.cancelOperation(player, incrementalId);
                             lightsHandler.removeLights(player, incrementalId);
 
-                            // Obtener el ítem original desde la instancia de lumenItems
                             ItemStack customItem = lumenItems.getLumenItem(id);
 
                                 if (customItem != null) {
-                                    // Soltar el ítem clonado
                                     brokenBlock.getWorld().dropItemNaturally(brokenBlock.getLocation(), customItem.clone());
 
-                                    // Evitar el drop predeterminado
                                     event.setDropItems(false);
 
                                     LoggingUtils.sendAndLog(player,"torch.light_broken", incrementalId);
@@ -174,14 +164,12 @@ public class TorchListener implements Listener {
                                 return;
                             }
 
-                            // Verificar si el jugador aún tiene la antorcha en la mano
                             ItemStack currentItem = player.getInventory().getItemInMainHand();
                             if (currentItem.getType() != Material.PLAYER_HEAD || currentItem.getItemMeta() == null) {
                                 player.sendMessage("§cNo tienes la antorcha en la mano.");
                                 return;
                             }
 
-                            // Guardar el valor en la antorcha
                             ItemMeta meta = currentItem.getItemMeta();
                             PersistentDataContainer metaContainer = meta.getPersistentDataContainer();
                             metaContainer.set(new NamespacedKey(plugin, "custom_light_level"), PersistentDataType.INTEGER, lightLevel);
@@ -192,7 +180,6 @@ public class TorchListener implements Listener {
                             LoggingUtils.sendAndLog(player, "torch.error.invalid_light_level");
                         }
 
-                        // Desinscribir el listener correctamente
                         AsyncChatEvent.getHandlerList().unregister(this);
                     }
                 }, plugin);

@@ -78,7 +78,6 @@ public class UndoCommand {
                     }
                 }
 
-                // Solo marcar la operación como eliminada si se eliminaron bloques
                 if (!removedBlocks.isEmpty()) {
                     LightRegistry.softDeleteBlocksByOperationId(operationId);
                     allRemovedBlocks.addAll(removedBlocks);
@@ -86,7 +85,6 @@ public class UndoCommand {
             }
         }
 
-        // Registrar en CoreProtect solo si hay bloques eliminados
         if (!allRemovedBlocks.isEmpty() && coreProtectHandler != null && coreProtectHandler.isEnabled()) {
             coreProtectHandler.logRemoval(player.getName(), allRemovedBlocks, Material.LIGHT);
         }
