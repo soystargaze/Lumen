@@ -1,4 +1,4 @@
-import proguard.gradle.ProGuardTask
+//import proguard.gradle.ProGuardTask
 
 buildscript {
     repositories {
@@ -67,28 +67,28 @@ tasks.shadowJar {
     relocate 'org.bstats', 'com.erosmari.vitamin.shaded.bstats'
 }
 
-tasks.register('proguard', ProGuardTask) {
-    dependsOn tasks.shadowJar, tasks.jar
+// tasks.register('proguard', ProGuardTask) {
+//     dependsOn tasks.shadowJar, tasks.jar
 
-    injars(tasks.named('shadowJar', Jar).flatMap { it.archiveFile })
-    inputs.file(tasks.named('jar', Jar).flatMap { it.archiveFile })
+//     injars(tasks.named('shadowJar', Jar).flatMap { it.archiveFile })
+//     inputs.file(tasks.named('jar', Jar).flatMap { it.archiveFile })
 
-    if (System.getProperty('java.version').startsWith('1.')) {
-        libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-    } else {
-        libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.getProperty('java.home')}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-        libraryjars "${System.getProperty('java.home')}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-    }
+//     if (System.getProperty('java.version').startsWith('1.')) {
+//         libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
+//     } else {
+//         libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+//         libraryjars "${System.getProperty('java.home')}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+//         libraryjars "${System.getProperty('java.home')}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
+//     }
 
-    libraryjars files(configurations.compileClasspath.files)
+//     libraryjars files(configurations.compileClasspath.files)
 
-    verbose()
+//     verbose()
 
-    outjars layout.buildDirectory.file("libs/${project.group}-${project.name}-${project.version}-minified.jar")
+//     outjars layout.buildDirectory.file("libs/${project.group}-${project.name}-${project.version}-minified.jar")
 
-    configuration file('proguard.pro')
-}
+//     configuration file('proguard.pro')
+// }
 
 tasks.build {
     dependsOn tasks.shadowJar
