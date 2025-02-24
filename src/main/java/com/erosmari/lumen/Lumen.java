@@ -130,7 +130,10 @@ public class Lumen extends JavaPlugin implements Listener {
         if (!translationFile.exists()) {
             try {
                 saveResource("Translations/" + fileName, false);
-            } catch (Exception ignored) {
+            } catch (Exception e) {
+                final String SAVE_ERROR_KEY = "translations.language_not_found";
+                TranslationHandler.registerTemporaryTranslation(SAVE_ERROR_KEY, "Translations cannot be saved: {0} {1}");
+                LoggingUtils.logTranslated(SAVE_ERROR_KEY, fileName, e.getMessage());
             }
         }
     }

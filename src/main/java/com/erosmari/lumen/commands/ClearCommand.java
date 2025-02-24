@@ -19,16 +19,12 @@ import java.util.UUID;
 public class ClearCommand {
 
     private static final Map<UUID, Long> confirmationRequests = new HashMap<>();
-    private static final long CONFIRMATION_TIMEOUT = 30_000; // 30 segundos
+    private static final long CONFIRMATION_TIMEOUT = 30_000;
 
     public ClearCommand() {
+        // Empty constructor
     }
 
-    /**
-     * Registra el subcomando `/lumen clear` y su subcomando `/lumen clear confirm`.
-     *
-     * @return Nodo literal del comando para registrarlo en el comando principal.
-     */
     public LiteralArgumentBuilder<CommandSourceStack> register() {
         return Commands.literal("clear")
                 .requires(source -> source.getSender().hasPermission("lumen.clear"))
@@ -39,12 +35,6 @@ public class ClearCommand {
                 );
     }
 
-    /**
-     * Maneja la solicitud de confirmación para `/lumen clear`.
-     *
-     * @param source Fuente del comando.
-     * @return Código de éxito.
-     */
     private int handleClearRequest(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
@@ -60,12 +50,6 @@ public class ClearCommand {
         return 1;
     }
 
-    /**
-     * Maneja la confirmación para `/lumen clear confirm`.
-     *
-     * @param source Fuente del comando.
-     * @return Código de éxito.
-     */
     private int handleClearConfirm(CommandSourceStack source) {
         if (!(source.getSender() instanceof Player player)) {
             source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
@@ -89,7 +73,6 @@ public class ClearCommand {
 
         List<Location> blocks = LightRegistry.getAllBlocks();
 
-        // Usar RemoveLightUtils para eliminar bloques y registrar en CoreProtect
         int removedCount = blocks.stream()
                 .mapToInt(location -> RemoveLightUtils.removeLightBlock(location) ? 1 : 0)
                 .sum();
