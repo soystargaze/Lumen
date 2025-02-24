@@ -64,6 +64,7 @@ processResources {
 tasks.shadowJar {
     archiveClassifier.set('')
     minimize()
+    relocate 'org.bstats', 'com.erosmari.vitamin.shaded.bstats'
 }
 
 tasks.register('proguard', ProGuardTask) {
