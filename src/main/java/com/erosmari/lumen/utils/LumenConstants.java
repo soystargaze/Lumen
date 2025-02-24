@@ -5,7 +5,7 @@ import org.bukkit.plugin.Plugin;
 
 public final class LumenConstants {
 
-    private static NamespacedKey LUMEN_ID_KEY;
+    private static NamespacedKey lumenIdKey;
 
     // Constructor privado para evitar instanciación
     private LumenConstants() {}
@@ -16,8 +16,8 @@ public final class LumenConstants {
      * @param plugin La instancia del plugin.
      */
     public static void init(Plugin plugin) {
-        if (LUMEN_ID_KEY == null) {
-            LUMEN_ID_KEY = new NamespacedKey(plugin, "lumen_id");
+        if (lumenIdKey == null) {
+            lumenIdKey = new NamespacedKey(plugin, "lumen_id");
         }
     }
 
@@ -28,9 +28,9 @@ public final class LumenConstants {
      * @throws IllegalStateException si no se ha inicializado previamente mediante init(plugin).
      */
     public static NamespacedKey getLumenIdKey() {
-        if (LUMEN_ID_KEY == null) {
+        if (lumenIdKey == null) {
             throw new IllegalStateException("LumenConstants no ha sido inicializado. Llama a init(plugin) primero.");
         }
-        return LUMEN_ID_KEY;
+        return lumenIdKey;
     }
 }

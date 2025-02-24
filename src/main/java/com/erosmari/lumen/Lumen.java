@@ -56,7 +56,7 @@ public class Lumen extends JavaPlugin implements Listener {
         loadConfigurations();
         initializeMetrics();
 
-        ConsoleUtils.displayAsciiArt(this);
+        ConsoleUtils.displayAsciiArt();
         LoggingUtils.logTranslated("plugin.separator");
         LoggingUtils.logTranslated("plugin.name");
         LoggingUtils.logTranslated("plugin.version", getPluginMeta().getVersion());
@@ -69,7 +69,7 @@ public class Lumen extends JavaPlugin implements Listener {
             registerEvents();
             registerServerLoadListener();
 
-            ConsoleUtils.displaySuccessMessage(this);
+            ConsoleUtils.displaySuccessMessage();
         } catch (Exception e) {
             LoggingUtils.logTranslated("plugin.enable_error", e);
             getServer().getPluginManager().disablePlugin(this);

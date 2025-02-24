@@ -1,36 +1,25 @@
 package com.erosmari.lumen.utils;
 
-import org.bukkit.plugin.java.JavaPlugin;
-
 import static com.erosmari.lumen.utils.TranslationHandler.loadedKeys;
 
-@SuppressWarnings("ALL")
 public class ConsoleUtils {
 
-    /**
-     * Muestra el arte ASCII personalizado en la consola.
-     *
-     * @param plugin El plugin que ejecuta el mensaje.
-     */
-    public static void displayAsciiArt(JavaPlugin plugin) {
+    public static void displayAsciiArt() {
 
         final String LOCAL_TEST_MESSAGE_KEY = "plugin.logo";
-        TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, "\n" +
-                "  _                                   \n" +
-                " | |                                  \n" +
-                " | |    _   _ _ __ ___   ___ _ __     \n" +
-                " | |   | | | | '_ ` _ \\ / _ \\ '_ \\ \n" +
-                " | |___| |_| | | | | | |  __/ | | |   \n" +
-                " |______\\__,_|_| |_| |_|\\___|_| |_| \n");
+        TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, """
+                
+                  _                                  \s
+                 | |                                 \s
+                 | |    _   _ _ __ ___   ___ _ __    \s
+                 | |   | | | | '_ ` _ \\ / _ \\ '_ \\\s
+                 | |___| |_| | | | | | |  __/ | | |  \s
+                 |______\\__,_|_| |_| |_|\\___|_| |_|\s
+                """);
         LoggingUtils.logTranslated(LOCAL_TEST_MESSAGE_KEY);
     }
 
-    /**
-     * Muestra el mensaje de éxito en la consola.
-     *
-     * @param plugin El plugin que ejecuta el mensaje.
-     * */
-    public static void displaySuccessMessage(JavaPlugin plugin) {
+    public static void displaySuccessMessage() {
 
         LoggingUtils.logTranslated("plugin.separator");
         LoggingUtils.logTranslated("plugin.enabled");

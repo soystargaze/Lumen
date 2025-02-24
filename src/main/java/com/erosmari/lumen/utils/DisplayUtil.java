@@ -12,18 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static java.lang.Math.clamp;
+
 public class DisplayUtil {
 
     private static final Map<UUID, BossBar> bossBars = new HashMap<>();
 
-    /**
-     * Muestra un BossBar al jugador con progreso dinámico de 0 a 100.
-     *
-     * @param player   El jugador que verá el BossBar.
-     * @param progress Progreso entre 0.0 y 1.0 (se convierte a porcentaje).
-     */
     public static void showBossBar(Player player, double progress) {
-        if (!ConfigHandler.isBossBarEnabled()) return; // Desactivado en config.yml
+        if (!ConfigHandler.isBossBarEnabled()) return;
 
         String message = ConfigHandler.getBossBarMessage().replace("{progress}", String.valueOf((int) (progress * 100)));
         BarColor color = ConfigHandler.getBossBarColor();
@@ -36,15 +32,12 @@ public class DisplayUtil {
             bossBar.addPlayer(player);
         }
 
+
+
         bossBar.setTitle(message);
-        bossBar.setProgress(Math.max(0.0, Math.min(progress, 1.0))); // Clampea el progreso
+        bossBar.setProgress(clamp(progress, 0.0, 1.0));
     }
 
-    /**
-     * Oculta el BossBar de un jugador.
-     *
-     * @param player El jugador al que se le ocultará el BossBar.
-     */
     public static void hideBossBar(Player player) {
         BossBar bossBar = bossBars.remove(player.getUniqueId());
         if (bossBar != null) {
@@ -52,24 +45,14 @@ public class DisplayUtil {
         }
     }
 
-    /**
-     * Muestra un mensaje de ActionBar al jugador con progreso dinámico de 0 a 100.
-     *
-     * @param player   El jugador que verá el ActionBar.
-     * @param progress Progreso entre 0.0 y 1.0 (se convierte a porcentaje).
-     */
     public static void showActionBar(Player player, double progress) {
-        if (!ConfigHandler.isActionBarEnabled()) return; // Desactivado en config.yml
+        if (!ConfigHandler.isActionBarEnabled()) return;
 
         String message = ConfigHandler.getActionBarMessage().replace("{progress}", String.valueOf((int) (progress * 100)));
 
-        // Usando Adventure para enviar el mensaje
         player.sendActionBar(Component.text(message));
     }
 
-    /**
-     * Limpia todos los BossBars activos.
-     */
     @SuppressWarnings("unused")
     public static void clearAllBossBars() {
         for (BossBar bossBar : bossBars.values()) {

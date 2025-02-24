@@ -27,15 +27,13 @@ public class LumenItems {
 
     private final Plugin plugin;
 
-    // Mapa para almacenar los ítems personalizados
-    private final Map<String, ItemStack> lumenItems = new HashMap<>();
+    private final Map<String, ItemStack> lumenTorchItems = new HashMap<>();
 
     public LumenItems(Plugin plugin) {
         this.plugin = plugin;
     }
 
     public void registerItems() {
-        // Crear los objetos con texturas
         ItemStack lumenTorch = createLumenTorch(
                 TranslationHandler.get("items.torch.name"),
                 TranslationHandler.get("items.torch.lore"),
@@ -49,27 +47,18 @@ public class LumenItems {
                 "guard"
         );
 
-        // Agregar los ítems al mapa
-        lumenItems.put("torch", lumenTorch);
-        lumenItems.put("guard", lumenGuard);
+        lumenTorchItems.put("torch", lumenTorch);
+        lumenTorchItems.put("guard", lumenGuard);
 
-        // Registrar las recetas de los objetos
         registerRecipe("lumen_torch", lumenTorch, Material.GOLD_INGOT);
         registerRecipe("lumen_guard", lumenGuard, Material.DIAMOND);
     }
 
-    /**
-     * Obtiene un ítem personalizado por su clave.
-     *
-     * @param key La clave del ítem (por ejemplo, "light" o "anti_mob").
-     * @return El ItemStack correspondiente, o null si no existe.
-     */
     public ItemStack getLumenItem(String key) {
-        return lumenItems.getOrDefault(key, null);
+        return lumenTorchItems.getOrDefault(key, null);
     }
 
     private ItemStack createLumenTorch(String name, String lore, String texture, String identifier) {
-        // Crear la cabeza personalizada con la textura
         ItemStack head = getSkull(texture);
         ItemMeta meta = head.getItemMeta();
 
@@ -82,7 +71,6 @@ public class LumenItems {
             );
             meta.lore(loreComponents);
 
-            // Agregar el identificador al PersistentDataContainer
             PersistentDataContainer container = meta.getPersistentDataContainer();
             container.set(LumenConstants.getLumenIdKey(), PersistentDataType.STRING, identifier);
 
