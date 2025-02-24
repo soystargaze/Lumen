@@ -33,7 +33,7 @@ public class TranslationHandler {
 
         FileConfiguration langConfig = YamlConfiguration.loadConfiguration(langFile);
         loadedKeys = 0;
-        translations.clear(); // Limpiar traducciones previas antes de cargar nuevas
+        translations.clear();
 
         for (String key : langConfig.getKeys(true)) {
             if (langConfig.isString(key)) {
