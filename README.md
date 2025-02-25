@@ -7,7 +7,7 @@
 
 ![Discord](https://img.shields.io/discord/1079917552588816484?label=Discord&logo=discord&logoColor=white&color=31FFA3&style=for-the-badge) ![](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F%20by%20stargaze-31FFA3?style=for-the-badge) [![CodeFactor](https://img.shields.io/codefactor/grade/github/soystargaze/lumen?style=for-the-badge&logo=codefactor&logoColor=white&color=31FFA3)](https://www.codefactor.io/repository/github/soystargaze/lumen)
 
-![Banner Logo](https://cdn.modrinth.com/data/5WB5vvtt/images/ed1c78a69e6aba737ccc687acc242140fcce6299.png)
+![Banner Logo](https://cdn.modrinth.com/data/izTZx6gw/images/ed1c78a69e6aba737ccc687acc242140fcce6299.png)
 
 ---
 
@@ -140,13 +140,13 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
 <details>
 <summary>Lumen Torch</summary>
 
-![Lumen Torch Recipe](https://cdn.modrinth.com/data/5WB5vvtt/images/3cf389c35844ac90b2f07e8f7194913937712305.png)
+![Lumen Torch Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/3cf389c35844ac90b2f07e8f7194913937712305.png)
 
 </details>
 <details>
 <summary>Lumen Guard</summary>
 
-![Lumen Guard Recipe](https://cdn.modrinth.com/data/5WB5vvtt/images/64419e0fbf155c4c1aad408f77c3083b2764da6a.png)
+![Lumen Guard Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/64419e0fbf155c4c1aad408f77c3083b2764da6a.png)
 
 </details>
 
