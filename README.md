@@ -156,9 +156,16 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
 
 ### For Administrators
 - Advanced light management using commands.
-- Safe light removal with `/lumen remove` and `/lumen clear confirm`.
+- Safe light removal with `/lumen remove`.
+- Undo and redo light placements with `/lumen undo` and `/lumen redo`.
+- Clear all lights with `/lumen clear` (Dangerous).
 - Item distribution using `/lumen give`.
 - Full customization through `config.yml` and translation files in `Translations/`.
+- Integration with CoreProtect and FAWE for enhanced performance and control.
+- Change the plugin language with `/lumen lang`.
+- Reload configuration and translations with `/lumen reload`.
+- Adjust performance settings in `config.yml`: Control the number of lights placed per tick and the interval between torch ticks.
+- Control the permissions of each command and item.
 
 ---
 
