@@ -5,7 +5,7 @@
 - **Lumen Torch** – Automatically lights up the surroundings with custom light level.
 - **Lumen Guard** – Prevents hostile mobs from spawning.
 
-![Discord](https://img.shields.io/discord/1079917552588816484?label=Discord&logo=discord&logoColor=white&color=31FFA3&style=for-the-badge) ![](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F%20by%20stargaze-31FFA3?style=for-the-badge) [![CodeFactor](https://img.shields.io/codefactor/grade/github/soystargaze/lumen?style=for-the-badge&logo=codefactor&logoColor=white&color=31FFA3)](https://www.codefactor.io/repository/github/soystargaze/lumen)
+[![Discord](https://img.shields.io/discord/1079917552588816484?label=Discord&logo=discord&logoColor=white&color=31FFA3&style=for-the-badge)](https://erosmari.com/discord) ![](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F%20by%20stargaze-31FFA3?style=for-the-badge) [![CodeFactor](https://img.shields.io/codefactor/grade/github/soystargaze/lumen?style=for-the-badge&logo=codefactor&logoColor=white&color=31FFA3)](https://www.codefactor.io/repository/github/soystargaze/lumen)
 
 ![Banner Logo](https://cdn.modrinth.com/data/izTZx6gw/images/ed1c78a69e6aba737ccc687acc242140fcce6299.png)
 
