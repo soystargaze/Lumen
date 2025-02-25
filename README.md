@@ -140,13 +140,13 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
 <details>
 <summary>Lumen Torch</summary>
 
-![Lumen Torch Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/3cf389c35844ac90b2f07e8f7194913937712305.png)
+![Lumen Torch Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/3b24b9cfe98580f238256d836aa834aa0eb637de.png)
 
 </details>
 <details>
 <summary>Lumen Guard</summary>
 
-![Lumen Guard Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/64419e0fbf155c4c1aad408f77c3083b2764da6a.png)
+![Lumen Guard Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/fcc06b4f5b13ef6a5db471241a713acd3b700195.png)
 
 </details>
 
