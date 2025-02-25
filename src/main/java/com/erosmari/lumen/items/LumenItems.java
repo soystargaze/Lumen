@@ -50,8 +50,8 @@ public class LumenItems {
         lumenTorchItems.put("torch", lumenTorch);
         lumenTorchItems.put("guard", lumenGuard);
 
-        registerRecipe("lumen_torch", lumenTorch, Material.GOLD_INGOT);
-        registerRecipe("lumen_guard", lumenGuard, Material.DIAMOND);
+        registerRecipe("lumen_torch", lumenTorch, Material.GOLD_INGOT, Material.LANTERN);
+        registerRecipe("lumen_guard", lumenGuard, Material.DIAMOND, Material.SOUL_LANTERN);
     }
 
     public ItemStack getLumenItem(String key) {
@@ -92,13 +92,13 @@ public class LumenItems {
         return head;
     }
 
-    private void registerRecipe(String key, ItemStack result, Material ingredientG) {
+    private void registerRecipe(String key, ItemStack result, Material ingredientG, Material ingredientS) {
         NamespacedKey recipeKey = new NamespacedKey(plugin, key);
         ShapedRecipe recipe = new ShapedRecipe(recipeKey, result);
 
         recipe.shape("GGG", "FSF", "GGG");
         recipe.setIngredient('G', ingredientG);
-        recipe.setIngredient('S', Material.SEA_LANTERN);
+        recipe.setIngredient('S', ingredientS);
         recipe.setIngredient('F', Material.GLASS);
 
         Bukkit.addRecipe(recipe);
