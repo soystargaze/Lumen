@@ -17,7 +17,7 @@
 - **Auto-lighting** torches with custom light level (Lumen Torch).
 - Mob spawn prevention (Lumen Guard).
 - **Integration** with **CoreProtect & FAWE**. (Recommended)
-- **Multilingual Support** – Available translations: `es_es.yml`, `zh_cn.yml`, `en_en.yml`, `fr_fr.yml`, `de_de.yml`, `it_it.yml`, `pt_br.yml`. Custom languages can be added.
+- **Multilingual Support** – Available translations: **Spanish**, **Chinese**, **English**, **French**, **German**, **Italian** and **Brazilian Portuguese**. Custom languages can be added.
 
 ---
 
@@ -32,6 +32,89 @@ Lumen can leverage other tools to enhance performance and functionality:
   ![LightCommandWithFAWE](https://imgur.com/tqJ3gLA.gif)
 
 These integrations are optional but recommended for better control and efficiency.
+
+---
+
+## 🔐 Commands & Permissions
+
+<details>
+<summary>Commands</summary>
+
+Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `/l`.
+
+- `/lumen light <range> <light_level> <include_skylight>` – Places lights dynamically.
+- `/lumen undo` – Undoes previous light placements.
+- `/lumen redo` – Redoes removed lights.
+- `/lumen remove area <range>` – Removes lights in a specified area.
+- `/lumen clear confirm` – Clears all registered lights.
+- `/lumen give <player/all> <torch_type> <quantity>` – Gives torches to players.
+- `/lumen reload` – Reloads configuration and translations.
+- `/lumen lang <language>` – Changes the plugin language.
+
+</details>
+
+<details>
+<summary>Permissions</summary>
+
+- **OP Permissions:**
+  - `lumen.light` – Permission to use `/lumen light`.
+  - `lumen.cancel` – Permission to cancel active tasks.
+  - `lumen.undo` – Permission to undo placements.
+  - `lumen.redo` – Permission to redo removed lights.
+  - `lumen.remove` – Permission to remove lights.
+  - `lumen.clear` – Permission to clear all lights.
+  - `lumen.give` – Permission to give `Lumen Torch` and `Lumen Guard`.
+  - `lumen.reload` – Permission to reload configuration and translations.
+  - `lumen.lang` – Permission to change the language.
+- **PLAYER Permissions:**
+  - `lumen.craft.*` – Permission to craft all Lumen items.
+    - `lumen.craft.torch` – Permission to craft the `Lumen Torch`.
+    - `lumen.craft.guard` – Permission to craft the `Lumen Guard`.
+
+</details>
+
+---
+
+## Usage
+
+### For Players
+- The `Lumen Torch` automatically lights up nearby areas.
+    - Players can right-click the air while holding a Lumen Torch and input a light level between 0 and 15.
+    - The selected light level will be stored in the torch and applied when placed.
+- The `Lumen Guard` prevents mob spawning within its range.
+- Torches can be removed without being lost, and their effects disappear when removed.
+- To craft them, you need `lumen.craft.torch` and `lumen.craft.guard` permissions.
+
+**Crafting Recipes**
+<details>
+<summary>Lumen Torch</summary>
+
+![Lumen Torch Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/3b24b9cfe98580f238256d836aa834aa0eb637de.png)
+
+</details>
+<details>
+<summary>Lumen Guard</summary>
+
+![Lumen Guard Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/fcc06b4f5b13ef6a5db471241a713acd3b700195.png)
+
+</details>
+
+![Lumen Torch](https://imgur.com/3OQtjzg.gif)
+
+---
+
+### For Administrators
+- Advanced light management using commands.
+- Safe light removal with `/lumen remove`.
+- Undo and redo light placements with `/lumen undo` and `/lumen redo`.
+- Clear all lights with `/lumen clear` (Dangerous).
+- Item distribution using `/lumen give`.
+- Full customization through `config.yml` and translation files in `Translations/`.
+- Integration with CoreProtect and FAWE for enhanced performance and control.
+- Change the plugin language with `/lumen lang`.
+- Reload configuration and translations with `/lumen reload`.
+- Adjust performance settings in `config.yml`: Control the number of lights placed per tick and the interval between torch ticks.
+- Control the permissions of each command and item.
 
 ---
 
@@ -80,94 +163,7 @@ Download the latest version of **Lumen** from [Modrinth](https://modrinth.com/pl
 - **Low performance when placing lights:** Adjust values in `config.yml` and/or install **FastAsyncWorldEdit** to optimize large-scale block processing.
 - Only newly placed `Lumen Torch` and `Lumen Guard` will have effects of changes in config.yml. Previously placed torches will not be affected unless removed and placed again.
 
----
-
-## **Support & Contact**
-If you encounter issues or have questions, contact support on **[Discord](https://erosmari.com/discord)** or refer to the official plugin documentation.
-
 </details>
-
----
-
-## 🔐 Commands & Permissions
-
-<details>
-<summary>Commands</summary>
-
-Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `/l`.
-
-- `/lumen light <range> <light_level> <include_skylight>` – Places lights dynamically.
-- `/lumen undo` – Undoes previous light placements.
-- `/lumen redo` – Redoes removed lights.
-- `/lumen remove area <range>` – Removes lights in a specified area.
-- `/lumen clear confirm` – Clears all registered lights.
-- `/lumen give <player/all> <torch_type> <quantity>` – Gives torches to players.
-- `/lumen reload` – Reloads configuration and translations.
-- `/lumen lang <language>` – Changes the plugin language.
-
-</details>
-
-<details>
-<summary>Permissions</summary>
-
-- `lumen.light` – Permission to use `/lumen light`.
-- `lumen.cancel` – Permission to cancel active tasks.
-- `lumen.undo` – Permission to undo placements.
-- `lumen.redo` – Permission to redo removed lights.
-- `lumen.remove` – Permission to remove lights.
-- `lumen.clear` – Permission to clear all lights.
-- `lumen.give` – Permission to give `Lumen Torch` and `Lumen Guard`.
-- `lumen.reload` – Permission to reload configuration and translations.
-- `lumen.lang` – Permission to change the language.
-- `lumen.craft.torch` – Permission to craft the `Lumen Torch`.
-- `lumen.craft.guard` – Permission to craft the `Lumen Guard`.
-
-</details>
-
----
-
-## Usage
-
-### For Players
-- The `Lumen Torch` automatically lights up nearby areas.
-    - Players can right-click the air while holding a Lumen Torch and input a light level between 0 and 15.
-    - The selected light level will be stored in the torch and applied when placed.
-- The `Lumen Guard` prevents mob spawning within its range.
-- Torches can be removed without being lost, and their effects disappear when removed.
-- To craft them, you need `lumen.craft.torch` and `lumen.craft.guard` permissions.
-
-**Crafting Recipes**
-<details>
-<summary>Lumen Torch</summary>
-
-![Lumen Torch Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/3b24b9cfe98580f238256d836aa834aa0eb637de.png)
-
-</details>
-<details>
-<summary>Lumen Guard</summary>
-
-![Lumen Guard Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/fcc06b4f5b13ef6a5db471241a713acd3b700195.png)
-
-</details>
-
-![Lumen Torch](https://imgur.com/3OQtjzg.gif)
-
----
-
-### For Administrators
-- Advanced light management using commands.
-- Safe light removal with `/lumen remove`.
-- Undo and redo light placements with `/lumen undo` and `/lumen redo`.
-- Clear all lights with `/lumen clear` (Dangerous).
-- Item distribution using `/lumen give`.
-- Full customization through `config.yml` and translation files in `Translations/`.
-- Integration with CoreProtect and FAWE for enhanced performance and control.
-- Change the plugin language with `/lumen lang`.
-- Reload configuration and translations with `/lumen reload`.
-- Adjust performance settings in `config.yml`: Control the number of lights placed per tick and the interval between torch ticks.
-- Control the permissions of each command and item.
-
----
 
 ## 💬 Support & Contact
 
