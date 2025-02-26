@@ -141,8 +141,10 @@ torch:
   light_broken: "Lumen Torch rota. Luces eliminadas: {0}."
   guard_broken: "Lumen Guard rota. Área de protección eliminada en: {0}."
   light_level_set: "Nivel de luz establecido en: {0}."
+  light_level_prompt: "Por favor, ingresa el nivel de luz (0-15) para la antorcha."
   error:
     invalid_light_level: "Por favor, ingresa un número válido entre 0 y 15."
+    no_torch_in_hand: "¡No tienes una Lumen Torch en la mano!"
 
 light:
   error:

@@ -141,8 +141,10 @@ torch:
   light_broken: "Lumen Fackel zerstört. Entfernte Lichter: {0}."
   guard_broken: "Lumen Wächter zerstört. Schutzbereich bei: {0} entfernt."
   light_level_set: "Die Lichtstärke ist auf: {0}."
+  light_level_prompt: "Bitte gib eine Lichtstufe zwischen 0 und 15 ein."
   error:
-    invalid_light_level: "Bitte geben Sie eine gültige Zahl zwischen 0 und 15 ein."
+    invalid_light_level: "Sie muss zwischen 1 und 15 liegen."
+    no_torch_in_hand: "Du musst eine Lumen Fackel in der Hand halten, um diesen Befehl auszuführen."
 
 light:
   error:

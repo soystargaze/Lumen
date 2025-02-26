@@ -147,7 +147,7 @@ public class TorchListener implements Listener {
             if (container.has(lumenIdKey, PersistentDataType.STRING) &&
                     "torch".equals(container.get(lumenIdKey, PersistentDataType.STRING))) {
 
-                player.sendMessage("§eEscribe un valor de luz entre 0 y 15 en el chat.");
+                LoggingUtils.sendMessage(player, "torch.light_level_prompt");
 
                 plugin.getServer().getPluginManager().registerEvents(new Listener() {
                     @EventHandler
@@ -160,13 +160,13 @@ public class TorchListener implements Listener {
                         try {
                             int lightLevel = Integer.parseInt(message);
                             if (lightLevel < 0 || lightLevel > 15) {
-                                player.sendMessage("§cEl valor debe estar entre 0 y 15.");
+                                LoggingUtils.sendMessage(player, "torch.error.invalid_light_level");
                                 return;
                             }
 
                             ItemStack currentItem = player.getInventory().getItemInMainHand();
                             if (currentItem.getType() != Material.PLAYER_HEAD || currentItem.getItemMeta() == null) {
-                                player.sendMessage("§cNo tienes la antorcha en la mano.");
+                                LoggingUtils.sendMessage(player, "torch.error.no_torch_in_hand");
                                 return;
                             }
 

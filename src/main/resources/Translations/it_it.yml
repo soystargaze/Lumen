@@ -141,8 +141,10 @@ torch:
   light_broken: "Torcia Lumen distrutta. Luci rimosse: {0}."
   guard_broken: "Guardiano Lumen distrutto. Area di protezione rimossa in: {0}."
   light_level_set: "Livello di luce impostato su: {0}."
+  light_level_prompt: "Inserisci il livello di luce (0-15):"
   error:
-    invalid_light_level: "Inserire un numero valido tra 0 e 15"
+    invalid_light_level: "Livello di luce non valido. Deve essere compreso tra 1 e 15."
+    no_torch_in_hand: "Devi tenere in mano una Torcia Lumen per impostare il livello di luce."
 
 light:
   error:

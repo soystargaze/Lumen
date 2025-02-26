@@ -148,8 +148,10 @@ torch:
   light_broken: "Se ha roto una Antorcha Lumen y se han quitao {0} luce'."
   guard_broken: "Guardia Lumen destruyía. Área de protección eliminá en {0}."
   light_level_set: "¡Ea! Nivel de luz cambiado a {0}."
+  light_level_prompt: "Ponme un nivel de luz entre 0 y 15, que ehto no eh feria."
   error:
-    invalid_light_level: "¡Ehto no cuadra! Er nivel de luz no es correcto. Debe í entre 1 y 15."
+    invalid_light_level: "¡Ehto no cuadra! Debe í entre 1 y 15."
+    no_torch_in_hand: "¡No tieneh na' en la mano! Pon una antorcha pa' cambia' la luz."
 
 light:
   error:

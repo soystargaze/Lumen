@@ -141,8 +141,10 @@ torch:
   light_broken: "Lumen 火把被破坏。移除的光照方块：{0}。"
   guard_broken: "Lumen 护卫被破坏。在 {0} 的防护区域已移除。"
   light_level_set: "光照等级设定为：{0}"
+  light_level_prompt: "请输入要设置的光照等级（0-15）："
   error:
     invalid_light_level: "请指定一个有效的光照等级，范围在 0 到 15 之间。"
+    no_torch_in_hand: "您必须手持 Lumen 火把才能设置光照等级。"
 
 light:
   error:

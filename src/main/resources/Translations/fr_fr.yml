@@ -141,8 +141,10 @@ torch:
   light_broken: "Torche Lumen cassée. Lumières supprimées : {0}."
   guard_broken: "Gardien Lumen cassé. Zone de protection supprimée à : {0}."
   light_level_set: "Niveau d'éclairage réglé sur: {0}."
+  light_level_prompt: "Entrez un niveau de lumière entre 0 et 15 :"
   error:
-    invalid_light_level: "Veuillez entrer un nombre valide entre 0 et 15"
+    invalid_light_level: "Il doit être compris entre 1 et 15."
+    no_torch_in_hand: "Vous devez tenir une torche Lumen pour utiliser cette commande."
 
 light:
   error:
