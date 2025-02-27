@@ -21,6 +21,34 @@
 
 ---
 
+## Usage
+
+### For Players
+- The `Lumen Torch` automatically lights up nearby areas.
+  - Players can right-click the air while holding a Lumen Torch and input a light level between 0 and 15.
+  - The selected light level will be stored in the torch and applied when placed.
+- The `Lumen Guard` prevents mob spawning within its range.
+- Torches can be removed without being lost, and their effects disappear when removed.
+- To craft them, you need `lumen.craft.torch` and `lumen.craft.guard` permissions.
+
+**Crafting Recipes**
+<details>
+<summary>Lumen Torch</summary>
+
+![Lumen Torch Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/3b24b9cfe98580f238256d836aa834aa0eb637de.png)
+
+</details>
+<details>
+<summary>Lumen Guard</summary>
+
+![Lumen Guard Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/fcc06b4f5b13ef6a5db471241a713acd3b700195.png)
+
+</details>
+
+![Lumen Torch](https://imgur.com/3OQtjzg.gif)
+
+---
+
 ## 🛠️ Compatible Integrations
 
 Lumen can leverage other tools to enhance performance and functionality:
@@ -72,34 +100,6 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
     - `lumen.craft.guard` – Permission to craft the `Lumen Guard`.
 
 </details>
-
----
-
-## Usage
-
-### For Players
-- The `Lumen Torch` automatically lights up nearby areas.
-    - Players can right-click the air while holding a Lumen Torch and input a light level between 0 and 15.
-    - The selected light level will be stored in the torch and applied when placed.
-- The `Lumen Guard` prevents mob spawning within its range.
-- Torches can be removed without being lost, and their effects disappear when removed.
-- To craft them, you need `lumen.craft.torch` and `lumen.craft.guard` permissions.
-
-**Crafting Recipes**
-<details>
-<summary>Lumen Torch</summary>
-
-![Lumen Torch Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/3b24b9cfe98580f238256d836aa834aa0eb637de.png)
-
-</details>
-<details>
-<summary>Lumen Guard</summary>
-
-![Lumen Guard Recipe](https://cdn.modrinth.com/data/izTZx6gw/images/fcc06b4f5b13ef6a5db471241a713acd3b700195.png)
-
-</details>
-
-![Lumen Torch](https://imgur.com/3OQtjzg.gif)
 
 ---
 
