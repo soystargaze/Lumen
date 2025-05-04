@@ -282,7 +282,7 @@ public class LightRegistry {
     }
 
     private static void setQueryParameters(PreparedStatement statement, Location center, int range) throws SQLException {
-        statement.setString(1, center.getWorld().getName());
+        statement.setString(1, Objects.requireNonNull(center.getWorld()).getName());
         statement.setInt(2, center.getBlockX() - range);
         statement.setInt(3, center.getBlockX() + range);
         statement.setInt(4, center.getBlockY() - range);
@@ -320,7 +320,7 @@ public class LightRegistry {
     }
 
     private static void setBlockStatementParameters(PreparedStatement statement, Location location, int lightLevel, int operationId) throws SQLException {
-        statement.setString(1, location.getWorld().getName());
+        statement.setString(1, Objects.requireNonNull(location.getWorld()).getName());
         statement.setInt(2, location.getBlockX());
         statement.setInt(3, location.getBlockY());
         statement.setInt(4, location.getBlockZ());

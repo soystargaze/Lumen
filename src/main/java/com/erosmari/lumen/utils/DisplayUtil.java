@@ -1,8 +1,9 @@
 package com.erosmari.lumen.utils;
 
 import com.erosmari.lumen.config.ConfigHandler;
-import net.kyori.adventure.text.Component;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
@@ -50,7 +51,8 @@ public class DisplayUtil {
 
         String message = ConfigHandler.getActionBarMessage().replace("{progress}", String.valueOf((int) (progress * 100)));
 
-        player.sendActionBar(Component.text(message));
+        player.spigot().sendMessage(net.md_5.bungee.api.ChatMessageType.ACTION_BAR,
+                new TextComponent(ChatColor.translateAlternateColorCodes('&', message)));
     }
 
     @SuppressWarnings("unused")

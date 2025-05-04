@@ -8,3 +8,35 @@ website: https://erosmari.com
 softdepend:
   - CoreProtect
   - FastAsyncWorldEdit
+commands:
+  lumen:
+    description: Main Lumen command
+    usage: /<command> [subcommand]
+    aliases: [lu, l]
+  light:
+    description: Place light blocks
+    usage: /<command> <range> [light_level] [include_skylight]
+  lang:
+    description: Change language
+    usage: /<command> <language>
+  redo:
+    description: Redo a previous light operation
+    usage: /<command>
+  give:
+    description: Give Lumen items
+    usage: /<command> <target> <torch|guard> [amount]
+  undo:
+    description: Undo light operations
+    usage: /<command> [count]
+  remove:
+    description: Remove light blocks
+    usage: /<command> area <range>
+  cancel:
+    description: Cancel active tasks
+    usage: /<command>
+  reload:
+    description: Reload plugin configuration
+    usage: /<command>
+  clear:
+    description: Clear all light blocks
+    usage: /<command> [confirm]

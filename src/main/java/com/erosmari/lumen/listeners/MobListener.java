@@ -92,12 +92,6 @@ public class MobListener implements Listener {
         }
     }
 
-    /**
-     * Transfiere los datos de un PersistentDataContainer fuente a otro destino.
-     *
-     * @param source El contenedor de datos fuente.
-     * @param target El contenedor de datos destino.
-     */
     private void transferPersistentData(PersistentDataContainer source, PersistentDataContainer target) {
         for (NamespacedKey key : source.getKeys()) {
             if (source.has(key, PersistentDataType.STRING)) {

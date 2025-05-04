@@ -3,93 +3,108 @@ package com.erosmari.lumen.commands;
 import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.items.LumenItems;
 import com.erosmari.lumen.utils.LoggingUtils;
-import com.erosmari.lumen.utils.TranslationHandler;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.suggestion.Suggestions;
-import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.ArrayList;
+import java.util.List;
 
-@SuppressWarnings("UnstableApiUsage")
-public class GiveCommand {
+public class GiveCommand implements CommandExecutor, TabCompleter {
 
-    public static LiteralArgumentBuilder<CommandSourceStack> register() {
-        return Commands.literal("give")
-                .requires(source -> source.getSender().hasPermission("lumen.give"))
-                .then(
-                        Commands.argument("target", StringArgumentType.string())
-                                .suggests((context, builder) -> suggestTargets(builder))
-                                .then(
-                                        Commands.argument("torch", StringArgumentType.string())
-                                                .suggests((context, builder) -> {
-                                                    builder.suggest("torch");
-                                                    builder.suggest("guard");
-                                                    return builder.buildFuture();
-                                                })
-                                                .then(
-                                                        Commands.argument("amount", IntegerArgumentType.integer(1))
-                                                                .executes(ctx -> {
-                                                                    String target = ctx.getArgument("target", String.class);
-                                                                    String torchType = ctx.getArgument("torch", String.class);
-                                                                    int amount = ctx.getArgument("amount", Integer.class);
-                                                                    return handleGiveCommand(ctx.getSource(), target, torchType, amount);
-                                                                })
-                                                )
-                                )
-                );
-    }
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!(sender instanceof Player player)) {
+            LoggingUtils.logTranslated("command.only_players");
+            return true;
+        }
 
-    private static int handleGiveCommand(CommandSourceStack source, String target, String torchType, int amount) {
+        if (!sender.hasPermission("lumen.give")) {
+            LoggingUtils.sendMessage(player,"command.no_permission");
+            return true;
+        }
+
+        if (args.length < 2 || args.length > 3) {
+            LoggingUtils.sendMessage(player,"command.give.usage");
+            return true;
+        }
+
+        String target = args[0];
+        String torchType = args[1];
+        int amount = args.length == 3 ? parseAmount(args[2], sender) : 1;
         if (amount <= 0) {
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.invalid_amount"));
-            LoggingUtils.logTranslated("command.give.invalid_amount");
-            return 0;
+            return true;
         }
 
         LumenItems lumenItems = Lumen.getInstance().getLumenItems();
         ItemStack torch = lumenItems.getLumenItem(torchType.toLowerCase());
 
         if (torch == null) {
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.invalid_torch"));
+            LoggingUtils.sendMessage(player,"command.give.invalid_torch");
             LoggingUtils.logTranslated("command.give.invalid_torch");
-            return 0;
+            return true;
         }
 
         torch.setAmount(amount);
 
         if (target.equalsIgnoreCase("all") || target.equalsIgnoreCase("@a")) {
-            Bukkit.getOnlinePlayers().forEach(player -> {
+            Bukkit.getOnlinePlayers().forEach(p -> {
                 player.getInventory().addItem(torch.clone());
-                LoggingUtils.sendAndLog(player,"command.give.received", amount, torchType);
+                LoggingUtils.sendAndLog(player, "command.give.received", amount, torchType);
             });
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.success_all", amount, torchType));
+            LoggingUtils.sendMessage(player,"command.give.success_all", amount, torchType);
             LoggingUtils.logTranslated("command.give.success_all", amount, torchType);
         } else {
-            Player player = Bukkit.getPlayerExact(target);
-            if (player != null && player.isOnline()) {
+            Player p = Bukkit.getPlayerExact(target);
+            if (p != null && player.isOnline()) {
                 player.getInventory().addItem(torch.clone());
-                LoggingUtils.sendAndLog(player,"command.give.received", amount, torchType);
-                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.success_one", target, amount, torchType));
+                LoggingUtils.sendAndLog(player, "command.give.received", amount, torchType);
+                LoggingUtils.sendMessage(player,"command.give.success_one", target, amount, torchType);
                 LoggingUtils.logTranslated("command.give.success_one", target, amount, torchType);
             } else {
-                source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.give.invalid_player"));
+                LoggingUtils.sendMessage(player,"command.give.invalid_player");
                 LoggingUtils.logTranslated("command.give.invalid_player");
             }
         }
 
-        return 1;
+        return true;
     }
 
-    private static CompletableFuture<Suggestions> suggestTargets(SuggestionsBuilder builder) {
-        Bukkit.getOnlinePlayers().forEach(player -> builder.suggest(player.getName()));
-        builder.suggest("all");
-        return builder.buildFuture();
+    private int parseAmount(String arg, CommandSender sender) {
+        if (!(sender instanceof Player player)) {
+            LoggingUtils.logTranslated("command.only_players");
+            return -1;
+        }
+        try {
+            int amount = Integer.parseInt(arg);
+            if (amount <= 0) {
+                LoggingUtils.sendMessage(player,"command.give.invalid_amount");
+                LoggingUtils.logTranslated("command.give.invalid_amount");
+                return -1;
+            }
+            return amount;
+        } catch (NumberFormatException e) {
+            LoggingUtils.sendMessage(player,"command.give.invalid_amount");
+            LoggingUtils.logTranslated("command.give.invalid_amount");
+            return -1;
+        }
+    }
+
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+        List<String> suggestions = new ArrayList<>();
+        if (args.length == 1) {
+            Bukkit.getOnlinePlayers().forEach(player -> suggestions.add(player.getName()));
+            suggestions.add("all");
+        } else if (args.length == 2) {
+            suggestions.add("torch");
+            suggestions.add("guard");
+        }
+        return suggestions;
     }
 }

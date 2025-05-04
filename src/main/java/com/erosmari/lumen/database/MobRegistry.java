@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class MobRegistry {
 
@@ -19,7 +20,7 @@ public class MobRegistry {
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, location.getWorld().getName());
+            stmt.setString(1, Objects.requireNonNull(location.getWorld()).getName());
             stmt.setInt(2, location.getBlockX());
             stmt.setInt(3, location.getBlockY());
             stmt.setInt(4, location.getBlockZ());
@@ -37,7 +38,7 @@ public class MobRegistry {
         try (Connection connection = DatabaseHandler.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
 
-            stmt.setString(1, location.getWorld().getName());
+            stmt.setString(1, Objects.requireNonNull(location.getWorld()).getName());
             stmt.setInt(2, location.getBlockX());
             stmt.setInt(3, location.getBlockY());
             stmt.setInt(4, location.getBlockZ());

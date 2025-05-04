@@ -50,7 +50,6 @@ public class Lumen extends JavaPlugin implements Listener {
         instance = null;
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private void initializePlugin() {
         LumenConstants.init(this);
         loadConfigurations();
@@ -59,8 +58,8 @@ public class Lumen extends JavaPlugin implements Listener {
         ConsoleUtils.displayAsciiArt();
         LoggingUtils.logTranslated("plugin.separator");
         LoggingUtils.logTranslated("plugin.name");
-        LoggingUtils.logTranslated("plugin.version", getPluginMeta().getVersion());
-        LoggingUtils.logTranslated("plugin.author", getPluginMeta().getAuthors().getFirst());
+        LoggingUtils.logTranslated("plugin.version", getDescription().getVersion());
+        LoggingUtils.logTranslated("plugin.author", getDescription().getAuthors());
         LoggingUtils.logTranslated("plugin.separator");
 
         try {

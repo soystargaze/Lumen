@@ -4,13 +4,14 @@ import com.erosmari.lumen.config.ConfigHandler;
 import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings("UnstableApiUsage")
-public class ReloadCommand {
+public class ReloadCommand implements CommandExecutor {
 
     private final JavaPlugin plugin;
 
@@ -18,29 +19,31 @@ public class ReloadCommand {
         this.plugin = plugin;
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> register(JavaPlugin plugin) {
-        return Commands.literal("reload")
-                .requires(source -> source.getSender().hasPermission("lumen.reload"))
-                .executes(context -> {
-                    new ReloadCommand(plugin).execute(context.getSource());
-                    return 1;
-                });
-    }
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!(sender instanceof Player player)) {
+            LoggingUtils.logTranslated("command.only_players");
+            return true;
+        }
 
-    public void execute(CommandSourceStack source) {
+        if (!sender.hasPermission("lumen.reload")) {
+            LoggingUtils.sendMessage(player,"command.no_permission");
+            return true;
+        }
+
         try {
             reloadConfig();
             int loadedTranslations = reloadTranslations();
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.reload.success", loadedTranslations));
+            LoggingUtils.sendMessage(player,"command.reload.success", loadedTranslations);
         } catch (Exception e) {
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.reload.error"));
+            LoggingUtils.sendMessage(player,"command.reload.error");
             LoggingUtils.logTranslated("command.reload.error", e.getMessage());
         }
+        return true;
     }
 
     private void reloadConfig() {
         plugin.reloadConfig();
-
         ConfigHandler.reload();
         ItemLightsHandler.reloadSettings();
     }

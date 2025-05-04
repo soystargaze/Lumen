@@ -7,8 +7,6 @@ import com.erosmari.lumen.lights.ItemLightsHandler;
 import com.erosmari.lumen.utils.ItemEffectUtil;
 import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.LumenConstants;
-import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -20,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -101,10 +100,10 @@ public class TorchListener implements Listener {
                             Integer incrementalId = blockContainer.get(operationKey, PersistentDataType.INTEGER);
                             if (incrementalId != null) {
 
-                            lightsHandler.cancelOperation(player, incrementalId);
-                            lightsHandler.removeLights(player, incrementalId);
+                                lightsHandler.cancelOperation(player, incrementalId);
+                                lightsHandler.removeLights(player, incrementalId);
 
-                            ItemStack customItem = lumenItems.getLumenItem(id);
+                                ItemStack customItem = lumenItems.getLumenItem(id);
 
                                 if (customItem != null) {
                                     brokenBlock.getWorld().dropItemNaturally(brokenBlock.getLocation(), customItem.clone());
@@ -151,11 +150,11 @@ public class TorchListener implements Listener {
 
                 plugin.getServer().getPluginManager().registerEvents(new Listener() {
                     @EventHandler
-                    public void onChat(AsyncChatEvent chatEvent) {
+                    public void onChat(AsyncPlayerChatEvent chatEvent) {
                         if (!chatEvent.getPlayer().equals(player)) return;
 
                         chatEvent.setCancelled(true);
-                        String message = PlainTextComponentSerializer.plainText().serialize(chatEvent.message());
+                        String message = chatEvent.getMessage();
 
                         try {
                             int lightLevel = Integer.parseInt(message);
@@ -180,7 +179,7 @@ public class TorchListener implements Listener {
                             LoggingUtils.sendAndLog(player, "torch.error.invalid_light_level");
                         }
 
-                        AsyncChatEvent.getHandlerList().unregister(this);
+                        AsyncPlayerChatEvent.getHandlerList().unregister(this);
                     }
                 }, plugin);
             }

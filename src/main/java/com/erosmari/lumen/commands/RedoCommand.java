@@ -8,21 +8,20 @@ import com.erosmari.lumen.utils.BatchProcessor;
 import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.utils.DisplayUtil;
 import com.erosmari.lumen.utils.LoggingUtils;
-import com.erosmari.lumen.utils.TranslationHandler;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Levelled;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-@SuppressWarnings("UnstableApiUsage")
-public class RedoCommand {
+public class RedoCommand implements CommandExecutor {
 
     private final Lumen plugin;
     private static final int MAX_RETRY_ATTEMPTS = 3;
@@ -35,29 +34,28 @@ public class RedoCommand {
         return plugin.getCoreProtectHandler();
     }
 
-    public LiteralArgumentBuilder<CommandSourceStack> register() {
-        return Commands.literal("redo")
-                .requires(source -> source.getSender().hasPermission("lumen.redo"))
-                .executes(ctx -> handleRedoCommand(ctx.getSource()));
-    }
-
-    private int handleRedoCommand(CommandSourceStack source) {
-        if (!(source.getSender() instanceof Player player)) {
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.only_players"));
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!(sender instanceof Player player)) {
             LoggingUtils.logTranslated("command.only_players");
-            return 0;
+            return true;
+        }
+
+        if (!sender.hasPermission("lumen.redo")) {
+            LoggingUtils.sendMessage(player,"command.no_permission");
+            return true;
         }
 
         Integer operationId = LightRegistry.getLastSoftDeletedOperationId();
         if (operationId == null) {
-            LoggingUtils.sendAndLog(player,"command.redo.no_previous_operations");
-            return 0;
+            LoggingUtils.sendAndLog(player, "command.redo.no_previous_operations");
+            return true;
         }
 
         Map<Location, Integer> blocksWithLightLevels = LightRegistry.getSoftDeletedBlocksWithLightLevelByOperationId(operationId);
         if (blocksWithLightLevels.isEmpty()) {
-            LoggingUtils.sendAndLog(player,"command.redo.no_blocks_found", operationId);
-            return 0;
+            LoggingUtils.sendAndLog(player, "command.redo.no_blocks_found", operationId);
+            return true;
         }
 
         if (isFAWEAvailable()) {
@@ -99,7 +97,7 @@ public class RedoCommand {
                     }
 
                     LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
-                    LoggingUtils.sendAndLog(player,"command.redo.restoration_completed", operationId);
+                    LoggingUtils.sendAndLog(player, "command.redo.restoration_completed", operationId);
                     DisplayUtil.hideBossBar(player);
                     task.cancel();
                 } else if (blockQueue.isEmpty()) {
@@ -112,8 +110,8 @@ public class RedoCommand {
             }, 0L, 1L);
         }
 
-        LoggingUtils.sendAndLog(player,"command.redo.restoration_started", blocksWithLightLevels.size());
-        return 1;
+        LoggingUtils.sendAndLog(player, "command.redo.restoration_started", blocksWithLightLevels.size());
+        return true;
     }
 
     private boolean isFAWEAvailable() {

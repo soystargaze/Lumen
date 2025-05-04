@@ -1,12 +1,11 @@
 package com.erosmari.lumen.items;
 
-import com.destroystokyo.paper.profile.PlayerProfile;
-import com.destroystokyo.paper.profile.ProfileProperty;
 import com.erosmari.lumen.utils.LumenConstants;
 import com.erosmari.lumen.utils.TranslationHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -17,11 +16,17 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class LumenItems {
 
@@ -63,16 +68,29 @@ public class LumenItems {
         ItemMeta meta = head.getItemMeta();
 
         if (meta != null) {
-            Component displayName = MiniMessage.miniMessage().deserialize(name).decoration(TextDecoration.ITALIC, false);
-            meta.displayName(displayName);
+            Component displayName = MiniMessage.miniMessage()
+                    .deserialize(name)
+                    .decoration(TextDecoration.ITALIC, false);
 
             List<Component> loreComponents = List.of(
-                    MiniMessage.miniMessage().deserialize(lore).decoration(TextDecoration.ITALIC, false)
+                    MiniMessage.miniMessage()
+                            .deserialize(lore)
+                            .decoration(TextDecoration.ITALIC, false)
             );
-            meta.lore(loreComponents);
+
+            LegacyComponentSerializer legacy = LegacyComponentSerializer.legacySection();
+            String legacyName = legacy.serialize(displayName);
+            List<String> legacyLore = loreComponents.stream()
+                    .map(legacy::serialize)
+                    .collect(Collectors.toList());
+
+            meta.setDisplayName(legacyName);
+            meta.setLore(legacyLore);
 
             PersistentDataContainer container = meta.getPersistentDataContainer();
-            container.set(LumenConstants.getLumenIdKey(), PersistentDataType.STRING, identifier);
+            container.set(LumenConstants.getLumenIdKey(),
+                    PersistentDataType.STRING,
+                    identifier);
 
             head.setItemMeta(meta);
         }
@@ -80,14 +98,31 @@ public class LumenItems {
         return head;
     }
 
-    private ItemStack getSkull(String textures) {
+    private ItemStack getSkull(String texture) {
         ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta meta = (SkullMeta) head.getItemMeta();
 
-        head.editMeta(SkullMeta.class, skullMeta -> {
-            PlayerProfile playerProfile = Bukkit.createProfile(UUID.randomUUID());
-            playerProfile.setProperty(new ProfileProperty("textures", textures));
-            skullMeta.setPlayerProfile(playerProfile);
-        });
+        if (meta != null) {
+            try {
+                String json = new String(
+                        Base64.getDecoder().decode(texture),
+                        StandardCharsets.UTF_8
+                );
+                int i = json.indexOf("\"url\":\"") + 7;
+                int j = json.indexOf('"', i);
+                String skinUrl = json.substring(i, j);
+
+                PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), null);
+                PlayerTextures textures = profile.getTextures();
+                textures.setSkin(new URI(skinUrl).toURL());
+                profile.setTextures(textures);
+
+                meta.setOwnerProfile(profile);
+                head.setItemMeta(meta);
+            } catch (Exception e) {
+                plugin.getLogger().warning("Error applying texture to skull: " + e.getMessage());
+            }
+        }
 
         return head;
     }

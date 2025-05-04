@@ -1,18 +1,21 @@
 package com.erosmari.lumen.commands;
 
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.TranslationHandler;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-@SuppressWarnings("UnstableApiUsage")
-public class LangCommand {
+public class LangCommand implements CommandExecutor, TabCompleter {
 
     private final JavaPlugin plugin;
 
@@ -20,47 +23,58 @@ public class LangCommand {
         this.plugin = plugin;
     }
 
-    public static LiteralArgumentBuilder<CommandSourceStack> register(JavaPlugin plugin) {
-        return Commands.literal("lang")
-                .requires(source -> source.getSender().hasPermission("lumen.lang"))
-                .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("file", StringArgumentType.string())
-                        .suggests((context, builder) -> {
-                            File translationsFolder = new File(plugin.getDataFolder(), "Translations");
-                            if (translationsFolder.exists() && translationsFolder.isDirectory()) {
-                                for (File file : Objects.requireNonNull(translationsFolder.listFiles())) {
-                                    if (file.isFile() && file.getName().endsWith(".yml")) {
-                                        builder.suggest(file.getName().replace(".yml", ""));
-                                    }
-                                }
-                            }
-                            return builder.buildFuture();
-                        })
-                        .executes(context -> {
-                            String language = StringArgumentType.getString(context, "file");
-                            new LangCommand(plugin).execute(context.getSource(), language);
-                            return 1;
-                        })
-                );
-    }
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!(sender instanceof Player player)) {
+            LoggingUtils.logTranslated("command.only_players");
+            return true;
+        }
 
-    public void execute(CommandSourceStack source, String language) {
+        if (!sender.hasPermission("lumen.lang")) {
+            LoggingUtils.sendMessage(player,"command.no_permission");
+            return true;
+        }
+
+        if (args.length != 1) {
+            LoggingUtils.sendMessage(player,"command.lang.usage");
+            return true;
+        }
+
+        String language = args[0];
         if (!TranslationHandler.isLanguageAvailable(language)) {
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.lang.file_not_found", language));
-            return;
+            LoggingUtils.sendMessage(player,"command.lang.file_not_found", language);
+            return true;
         }
 
         try {
             TranslationHandler.setActiveLanguage(language);
-
             TranslationHandler.loadTranslations(plugin, language);
 
             plugin.getConfig().set("language", language);
             plugin.saveConfig();
 
             int loadedTranslations = TranslationHandler.getLoadedTranslationsCount();
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.lang.success", language, loadedTranslations));
+            LoggingUtils.sendMessage(player,"command.lang.success", language, loadedTranslations);
         } catch (Exception e) {
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.lang.error", language));
+            LoggingUtils.sendMessage(player,"command.lang.error", language);
         }
+        return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
+        if (args.length == 1) {
+            List<String> suggestions = new ArrayList<>();
+            File translationsFolder = new File(plugin.getDataFolder(), "Translations");
+            if (translationsFolder.exists() && translationsFolder.isDirectory()) {
+                for (File file : Objects.requireNonNull(translationsFolder.listFiles())) {
+                    if (file.isFile() && file.getName().endsWith(".yml")) {
+                        suggestions.add(file.getName().replace(".yml", ""));
+                    }
+                }
+            }
+            return suggestions;
+        }
+        return null;
     }
 }

@@ -34,16 +34,19 @@ repositories {
     maven {
         url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
     }
+    maven {
+        url = "https://oss.sonatype.org/content/repositories/snapshots"
+    }
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
-    //compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
+    //compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21.4-R0.1-SNAPSHOT")
     implementation("net.kyori:adventure-platform-bukkit:4.3.4")
     implementation("net.kyori:adventure-text-minimessage:4.20.0")
     compileOnly("me.clip:placeholderapi:2.11.6")
     implementation("com.zaxxer:HikariCP:5.0.1")
-    compileOnly files("libs/CoreProtect-23.2-RC3.jar")
+    compileOnly files("APIs/CoreProtect-23.2-RC3.jar")
     implementation(platform("com.intellectualsites.bom:bom-newest:1.52"))
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Core")
     compileOnly("com.fastasyncworldedit:FastAsyncWorldEdit-Bukkit") {
@@ -72,29 +75,6 @@ tasks.shadowJar {
     minimize()
     relocate 'org.bstats', 'com.erosmari.vitamin.shaded.bstats'
 }
-
-// tasks.register('proguard', ProGuardTask) {
-//     dependsOn tasks.shadowJar, tasks.jar
-
-//     injars(tasks.named('shadowJar', Jar).flatMap { it.archiveFile })
-//     inputs.file(tasks.named('jar', Jar).flatMap { it.archiveFile })
-
-//     if (System.getProperty('java.version').startsWith('1.')) {
-//         libraryjars "${System.getProperty('java.home')}/lib/rt.jar"
-//     } else {
-//         libraryjars "${System.getProperty('java.home')}/jmods/java.base.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-//         libraryjars "${System.getProperty('java.home')}/jmods/java.logging.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-//         libraryjars "${System.getProperty('java.home')}/jmods/java.xml.jmod", jarfilter: '!**.jar', filter: '!module-info.class'
-//     }
-
-//     libraryjars files(configurations.compileClasspath.files)
-
-//     verbose()
-
-//     outjars layout.buildDirectory.file("libs/${project.group}-${project.name}-${project.version}-minified.jar")
-
-//     configuration file('proguard.pro')
-// }
 
 tasks.build {
     dependsOn tasks.shadowJar

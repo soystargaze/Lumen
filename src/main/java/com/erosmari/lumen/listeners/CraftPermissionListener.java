@@ -1,7 +1,7 @@
 package com.erosmari.lumen.listeners;
 
+import com.erosmari.lumen.utils.LoggingUtils;
 import com.erosmari.lumen.utils.LumenConstants;
-import com.erosmari.lumen.utils.TranslationHandler;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -27,6 +27,7 @@ public class CraftPermissionListener implements Listener {
         if (result.getType().isAir() || !result.hasItemMeta()) return;
 
         ItemMeta meta = result.getItemMeta();
+        assert meta != null;
         PersistentDataContainer container = meta.getPersistentDataContainer();
         NamespacedKey key = LumenConstants.getLumenIdKey();
 
@@ -35,10 +36,10 @@ public class CraftPermissionListener implements Listener {
 
             if ("torch".equals(itemId) && !player.hasPermission("lumen.craft.torch")) {
                 event.getInventory().setResult(null);
-                player.sendMessage(TranslationHandler.getPlayerMessage("items.torch.no-permission"));
+                LoggingUtils.sendMessage(player,"items.torch.no-permission");
             } else if ("guard".equals(itemId) && !player.hasPermission("lumen.craft.guard")) {
                 event.getInventory().setResult(null);
-                player.sendMessage(TranslationHandler.getPlayerMessage("items.guard.no-permission"));
+                LoggingUtils.sendMessage(player,"items.guard.no-permission");
             }
         }
     }

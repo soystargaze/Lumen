@@ -4,20 +4,18 @@ import com.erosmari.lumen.Lumen;
 import com.erosmari.lumen.database.LightRegistry;
 import com.erosmari.lumen.connections.CoreProtectHandler;
 import com.erosmari.lumen.utils.LoggingUtils;
-import com.erosmari.lumen.utils.TranslationHandler;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
-import io.papermc.paper.command.brigadier.CommandSourceStack;
-import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("UnstableApiUsage")
-public class UndoCommand {
+public class UndoCommand implements CommandExecutor {
 
     private final Lumen plugin;
 
@@ -25,42 +23,47 @@ public class UndoCommand {
         this.plugin = plugin;
     }
 
-    public LiteralArgumentBuilder<CommandSourceStack> register() {
-        return Commands.literal("undo")
-                .requires(source -> source.getSender().hasPermission("lumen.undo"))
-                .then(
-                        Commands.argument("count", IntegerArgumentType.integer(1))
-                                .executes(ctx -> {
-                                    int count = ctx.getArgument("count", Integer.class);
-                                    return handleUndoCommand(ctx.getSource(), count);
-                                })
-                )
-                .executes(ctx -> handleUndoCommand(ctx.getSource(), 1)); // Por defecto deshace una operación
-    }
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!(sender instanceof Player player)) {
+            LoggingUtils.logTranslated("command.only_players");
+            return true;
+        }
 
-    private int handleUndoCommand(CommandSourceStack source, int count) {
-        if (!(source.getSender() instanceof Player player)) {
-            source.getSender().sendMessage(TranslationHandler.getPlayerMessage("command.undo.only_players"));
-            LoggingUtils.logTranslated("command.undo.only_players");
-            return 0;
+        if (!sender.hasPermission("lumen.undo")) {
+            LoggingUtils.sendMessage(player,"command.no_permission");
+            return true;
+        }
+
+        int count = 1;
+        if (args.length > 0) {
+            try {
+                count = Integer.parseInt(args[0]);
+                if (count < 1) {
+                    LoggingUtils.sendAndLog(player, "command.undo.invalid_count");
+                    return true;
+                }
+            } catch (NumberFormatException e) {
+                LoggingUtils.sendAndLog(player, "command.undo.invalid_count");
+                return true;
+            }
         }
 
         List<Integer> lastOperations = LightRegistry.getLastOperations(count);
 
         if (lastOperations.isEmpty()) {
             LoggingUtils.sendAndLog(player, "command.undo.no_previous_operations");
-            return 0;
+            return true;
         }
 
         int totalRemovedBlocks = removeLightBlocksByOperations(lastOperations, player);
 
         if (totalRemovedBlocks > 0) {
             LoggingUtils.sendAndLog(player, "command.undo.success", totalRemovedBlocks, count);
-            return 1;
         } else {
             LoggingUtils.sendAndLog(player, "command.undo.no_blocks", count);
-            return 0;
         }
+        return true;
     }
 
     private int removeLightBlocksByOperations(List<Integer> operationIds, Player player) {
@@ -89,7 +92,7 @@ public class UndoCommand {
             coreProtectHandler.logRemoval(player.getName(), allRemovedBlocks, Material.LIGHT);
         }
 
-        return allRemovedBlocks.size(); // Retorna el número total de bloques eliminados
+        return allRemovedBlocks.size();
     }
 
     private boolean removeLightBlock(Location location) {
