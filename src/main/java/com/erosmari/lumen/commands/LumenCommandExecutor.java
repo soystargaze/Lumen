@@ -41,7 +41,7 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("Only players can use this command.");
+            LoggingUtils.logTranslated("command.only_players");
             return true;
         }
 
