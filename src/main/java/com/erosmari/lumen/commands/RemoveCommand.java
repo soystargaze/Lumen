@@ -26,7 +26,7 @@ public class RemoveCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
             LoggingUtils.logTranslated("command.only_players");
             return true;
@@ -93,10 +93,18 @@ public class RemoveCommand implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, String[] args) {
-        if (args.length == 1) {
-            return List.of("area");
+    public List<String> onTabComplete(CommandSender sender, @NotNull Command command, @NotNull String alias, String @NotNull [] args) {
+        List<String> suggestions = new ArrayList<>();
+        if (!sender.hasPermission("lumen.remove")) {
+            return suggestions;
         }
-        return new ArrayList<>();
+
+        if (args.length == 1) {
+            suggestions.add("area");
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("area")) {
+            suggestions.add("<range>");
+        }
+
+        return suggestions;
     }
 }

@@ -38,20 +38,19 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
             LoggingUtils.logTranslated("command.only_players");
             return true;
         }
 
         if (!sender.hasPermission("lumen.use")) {
-            LoggingUtils.sendMessage(player,"command.no_permission");
+            LoggingUtils.sendMessage(player, "command.no_permission");
             return true;
         }
 
         if (args.length == 0) {
-            LoggingUtils.sendMessage(player,"command.usage");
+            LoggingUtils.sendMessage(player, "command.usage");
             return true;
         }
 
@@ -69,7 +68,7 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
             case "give" -> giveCommand.onCommand(sender, command, label, subArgs);
             case "reload" -> reloadCommand.onCommand(sender, command, label, subArgs);
             default -> {
-                LoggingUtils.sendMessage(player,"command.usage");
+                LoggingUtils.sendMessage(player, "command.usage");
                 yield true;
             }
         };
@@ -96,24 +95,10 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
 
         return switch (subCommand) {
             case "lang" -> langCommand.onTabComplete(sender, command, alias, subArgs);
-            case "light" -> new ArrayList<>(); // No specific tab completion for light
-            case "cancel" -> new ArrayList<>(); // No tab completion for cancel
-            case "undo" -> new ArrayList<>(); // Tab completion for count could be added
-            case "redo" -> new ArrayList<>(); // No tab completion for redo
-            case "clear" -> {
-                if (args.length == 2 && sender.hasPermission("lumen.clear")) {
-                    yield List.of("confirm");
-                }
-                yield new ArrayList<>();
-            }
-            case "remove" -> {
-                if (args.length == 2 && sender.hasPermission("lumen.remove")) {
-                    yield List.of("area");
-                }
-                yield new ArrayList<>();
-            }
+            case "light" -> lightCommand.onTabComplete(sender, command, alias, subArgs);
+            case "clear" -> clearCommand.onTabComplete(sender, command, alias, subArgs);
+            case "remove" -> removeCommand.onTabComplete(sender, command, alias, subArgs);
             case "give" -> giveCommand.onTabComplete(sender, command, alias, subArgs);
-            case "reload" -> new ArrayList<>(); // No tab completion for reload
             default -> new ArrayList<>();
         };
     }
