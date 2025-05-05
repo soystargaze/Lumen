@@ -12,7 +12,7 @@
 -keepattributes *Annotation*,Signature,EnclosingMethod,SourceFile,LineNumberTable
 
 # Conservar la clase principal (ajusta el nombre completo de tu clase principal)
--keep public class com.erosmari.lumen.Lumen {
+-keep public class com.soystargaze.lumen.Lumen {
     public *;
 }
 
