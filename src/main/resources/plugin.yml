@@ -4,7 +4,7 @@ main: com.soystargaze.lumen.Lumen
 api-version: '1.21'
 load: STARTUP
 authors: [Eros Marí]
-website: https://erosmari.com
+website: https://soystargaze.com
 softdepend:
   - CoreProtect
   - FastAsyncWorldEdit
