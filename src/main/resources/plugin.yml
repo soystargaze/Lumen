@@ -8,7 +8,7 @@ website: https://soystargaze.com
 softdepend:
   - CoreProtect
   - FastAsyncWorldEdit
-ommands:
+commands:
   lumen:
     description: Main command for Lumen
     usage: /<command> [subcommand] [...]
