@@ -1,6 +1,6 @@
 package com.soystargaze.lumen.connections;
 
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
@@ -18,8 +18,8 @@ public class CoreProtectHandler {
             setupCoreProtect();
         } else {
             coreProtectAPI = null;
-            LoggingUtils.logTranslated("plugin.separator");
-            LoggingUtils.logTranslated("coreprotect.integration.not_found_or_disabled");
+            TextHandler.get().logTranslated("plugin.separator");
+            TextHandler.get().logTranslated("coreprotect.integration.not_found_or_disabled");
         }
     }
 
@@ -37,12 +37,12 @@ public class CoreProtectHandler {
 
         if (coreProtect != null && coreProtect.isEnabled() && coreProtect.getAPI().isEnabled()) {
             coreProtectAPI = coreProtect.getAPI();
-            LoggingUtils.logTranslated("plugin.separator");
-            LoggingUtils.logTranslated("coreprotect.integration.success");
+            TextHandler.get().logTranslated("plugin.separator");
+            TextHandler.get().logTranslated("coreprotect.integration.success");
         } else {
             coreProtectAPI = null;
-            LoggingUtils.logTranslated("plugin.separator");
-            LoggingUtils.logTranslated("coreprotect.integration.not_found_or_disabled");
+            TextHandler.get().logTranslated("plugin.separator");
+            TextHandler.get().logTranslated("coreprotect.integration.not_found_or_disabled");
         }
     }
 
@@ -52,31 +52,31 @@ public class CoreProtectHandler {
 
     public void logLightPlacement(String playerName, List<Location> locations, Material material) {
         if (!isEnabled() || locations == null || locations.isEmpty()) {
-            LoggingUtils.logTranslated("coreprotect.no_locations_provided");
+            TextHandler.get().logTranslated("coreprotect.no_locations_provided");
             return;
         }
 
         int successCount = processLocations(playerName, locations, material, true);
 
         if (successCount > 0) {
-            LoggingUtils.logTranslated("coreprotect.placement.success", successCount, playerName);
+            TextHandler.get().logTranslated("coreprotect.placement.success", successCount, playerName);
         } else {
-            LoggingUtils.logTranslated("coreprotect.placement.none", playerName);
+            TextHandler.get().logTranslated("coreprotect.placement.none", playerName);
         }
     }
 
     public void logRemoval(String playerName, List<Location> locations, Material forcedMaterial) {
         if (!isEnabled() || locations == null || locations.isEmpty()) {
-            LoggingUtils.logTranslated("coreprotect.no_locations_provided");
+            TextHandler.get().logTranslated("coreprotect.no_locations_provided");
             return;
         }
 
         int successCount = processLocations(playerName, locations, forcedMaterial, false);
 
         if (successCount > 0) {
-            LoggingUtils.logTranslated("coreprotect.removal.success", successCount, playerName);
+            TextHandler.get().logTranslated("coreprotect.removal.success", successCount, playerName);
         } else {
-            LoggingUtils.logTranslated("coreprotect.removal.none", playerName);
+            TextHandler.get().logTranslated("coreprotect.removal.none", playerName);
         }
     }
 
@@ -94,7 +94,7 @@ public class CoreProtectHandler {
                 }
                 successCount++;
             } catch (Exception e) {
-                LoggingUtils.logTranslated(isPlacement ? "coreprotect.placement.error" : "coreprotect.removal.error", location, e.getMessage());
+                TextHandler.get().logTranslated(isPlacement ? "coreprotect.placement.error" : "coreprotect.removal.error", location, e.getMessage());
             }
         }
         return successCount;

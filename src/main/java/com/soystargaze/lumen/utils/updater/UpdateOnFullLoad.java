@@ -1,6 +1,6 @@
 package com.soystargaze.lumen.utils.updater;
 
-import com.soystargaze.vitamin.Vitamin;
+import com.soystargaze.lumen.Lumen;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,7 +12,7 @@ public class UpdateOnFullLoad implements Listener {
     public void onServerLoad(ServerLoadEvent event) {
         if (event.getType() == ServerLoadEvent.LoadType.STARTUP) {
             Bukkit.getScheduler().runTaskAsynchronously(
-                    Vitamin.getInstance(),
+                    Lumen.getInstance(),
                     UpdateChecker::checkForUpdates
             );
         }

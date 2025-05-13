@@ -17,6 +17,10 @@ plugin:
   disabled: "Lumen désactivé avec succès."
   enable_error: "Erreur lors de l'activation du plugin. Consultez la console pour plus de détails."
   language_loaded: "Langue chargée : {0}.yml ({1} traductions)"
+  update_available: "<color:#FFA500>Mise à jour disponible:</color> Téléchargez Vitamin+ {0} sur {1}"
+  no_update_available: "<color:#FFA500>Aucune mise à jour disponible.</color> Vous utilisez la dernière version."
+  update_check_failed: "<color:#FFA500>Échec de la vérification des mises à jour:</color> {0}"
+  update_check_error: "<color:#FFA500>Erreur lors de la vérification des mises à jour:</color> {0}"
 
 translations:
   folder_error: "Erreur : Impossible de créer le dossier des traductions."

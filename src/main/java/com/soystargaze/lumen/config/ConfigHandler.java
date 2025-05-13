@@ -8,6 +8,12 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ConfigHandler {
 
@@ -15,12 +21,50 @@ public class ConfigHandler {
     private static String language;
 
     public static void setup(JavaPlugin plugin) {
-        File configFile = new File(plugin.getDataFolder(), "config.yml");
-        if (!configFile.exists()) {
-            plugin.saveResource("config.yml", false);
+        File dataFolder = plugin.getDataFolder();
+        if (!dataFolder.exists()) {
+            boolean created = dataFolder.mkdirs();
+            if (!created) {
+                plugin.getLogger().severe("Could not create plugin data folder at " +
+                        dataFolder.getAbsolutePath());
+                return;
+            }
         }
-        config = YamlConfiguration.loadConfiguration(configFile);
 
+        File configFile = new File(dataFolder, "config.yml");
+
+        FileConfiguration oldConfig = YamlConfiguration.loadConfiguration(configFile);
+        Map<String, Object> userValues = new HashMap<>();
+
+        InputStream defaultStream = plugin.getResource("config.yml");
+        if (defaultStream == null) {
+            plugin.getLogger().severe("Default config.yml not found in plugin JAR!");
+            return;
+        }
+        FileConfiguration defaultConfig = YamlConfiguration.loadConfiguration(
+                new InputStreamReader(defaultStream, StandardCharsets.UTF_8)
+        );
+
+        for (String key : defaultConfig.getKeys(true)) {
+            if (oldConfig.contains(key)) {
+                userValues.put(key, oldConfig.get(key));
+            }
+        }
+
+        plugin.saveResource("config.yml", true);
+
+        FileConfiguration mergedConfig = YamlConfiguration.loadConfiguration(configFile);
+        for (Map.Entry<String, Object> entry : userValues.entrySet()) {
+            mergedConfig.set(entry.getKey(), entry.getValue());
+        }
+
+        try {
+            mergedConfig.save(configFile);
+        } catch (IOException e) {
+            plugin.getLogger().severe("Error saving config.yml: " + e.getMessage());
+        }
+
+        config = mergedConfig;
         language = config.getString("language", "en_us");
     }
 

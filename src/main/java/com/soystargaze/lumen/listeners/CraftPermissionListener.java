@@ -1,7 +1,7 @@
 package com.soystargaze.lumen.listeners;
 
-import com.soystargaze.lumen.utils.LoggingUtils;
 import com.soystargaze.lumen.utils.LumenConstants;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,10 +36,10 @@ public class CraftPermissionListener implements Listener {
 
             if ("torch".equals(itemId) && !player.hasPermission("lumen.craft.torch")) {
                 event.getInventory().setResult(null);
-                LoggingUtils.sendMessage(player,"items.torch.no-permission");
+                TextHandler.get().sendMessage(player,"items.torch.no-permission");
             } else if ("guard".equals(itemId) && !player.hasPermission("lumen.craft.guard")) {
                 event.getInventory().setResult(null);
-                LoggingUtils.sendMessage(player,"items.guard.no-permission");
+                TextHandler.get().sendMessage(player,"items.guard.no-permission");
             }
         }
     }

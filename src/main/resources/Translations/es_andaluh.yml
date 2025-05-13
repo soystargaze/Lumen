@@ -17,6 +17,10 @@ plugin:
   disabled: "Lumen se ha apagaó... Cucha, ¿quién ha desenchufao esto?"
   enable_error: "Uff, ha habío un trancaço encendiendo Lumen. Mira la consola y arregraló."
   language_loaded: "¡Habemus idioma! Se ha cargao: {0}.yml con {1} traduccioneh."
+  update_available: "<color:#FFA500>Actualización disponible:</color> Descarga Lumen {0} en {1}"
+  no_update_available: "<color:#FFA500>No hay actualizaciones disponibles.</color> Estás usando la última versión."
+  update_check_failed: "<color:#FFA500>Error al verificar actualizaciones:</color> {0}"
+  update_check_error: "<color:#FFA500>Error al verificar actualizaciones:</color> {0}"
 
 translations:
   folder_error: "Quillo, no s'ha podío creá la carpeta de traduccioneh. Algo raro pasah."

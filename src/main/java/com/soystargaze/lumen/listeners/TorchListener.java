@@ -5,8 +5,8 @@ import com.soystargaze.lumen.database.LightRegistry;
 import com.soystargaze.lumen.items.LumenItems;
 import com.soystargaze.lumen.lights.ItemLightsHandler;
 import com.soystargaze.lumen.utils.ItemEffectUtil;
-import com.soystargaze.lumen.utils.LoggingUtils;
 import com.soystargaze.lumen.utils.LumenConstants;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -76,7 +76,7 @@ public class TorchListener implements Listener {
 
                     ItemEffectUtil.playEffect(placedLocation, "torch");
 
-                    LoggingUtils.sendAndLog(player,"torch.light_placed", placedLocation, incrementalId);
+                    TextHandler.get().sendAndLog(player,"torch.light_placed", placedLocation, incrementalId);
                 }
             }
         }
@@ -110,7 +110,7 @@ public class TorchListener implements Listener {
 
                                     event.setDropItems(false);
 
-                                    LoggingUtils.sendAndLog(player,"torch.light_broken", incrementalId);
+                                    TextHandler.get().sendAndLog(player,"torch.light_broken", incrementalId);
                                 }
                             }
                         }
@@ -146,7 +146,7 @@ public class TorchListener implements Listener {
             if (container.has(lumenIdKey, PersistentDataType.STRING) &&
                     "torch".equals(container.get(lumenIdKey, PersistentDataType.STRING))) {
 
-                LoggingUtils.sendMessage(player, "torch.light_level_prompt");
+                TextHandler.get().sendMessage(player, "torch.light_level_prompt");
 
                 plugin.getServer().getPluginManager().registerEvents(new Listener() {
                     @SuppressWarnings("deprecation")
@@ -160,13 +160,13 @@ public class TorchListener implements Listener {
                         try {
                             int lightLevel = Integer.parseInt(message);
                             if (lightLevel < 0 || lightLevel > 15) {
-                                LoggingUtils.sendMessage(player, "torch.error.invalid_light_level");
+                                TextHandler.get().sendMessage(player, "torch.error.invalid_light_level");
                                 return;
                             }
 
                             ItemStack currentItem = player.getInventory().getItemInMainHand();
                             if (currentItem.getType() != Material.PLAYER_HEAD || currentItem.getItemMeta() == null) {
-                                LoggingUtils.sendMessage(player, "torch.error.no_torch_in_hand");
+                                TextHandler.get().sendMessage(player, "torch.error.no_torch_in_hand");
                                 return;
                             }
 
@@ -175,9 +175,9 @@ public class TorchListener implements Listener {
                             metaContainer.set(new NamespacedKey(plugin, "custom_light_level"), PersistentDataType.INTEGER, lightLevel);
                             currentItem.setItemMeta(meta);
 
-                            LoggingUtils.sendAndLog(player, "torch.light_level_set", lightLevel);
+                            TextHandler.get().sendAndLog(player, "torch.light_level_set", lightLevel);
                         } catch (NumberFormatException e) {
-                            LoggingUtils.sendAndLog(player, "torch.error.invalid_light_level");
+                            TextHandler.get().sendAndLog(player, "torch.error.invalid_light_level");
                         }
 
                         AsyncPlayerChatEvent.getHandlerList().unregister(this);

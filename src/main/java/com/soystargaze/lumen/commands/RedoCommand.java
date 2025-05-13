@@ -7,7 +7,7 @@ import com.soystargaze.lumen.lights.integrations.RedoFAWEHandler;
 import com.soystargaze.lumen.utils.BatchProcessor;
 import com.soystargaze.lumen.connections.CoreProtectHandler;
 import com.soystargaze.lumen.utils.DisplayUtil;
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -37,24 +37,24 @@ public class RedoCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            LoggingUtils.logTranslated("command.only_players");
+            TextHandler.get().logTranslated("command.only_players");
             return true;
         }
 
         if (!sender.hasPermission("lumen.redo")) {
-            LoggingUtils.sendMessage(player,"command.no_permission");
+            TextHandler.get().sendMessage(player,"command.no_permission");
             return true;
         }
 
         Integer operationId = LightRegistry.getLastSoftDeletedOperationId();
         if (operationId == null) {
-            LoggingUtils.sendAndLog(player, "command.redo.no_previous_operations");
+            TextHandler.get().sendAndLog(player, "command.redo.no_previous_operations");
             return true;
         }
 
         Map<Location, Integer> blocksWithLightLevels = LightRegistry.getSoftDeletedBlocksWithLightLevelByOperationId(operationId);
         if (blocksWithLightLevels.isEmpty()) {
-            LoggingUtils.sendAndLog(player, "command.redo.no_blocks_found", operationId);
+            TextHandler.get().sendAndLog(player, "command.redo.no_blocks_found", operationId);
             return true;
         }
 
@@ -97,11 +97,11 @@ public class RedoCommand implements CommandExecutor {
                     }
 
                     LightRegistry.restoreSoftDeletedBlocksByOperationId(operationId);
-                    LoggingUtils.sendAndLog(player, "command.redo.restoration_completed", operationId);
+                    TextHandler.get().sendAndLog(player, "command.redo.restoration_completed", operationId);
                     DisplayUtil.hideBossBar(player);
                     task.cancel();
                 } else if (blockQueue.isEmpty()) {
-                    LoggingUtils.logTranslated("command.redo.retrying_failed_blocks");
+                    TextHandler.get().logTranslated("command.redo.retrying_failed_blocks");
 
                     failedBlocks.entrySet().removeIf(entry -> entry.getValue() >= MAX_RETRY_ATTEMPTS);
                     blockQueue.addAll(failedBlocks.entrySet());
@@ -110,7 +110,7 @@ public class RedoCommand implements CommandExecutor {
             }, 0L, 1L);
         }
 
-        LoggingUtils.sendAndLog(player, "command.redo.restoration_started", blocksWithLightLevels.size());
+        TextHandler.get().sendAndLog(player, "command.redo.restoration_started", blocksWithLightLevels.size());
         return true;
     }
 
@@ -137,10 +137,10 @@ public class RedoCommand implements CommandExecutor {
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
                 return true;
             } catch (ClassCastException e) {
-                LoggingUtils.logTranslated("command.redo.light_level_error", blockLocation, e.getMessage());
+                TextHandler.get().logTranslated("command.redo.light_level_error", blockLocation, e.getMessage());
             }
         } else {
-            LoggingUtils.logTranslated("command.redo.cannot_set_light", blockLocation);
+            TextHandler.get().logTranslated("command.redo.cannot_set_light", blockLocation);
         }
         return false;
     }

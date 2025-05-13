@@ -1,7 +1,7 @@
 package com.soystargaze.lumen.commands;
 
 import com.soystargaze.lumen.Lumen;
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,7 +19,6 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
     private final UndoCommand undoCommand;
     private final ClearCommand clearCommand;
     private final RedoCommand redoCommand;
-    private final LangCommand langCommand;
     private final LightCommand lightCommand;
     private final CancelCommand cancelCommand;
     private final GiveCommand giveCommand;
@@ -30,7 +29,6 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
         this.undoCommand = undoCommand;
         this.clearCommand = clearCommand;
         this.redoCommand = redoCommand;
-        this.langCommand = new LangCommand(plugin);
         this.lightCommand = new LightCommand();
         this.cancelCommand = new CancelCommand();
         this.giveCommand = new GiveCommand();
@@ -40,17 +38,17 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            LoggingUtils.logTranslated("command.only_players");
+            TextHandler.get().logTranslated("command.only_players");
             return true;
         }
 
         if (!sender.hasPermission("lumen.use")) {
-            LoggingUtils.sendMessage(player, "command.no_permission");
+            TextHandler.get().sendMessage(player, "command.no_permission");
             return true;
         }
 
         if (args.length == 0) {
-            LoggingUtils.sendMessage(player, "command.usage");
+            TextHandler.get().sendMessage(player, "command.usage");
             return true;
         }
 
@@ -58,7 +56,6 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
         String[] subArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
 
         return switch (subCommand) {
-            case "lang" -> langCommand.onCommand(sender, command, label, subArgs);
             case "light" -> lightCommand.onCommand(sender, command, label, subArgs);
             case "cancel" -> cancelCommand.onCommand(sender, command, label, subArgs);
             case "undo" -> undoCommand.onCommand(sender, command, label, subArgs);
@@ -68,7 +65,7 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
             case "give" -> giveCommand.onCommand(sender, command, label, subArgs);
             case "reload" -> reloadCommand.onCommand(sender, command, label, subArgs);
             default -> {
-                LoggingUtils.sendMessage(player, "command.usage");
+                TextHandler.get().sendMessage(player, "command.usage");
                 yield true;
             }
         };
@@ -94,7 +91,6 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
         String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
 
         return switch (subCommand) {
-            case "lang" -> langCommand.onTabComplete(sender, command, alias, subArgs);
             case "light" -> lightCommand.onTabComplete(sender, command, alias, subArgs);
             case "clear" -> clearCommand.onTabComplete(sender, command, alias, subArgs);
             case "remove" -> removeCommand.onTabComplete(sender, command, alias, subArgs);

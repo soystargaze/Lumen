@@ -3,7 +3,7 @@ package com.soystargaze.lumen.commands;
 import com.soystargaze.lumen.Lumen;
 import com.soystargaze.lumen.database.LightRegistry;
 import com.soystargaze.lumen.connections.CoreProtectHandler;
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -26,12 +26,12 @@ public class UndoCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            LoggingUtils.logTranslated("command.only_players");
+            TextHandler.get().logTranslated("command.only_players");
             return true;
         }
 
         if (!sender.hasPermission("lumen.undo")) {
-            LoggingUtils.sendMessage(player,"command.no_permission");
+            TextHandler.get().sendMessage(player,"command.no_permission");
             return true;
         }
 
@@ -40,11 +40,11 @@ public class UndoCommand implements CommandExecutor {
             try {
                 count = Integer.parseInt(args[0]);
                 if (count < 1) {
-                    LoggingUtils.sendAndLog(player, "command.undo.invalid_count");
+                    TextHandler.get().sendAndLog(player, "command.undo.invalid_count");
                     return true;
                 }
             } catch (NumberFormatException e) {
-                LoggingUtils.sendAndLog(player, "command.undo.invalid_count");
+                TextHandler.get().sendAndLog(player, "command.undo.invalid_count");
                 return true;
             }
         }
@@ -52,16 +52,16 @@ public class UndoCommand implements CommandExecutor {
         List<Integer> lastOperations = LightRegistry.getLastOperations(count);
 
         if (lastOperations.isEmpty()) {
-            LoggingUtils.sendAndLog(player, "command.undo.no_previous_operations");
+            TextHandler.get().sendAndLog(player, "command.undo.no_previous_operations");
             return true;
         }
 
         int totalRemovedBlocks = removeLightBlocksByOperations(lastOperations, player);
 
         if (totalRemovedBlocks > 0) {
-            LoggingUtils.sendAndLog(player, "command.undo.success", totalRemovedBlocks, count);
+            TextHandler.get().sendAndLog(player, "command.undo.success", totalRemovedBlocks, count);
         } else {
-            LoggingUtils.sendAndLog(player, "command.undo.no_blocks", count);
+            TextHandler.get().sendAndLog(player, "command.undo.no_blocks", count);
         }
         return true;
     }

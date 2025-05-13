@@ -1,7 +1,6 @@
 package com.soystargaze.lumen.database;
 
-import com.soystargaze.lumen.utils.LoggingUtils;
-import com.soystargaze.lumen.utils.TranslationHandler;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,7 +14,7 @@ public class DatabaseHandler {
 
     public static void initialize(JavaPlugin plugin) {
         if (dataSource != null) {
-            LoggingUtils.logTranslated("database.init.already_initialized");
+            TextHandler.get().logTranslated("database.init.already_initialized");
             return;
         }
 
@@ -23,15 +22,15 @@ public class DatabaseHandler {
             initializeSQLite(plugin);
             createTables();
         } catch (Exception e) {
-            LoggingUtils.logTranslated("database.init.error", e.getMessage());
-            throw new IllegalStateException(TranslationHandler.get("database.init.failed"));
+            TextHandler.get().logTranslated("database.init.error", e.getMessage());
+            throw new IllegalStateException("Failed to initialize database", e);
         }
     }
 
     private static void initializeSQLite(JavaPlugin plugin) throws SQLException {
         File dbFolder = new File(plugin.getDataFolder(), "Data");
         if (!dbFolder.exists() && !dbFolder.mkdirs()) {
-            throw new SQLException(TranslationHandler.getFormatted("database.sqlite.error_directory", dbFolder.getAbsolutePath()));
+            throw new SQLException("Failed to create database directory: " + dbFolder.getAbsolutePath());
         }
 
         String dbFilePath = new File(dbFolder, "lumen.db").getAbsolutePath();
@@ -77,13 +76,13 @@ public class DatabaseHandler {
             stmt.executeUpdate(createOperationsTable);
 
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("database.tables.error", e.getMessage());
+            TextHandler.get().logTranslated("database.tables.error", e.getMessage());
         }
     }
 
     public static Connection getConnection() throws SQLException {
         if (dataSource == null) {
-            throw new IllegalStateException(TranslationHandler.get("database.connection.uninitialized"));
+            throw new IllegalStateException("Database not initialized");
         }
         return dataSource.getConnection();
     }
@@ -92,7 +91,7 @@ public class DatabaseHandler {
         if (dataSource != null) {
             dataSource.close();
             dataSource = null;
-            LoggingUtils.logTranslated("database.close.success");
+            TextHandler.get().logTranslated("database.close.success");
         }
     }
 }

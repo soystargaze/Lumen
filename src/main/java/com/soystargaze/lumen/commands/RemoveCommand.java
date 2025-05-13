@@ -3,8 +3,8 @@ package com.soystargaze.lumen.commands;
 import com.soystargaze.lumen.Lumen;
 import com.soystargaze.lumen.database.LightRegistry;
 import com.soystargaze.lumen.connections.CoreProtectHandler;
-import com.soystargaze.lumen.utils.LoggingUtils;
 import com.soystargaze.lumen.utils.RemoveLightUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -28,26 +28,26 @@ public class RemoveCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            LoggingUtils.logTranslated("command.only_players");
+            TextHandler.get().logTranslated("command.only_players");
             return true;
         }
 
         if (!sender.hasPermission("lumen.remove")) {
-            LoggingUtils.sendMessage(player,"command.no_permission");
+            TextHandler.get().sendMessage(player,"command.no_permission");
             return true;
         }
 
 
 
         if (args.length != 2 || !args[0].equalsIgnoreCase("area")) {
-            LoggingUtils.sendMessage(player,"command.remove.usage");
+            TextHandler.get().sendMessage(player,"command.remove.usage");
             return true;
         }
 
         try {
             int range = Integer.parseInt(args[1]);
             if (range < 1 || range > 100) {
-                LoggingUtils.sendAndLog(player, "command.remove.invalid_range");
+                TextHandler.get().sendAndLog(player, "command.remove.invalid_range");
                 return true;
             }
 
@@ -55,7 +55,7 @@ public class RemoveCommand implements CommandExecutor, TabCompleter {
             List<Location> blocks = LightRegistry.getBlocksInRange(playerLocation, range);
 
             if (blocks.isEmpty()) {
-                LoggingUtils.sendAndLog(player, "command.remove.area.no_blocks", range);
+                TextHandler.get().sendAndLog(player, "command.remove.area.no_blocks", range);
                 return true;
             }
 
@@ -63,15 +63,15 @@ public class RemoveCommand implements CommandExecutor, TabCompleter {
             boolean coreProtectAvailable = coreProtectHandler != null && coreProtectHandler.isEnabled();
 
             if (!coreProtectAvailable) {
-                LoggingUtils.sendAndLog(player, "command.remove.coreprotect_not_available");
+                TextHandler.get().sendAndLog(player, "command.remove.coreprotect_not_available");
             }
 
             int removedCount = removeAndLogBlocks(blocks, player, coreProtectAvailable ? coreProtectHandler : null);
 
-            LoggingUtils.sendAndLog(player, "command.remove.area.success", removedCount, range);
+            TextHandler.get().sendAndLog(player, "command.remove.area.success", removedCount, range);
             return true;
         } catch (NumberFormatException e) {
-            LoggingUtils.sendAndLog(player, "command.remove.invalid_range");
+            TextHandler.get().sendAndLog(player, "command.remove.invalid_range");
             return true;
         }
     }

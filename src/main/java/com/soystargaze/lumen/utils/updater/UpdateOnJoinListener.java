@@ -1,6 +1,6 @@
 package com.soystargaze.lumen.utils.updater;
 
-import com.soystargaze.vitamin.config.ConfigHandler;
+import com.soystargaze.lumen.config.ConfigHandler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

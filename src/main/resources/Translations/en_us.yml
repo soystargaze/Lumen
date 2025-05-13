@@ -17,6 +17,10 @@ plugin:
   disabled: "Lumen disabled successfully."
   enable_error: "Error enabling the plugin. Check the console for more details."
   language_loaded: "Language loaded: {0}.yml ({1} translations)"
+  update_available: "<color:#FFA500>Update available:</color> Download Vitamin+ {0} at {1}"
+  no_update_available: "<color:#FFA500>No updates available.</color> You are using the latest version."
+  update_check_failed: "<color:#FFA500>Failed to check for updates:</color> {0}"
+  update_check_error: "<color:#FFA500>Error checking for updates:</color> {0}"
 
 translations:
   folder_error: "Error: Could not create the translations folder."

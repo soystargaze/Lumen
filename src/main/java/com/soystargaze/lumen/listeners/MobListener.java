@@ -3,8 +3,8 @@ package com.soystargaze.lumen.listeners;
 import com.soystargaze.lumen.items.LumenItems;
 import com.soystargaze.lumen.mobs.ItemMobsHandler;
 import com.soystargaze.lumen.utils.ItemEffectUtil;
-import com.soystargaze.lumen.utils.LoggingUtils;
 import com.soystargaze.lumen.utils.LumenConstants;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
@@ -56,7 +56,7 @@ public class MobListener implements Listener {
 
                     ItemEffectUtil.playEffect(placedLocation, "guard");
 
-                    LoggingUtils.sendAndLog(player,"torch.guard_placed", placedLocation);
+                    TextHandler.get().sendAndLog(player,"torch.guard_placed", placedLocation);
                 }
             }
         }
@@ -85,7 +85,7 @@ public class MobListener implements Listener {
 
                         event.setDropItems(false);
 
-                        LoggingUtils.sendAndLog(player,"torch.guard_broken", brokenLocation);
+                        TextHandler.get().sendAndLog(player,"torch.guard_broken", brokenLocation);
                     }
                 }
             }

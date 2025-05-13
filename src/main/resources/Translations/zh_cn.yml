@@ -17,6 +17,10 @@ plugin:
   disabled: "Lumen 禁用成功。"
   enable_error: "启用插件时出错。请检查控制台以获取更多详情。"
   language_loaded: "语言加载成功：{0}.yml（{1} 条翻译）"
+  update_available: "<color:#FFA500>可用更新:</color> 在 {1} 下载维生素+ {0}"
+  no_update_available: "<color:#FFA500>没有可用更新。</color> 您正在使用最新版本。"
+  update_check_failed: "<color:#FFA500>检查更新失败:</color> {0}"
+  update_check_error: "<color:#FFA500>检查更新时发生错误:</color> {0}"
 
 translations:
   folder_error: "错误：无法创建翻译文件夹。"

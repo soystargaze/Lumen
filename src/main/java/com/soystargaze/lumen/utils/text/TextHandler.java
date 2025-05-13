@@ -1,9 +1,9 @@
 package com.soystargaze.lumen.utils.text;
 
-import com.soystargaze.vitamin.utils.text.legacy.LegacyLoggingUtils;
-import com.soystargaze.vitamin.utils.text.legacy.LegacyTranslationHandler;
-import com.soystargaze.vitamin.utils.text.modern.ModernLoggingUtils;
-import com.soystargaze.vitamin.utils.text.modern.ModernTranslationHandler;
+import com.soystargaze.lumen.utils.text.legacy.LegacyLoggingUtils;
+import com.soystargaze.lumen.utils.text.legacy.LegacyTranslationHandler;
+import com.soystargaze.lumen.utils.text.modern.ModernLoggingUtils;
+import com.soystargaze.lumen.utils.text.modern.ModernTranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

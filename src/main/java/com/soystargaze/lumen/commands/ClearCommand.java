@@ -1,8 +1,8 @@
 package com.soystargaze.lumen.commands;
 
 import com.soystargaze.lumen.database.LightRegistry;
-import com.soystargaze.lumen.utils.LoggingUtils;
 import com.soystargaze.lumen.utils.RemoveLightUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -21,12 +21,12 @@ public class ClearCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            LoggingUtils.logTranslated("command.only_players");
+            TextHandler.get().logTranslated("command.only_players");
             return true;
         }
 
         if (!sender.hasPermission("lumen.clear")) {
-            LoggingUtils.sendMessage(player,"command.no_permission");
+            TextHandler.get().sendMessage(player,"command.no_permission");
             return true;
         }
 
@@ -34,20 +34,20 @@ public class ClearCommand implements CommandExecutor, TabCompleter {
 
         if (args.length == 0) {
             confirmationRequests.put(playerId, System.currentTimeMillis());
-            LoggingUtils.sendAndLog(player, "command.clear.request");
+            TextHandler.get().sendAndLog(player, "command.clear.request");
             return true;
         }
 
         if (args.length == 1 && args[0].equalsIgnoreCase("confirm")) {
             if (!confirmationRequests.containsKey(playerId)) {
-                LoggingUtils.sendAndLog(player, "command.clear.no_request");
+                TextHandler.get().sendAndLog(player, "command.clear.no_request");
                 return true;
             }
 
             long requestTime = confirmationRequests.get(playerId);
             if (System.currentTimeMillis() - requestTime > CONFIRMATION_TIMEOUT) {
                 confirmationRequests.remove(playerId);
-                LoggingUtils.sendAndLog(player, "command.clear.expired");
+                TextHandler.get().sendAndLog(player, "command.clear.expired");
                 return true;
             }
 
@@ -60,11 +60,11 @@ public class ClearCommand implements CommandExecutor, TabCompleter {
             LightRegistry.clearAllBlocks();
             confirmationRequests.remove(playerId);
 
-            LoggingUtils.sendAndLog(player, "command.clear.success", removedCount);
+            TextHandler.get().sendAndLog(player, "command.clear.success", removedCount);
             return true;
         }
 
-        LoggingUtils.sendMessage(player,"command.clear.usage");
+        TextHandler.get().sendMessage(player,"command.clear.usage");
         return true;
     }
 

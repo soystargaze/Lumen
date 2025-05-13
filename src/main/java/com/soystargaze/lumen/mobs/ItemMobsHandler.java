@@ -1,7 +1,7 @@
 package com.soystargaze.lumen.mobs;
 
 import com.soystargaze.lumen.database.MobRegistry;
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -27,13 +27,13 @@ public class ItemMobsHandler {
         int radius = plugin.getConfig().getInt("settings.mob_torch_radius", 35);
         protectedAreas.put(location, radius);
         MobRegistry.addProtectedArea(location, radius);
-        LoggingUtils.logTranslated("mobs.area_created_by_player", location, player.getName());
+        TextHandler.get().logTranslated("mobs.area_created_by_player", location, player.getName());
     }
 
     public void unregisterAntiMobArea(Location location) {
         if (protectedAreas.remove(location) != null) {
             MobRegistry.removeProtectedArea(location);
-            LoggingUtils.logTranslated("mobs.area_removed", location);
+            TextHandler.get().logTranslated("mobs.area_removed", location);
         }
     }
 }

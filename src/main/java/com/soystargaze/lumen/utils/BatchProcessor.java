@@ -1,6 +1,7 @@
 package com.soystargaze.lumen.utils;
 
 import com.soystargaze.lumen.database.LightRegistry;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Location;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public class BatchProcessor {
             try {
                 processBatch();
             } catch (Exception e) {
-                LoggingUtils.logTranslated("light.error.batch_failed" + e.getMessage());
+                TextHandler.get().logTranslated("light.error.batch_failed" + e.getMessage());
             }
         }, 0, BATCH_DELAY_MS, TimeUnit.MILLISECONDS);
     }
@@ -26,14 +27,14 @@ public class BatchProcessor {
     public static void addBlockToBatch(Location location, int lightLevel, int operationId) {
         boolean success = batchQueue.offer(new BatchEntry(location, lightLevel, operationId));
         if (!success) {
-            LoggingUtils.logTranslated("light_registry.error.add_block_failed", location, operationId);
+            TextHandler.get().logTranslated("light_registry.error.add_block_failed", location, operationId);
 
         }
     }
 
     private static void processBatch() {
         List<BatchEntry> batch = new ArrayList<>();
-        batchQueue.drainTo(batch, BATCH_SIZE); // Extrae hasta BATCH_SIZE elementos de la cola
+        batchQueue.drainTo(batch, BATCH_SIZE);
 
         if (!batch.isEmpty()) {
             int operationId = batch.getFirst().operationId();
@@ -45,7 +46,7 @@ public class BatchProcessor {
             }
 
             LightRegistry.addBlocksAsync(locations, lightLevel, operationId);
-            LoggingUtils.logTranslated("light_registry.info.batch_processed", locations.size(), operationId);
+            TextHandler.get().logTranslated("light_registry.info.batch_processed", locations.size(), operationId);
         }
     }
 

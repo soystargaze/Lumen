@@ -1,6 +1,6 @@
 package com.soystargaze.lumen.database;
 
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,9 +27,9 @@ public class MobRegistry {
             stmt.setInt(5, radius);
             stmt.executeUpdate();
 
-            LoggingUtils.logTranslated("mob_registry.protected_area_added", location, radius);
+            TextHandler.get().logTranslated("mob_registry.protected_area_added", location, radius);
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("mob_registry.error.adding_area", location, e.getMessage());
+            TextHandler.get().logTranslated("mob_registry.error.adding_area", location, e.getMessage());
         }
     }
 
@@ -44,9 +44,9 @@ public class MobRegistry {
             stmt.setInt(4, location.getBlockZ());
             stmt.executeUpdate();
 
-            LoggingUtils.logTranslated("mob_registry.protected_area_removed", location);
+            TextHandler.get().logTranslated("mob_registry.protected_area_removed", location);
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("mob_registry.error.removing_area", location, e.getMessage());
+            TextHandler.get().logTranslated("mob_registry.error.removing_area", location, e.getMessage());
         }
     }
 
@@ -61,7 +61,7 @@ public class MobRegistry {
             areas.putAll(processResultSet(rs));
 
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("mob_registry.error.fetching_areas", e.getMessage());
+            TextHandler.get().logTranslated("mob_registry.error.fetching_areas", e.getMessage());
         }
 
         return areas;
@@ -82,7 +82,7 @@ public class MobRegistry {
                 Location location = new Location(world, x, y, z);
                 areas.put(location, radius);
             } else {
-                LoggingUtils.logTranslated("mob_registry.warning.world_not_found", worldName);
+                TextHandler.get().logTranslated("mob_registry.warning.world_not_found", worldName);
             }
         }
         return areas;

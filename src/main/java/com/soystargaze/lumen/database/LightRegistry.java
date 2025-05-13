@@ -1,7 +1,7 @@
 package com.soystargaze.lumen.database;
 
-import com.soystargaze.lumen.utils.LoggingUtils;
-import com.soystargaze.lumen.utils.TranslationHandler;
+import com.soystargaze.lumen.utils.text.TextHandler;
+import com.soystargaze.lumen.utils.text.legacy.LegacyTranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,7 +16,7 @@ public class LightRegistry {
     public static void addBlockAsync(Location location, int lightLevel, int operationId) {
         CompletableFuture.runAsync(() -> {
             if (lightLevel <= 0 || lightLevel > 15) {
-                LoggingUtils.logTranslated("light_registry.error.invalid_light_level", lightLevel, location);
+                TextHandler.get().logTranslated("light_registry.error.invalid_light_level", lightLevel, location);
                 return;
             }
 
@@ -29,7 +29,7 @@ public class LightRegistry {
                 statement.executeUpdate();
 
             } catch (SQLException e) {
-                LoggingUtils.logTranslated("light_registry.error.add_block", e.getMessage());
+                TextHandler.get().logTranslated("light_registry.error.add_block", e.getMessage());
             }
         });
     }
@@ -49,9 +49,9 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("database.operation.register.error", e.getMessage());
+            TextHandler.get().logTranslated("database.operation.register.error", e.getMessage());
         }
-        throw new IllegalStateException(TranslationHandler.get("database.operation.register.failed"));
+        throw new IllegalStateException(LegacyTranslationHandler.get("database.operation.register.failed"));
     }
 
     public static void softDeleteBlocksByOperationId(int operationId) {
@@ -62,9 +62,9 @@ public class LightRegistry {
 
             statement.setInt(1, operationId);
             statement.executeUpdate();
-            LoggingUtils.logTranslated("light_registry.info.blocks_soft_deleted", operationId);
+            TextHandler.get().logTranslated("light_registry.info.blocks_soft_deleted", operationId);
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.soft_delete", operationId, e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.soft_delete", operationId, e.getMessage());
         }
     }
 
@@ -76,9 +76,9 @@ public class LightRegistry {
 
             statement.setInt(1, operationId);
             statement.executeUpdate();
-            LoggingUtils.logTranslated("light_registry.info.blocks_restored", operationId);
+            TextHandler.get().logTranslated("light_registry.info.blocks_restored", operationId);
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.restore", operationId, e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.restore", operationId, e.getMessage());
         }
     }
 
@@ -101,7 +101,7 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.fetch_soft_deleted", operationId, e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.fetch_soft_deleted", operationId, e.getMessage());
         }
 
         return blocksWithLightLevel;
@@ -118,7 +118,7 @@ public class LightRegistry {
                 return resultSet.getInt("operation_id");
             }
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.fetch_last_soft_deleted", e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.fetch_last_soft_deleted", e.getMessage());
         }
 
         return null;
@@ -142,7 +142,7 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.fetch_blocks_by_operation", operationId, e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.fetch_blocks_by_operation", operationId, e.getMessage());
         }
 
         return blocks;
@@ -167,9 +167,9 @@ public class LightRegistry {
             updateStatement.setInt(1, operationId);
             updateStatement.executeUpdate();
 
-            LoggingUtils.logTranslated("light_registry.info.blocks_removed", operationId);
+            TextHandler.get().logTranslated("light_registry.info.blocks_removed", operationId);
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.remove_blocks", operationId, e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.remove_blocks", operationId, e.getMessage());
         }
     }
 
@@ -191,7 +191,7 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.fetch_blocks_in_range", e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.fetch_blocks_in_range", e.getMessage());
         }
 
         return blocks;
@@ -212,7 +212,7 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.fetch_all_blocks", e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.fetch_all_blocks", e.getMessage());
         }
 
         return blocks;
@@ -233,7 +233,7 @@ public class LightRegistry {
                 }
             }
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.fetch_last_operations", count, e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.fetch_last_operations", count, e.getMessage());
         }
         return operations;
     }
@@ -253,9 +253,9 @@ public class LightRegistry {
             }
 
             updateStatement.executeUpdate();
-            LoggingUtils.logTranslated("light_registry.info.all_blocks_removed");
+            TextHandler.get().logTranslated("light_registry.info.all_blocks_removed");
         } catch (SQLException e) {
-            LoggingUtils.logTranslated("light_registry.error.clear_all_blocks", e.getMessage());
+            TextHandler.get().logTranslated("light_registry.error.clear_all_blocks", e.getMessage());
         }
     }
 
@@ -270,7 +270,7 @@ public class LightRegistry {
             return new Location(world, x, y, z);
         }
 
-        LoggingUtils.logTranslated("light_registry.warning.world_not_found", worldName);
+        TextHandler.get().logTranslated("light_registry.warning.world_not_found", worldName);
         return null;
     }
 
@@ -302,7 +302,7 @@ public class LightRegistry {
 
                 for (Location location : locations) {
                     if (lightLevel <= 0 || lightLevel > 15) {
-                        LoggingUtils.logTranslated("light_registry.error.invalid_light_level", lightLevel, location);
+                        TextHandler.get().logTranslated("light_registry.error.invalid_light_level", lightLevel, location);
                         continue;
                     }
 
@@ -312,9 +312,9 @@ public class LightRegistry {
 
                 statement.executeBatch();
                 connection.commit();
-                LoggingUtils.logTranslated("light_registry.info.blocks_added", locations.size(), operationId);
+                TextHandler.get().logTranslated("light_registry.info.blocks_added", locations.size(), operationId);
             } catch (SQLException e) {
-                LoggingUtils.logTranslated("light_registry.error.add_blocks", e.getMessage());
+                TextHandler.get().logTranslated("light_registry.error.add_blocks", e.getMessage());
             }
         });
     }

@@ -1,7 +1,7 @@
 package com.soystargaze.lumen.items;
 
 import com.soystargaze.lumen.utils.LumenConstants;
-import com.soystargaze.lumen.utils.TranslationHandler;
+import com.soystargaze.lumen.utils.text.legacy.LegacyTranslationHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -41,14 +41,14 @@ public class LumenItems {
 
     public void registerItems() {
         ItemStack lumenTorch = createLumenTorch(
-                TranslationHandler.get("items.torch.name"),
-                TranslationHandler.get("items.torch.lore"),
+                LegacyTranslationHandler.get("items.torch.name"),
+                LegacyTranslationHandler.get("items.torch.lore"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzViNTFjYzJlOTlkMDhkZDI4NzlhNzkyZjA2MmUwNzc4MzJhMDE2M2YzZDg1YzI0NGUwYmExYzM5MmFiMDlkZSJ9fX0=",
                 "torch"
         );
         ItemStack lumenGuard = createLumenTorch(
-                TranslationHandler.get("items.guard.name"),
-                TranslationHandler.get("items.guard.lore"),
+                LegacyTranslationHandler.get("items.guard.name"),
+                LegacyTranslationHandler.get("items.guard.lore"),
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg0NDE3MjViZDQzMDczNmNmNDBkNGNlOTVjYjVhNWUxMDMwNWI3OTVhYzRmZjg0NzRlMDUzNWRmN2FmMWRkNyJ9fX0=",
                 "guard"
         );

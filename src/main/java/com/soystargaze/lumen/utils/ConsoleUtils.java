@@ -1,13 +1,14 @@
 package com.soystargaze.lumen.utils;
 
-import static com.soystargaze.lumen.utils.TranslationHandler.loadedKeys;
+import com.soystargaze.lumen.utils.text.TextHandler;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class ConsoleUtils {
 
-    public static void displayAsciiArt() {
+    public static void displayAsciiArt(JavaPlugin plugin) {
 
         final String LOCAL_TEST_MESSAGE_KEY = "plugin.logo";
-        TranslationHandler.registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, """
+        TextHandler.get().registerTemporaryTranslation(LOCAL_TEST_MESSAGE_KEY, """
                 
                   _                                  \s
                  | |                                 \s
@@ -16,19 +17,24 @@ public class ConsoleUtils {
                  | |___| |_| | | | | | |  __/ | | |  \s
                  |______\\__,_|_| |_| |_|\\___|_| |_|\s
                 """);
-        LoggingUtils.logTranslated(LOCAL_TEST_MESSAGE_KEY);
+        TextHandler.get().logTranslated(LOCAL_TEST_MESSAGE_KEY);
+        TextHandler.get().logTranslated("plugin.separator");
+        TextHandler.get().logTranslated("plugin.name");
+        TextHandler.get().logTranslated("plugin.version", plugin.getDescription().getVersion());
+        TextHandler.get().logTranslated("plugin.author", plugin.getDescription().getAuthors());
+        TextHandler.get().logTranslated("plugin.separator");
     }
 
-    public static void displaySuccessMessage() {
+    public static void displaySuccessMessage(JavaPlugin plugin) {
 
-        LoggingUtils.logTranslated("plugin.separator");
-        LoggingUtils.logTranslated("plugin.enabled");
-        LoggingUtils.logTranslated("plugin.language_loaded", TranslationHandler.getActiveLanguage(), loadedKeys);
-        LoggingUtils.logTranslated("database.initialized");
-        LoggingUtils.logTranslated("items.registered");
-        LoggingUtils.logTranslated("mobs.protected_areas_loaded");
-        LoggingUtils.logTranslated("command.registered");
-        LoggingUtils.logTranslated("events.registered");
-        LoggingUtils.logTranslated("plugin.separator");
+        TextHandler.get().logTranslated("plugin.separator");
+        TextHandler.get().logTranslated("plugin.enabled");
+        TextHandler.get().logTranslated("plugin.language_loaded", TextHandler.get().getActiveLanguage(), TextHandler.get().getLoadedTranslationsCount());
+        TextHandler.get().logTranslated("database.initialized");
+        TextHandler.get().logTranslated("items.registered");
+        TextHandler.get().logTranslated("mobs.protected_areas_loaded");
+        TextHandler.get().logTranslated("command.registered");
+        TextHandler.get().logTranslated("events.registered");
+        TextHandler.get().logTranslated("plugin.separator");
     }
 }

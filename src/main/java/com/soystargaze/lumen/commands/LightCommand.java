@@ -3,7 +3,7 @@ package com.soystargaze.lumen.commands;
 import com.soystargaze.lumen.Lumen;
 import com.soystargaze.lumen.database.LightRegistry;
 import com.soystargaze.lumen.lights.LightHandler;
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -21,30 +21,30 @@ public class LightCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            LoggingUtils.logTranslated("command.only_players");
+            TextHandler.get().logTranslated("command.only_players");
             return true;
         }
 
         if (!sender.hasPermission("lumen.light")) {
-            LoggingUtils.sendMessage(player,"command.no_permission");
+            TextHandler.get().sendMessage(player,"command.no_permission");
             return true;
         }
 
         if (args.length == 0) {
-            LoggingUtils.sendMessage(player,"command.light.usage");
+            TextHandler.get().sendMessage(player,"command.light.usage");
             return true;
         }
 
         try {
             int range = Integer.parseInt(args[0]);
             if (range < 1 || range > 150) {
-                LoggingUtils.sendAndLog(player, "command.light.invalid_range");
+                TextHandler.get().sendAndLog(player, "command.light.invalid_range");
                 return true;
             }
 
             int lightLevel = args.length > 1 ? Integer.parseInt(args[1]) : 15;
             if (lightLevel < 0 || lightLevel > 15) {
-                LoggingUtils.sendAndLog(player, "command.light.invalid_level");
+                TextHandler.get().sendAndLog(player, "command.light.invalid_level");
                 return true;
             }
 
@@ -55,10 +55,10 @@ public class LightCommand implements CommandExecutor, TabCompleter {
             LightHandler lightHandler = new LightHandler(Lumen.getInstance());
             lightHandler.placeLights(player, range, lightLevel, includeSkylight, operationId);
 
-            LoggingUtils.sendAndLog(player, "command.light.success", lightLevel, operationId);
+            TextHandler.get().sendAndLog(player, "command.light.success", lightLevel, operationId);
             return true;
         } catch (NumberFormatException e) {
-            LoggingUtils.sendAndLog(player, "command.light.invalid_arguments");
+            TextHandler.get().sendAndLog(player, "command.light.invalid_arguments");
             return true;
         }
     }

@@ -9,7 +9,7 @@ import com.soystargaze.lumen.tasks.TaskManager;
 import com.soystargaze.lumen.utils.AsyncExecutor;
 import com.soystargaze.lumen.utils.BatchProcessor;
 import com.soystargaze.lumen.utils.DisplayUtil;
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,20 +40,20 @@ public class LightHandler {
         World world = center.getWorld();
 
         if (world == null) {
-            LoggingUtils.sendAndLog(player, "light.error.no_world");
+            TextHandler.get().sendAndLog(player, "light.error.no_world");
             return;
         }
 
         CompletableFuture.supplyAsync(() -> calculateLightPositions(center, areaBlocks, includeSkylight), AsyncExecutor.getExecutor())
                 .thenAccept(blocksToLight -> {
                     if (blocksToLight.isEmpty()) {
-                        LoggingUtils.sendAndLog(player, "light.error.no_blocks_found");
+                        TextHandler.get().sendAndLog(player, "light.error.no_blocks_found");
                         return;
                     }
                     processBlocksAsync(player, blocksToLight, lightLevel, operationId);
                 })
                 .exceptionally(ex -> {
-                    LoggingUtils.logTranslated("light.error.calculating_positions", ex.getMessage());
+                    TextHandler.get().logTranslated("light.error.calculating_positions", ex.getMessage());
                     return null;
                 });
     }
@@ -62,7 +62,7 @@ public class LightHandler {
         List<Location> positions = new ArrayList<>();
         World world = center.getWorld();
         if (world == null) {
-            LoggingUtils.logTranslated("light.warning.no_world");
+            TextHandler.get().logTranslated("light.warning.no_world");
             return positions;
         }
 
@@ -80,7 +80,7 @@ public class LightHandler {
             }
         }
 
-        LoggingUtils.logTranslated("light.info.calculated_blocks", positions.size());
+        TextHandler.get().logTranslated("light.info.calculated_blocks", positions.size());
         return positions;
     }
 
@@ -136,7 +136,7 @@ public class LightHandler {
 
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int operationId) {
         if (isFAWEAvailable()) {
-            LoggingUtils.logTranslated("light.info.fawe_found");
+            TextHandler.get().logTranslated("light.info.fawe_found");
             CompletableFuture.runAsync(() -> {
                 try {
                     FAWEHandler.placeLightBlocks(blocks, lightLevel, player, coreProtectHandler);
@@ -145,17 +145,17 @@ public class LightHandler {
                     throw new RuntimeException("Error during FAWE block placement: " + e.getMessage(), e);
                 }
             }).thenRun(() -> {
-                LoggingUtils.sendAndLog(player, "light.info.completed_operation", operationId);
+                TextHandler.get().sendAndLog(player, "light.info.completed_operation", operationId);
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
             }).exceptionally(ex -> {
-                LoggingUtils.sendAndLog(player, "light.error.fawe_failed", ex.getMessage());
+                TextHandler.get().sendAndLog(player, "light.error.fawe_failed", ex.getMessage());
                 return null;
             });
             return;
         }
 
-        LoggingUtils.logTranslated("light.info.fawe_not_found");
+        TextHandler.get().logTranslated("light.info.fawe_not_found");
         int maxBlocksPerTick = ConfigHandler.getInt("settings.command_lights_per_tick", 1000);
         Queue<Location> blockQueue = new LinkedList<>(blocks);
         List<Location> processedBlocks = new ArrayList<>();
@@ -186,12 +186,12 @@ public class LightHandler {
                             processedBlocks,
                             Material.LIGHT
                     );
-                    LoggingUtils.logTranslated("light.info.blocks_registered", processedBlocks.size());
+                    TextHandler.get().logTranslated("light.info.blocks_registered", processedBlocks.size());
                 } else {
-                    LoggingUtils.logTranslated("light.warning.no_blocks_registered", operationId);
+                    TextHandler.get().logTranslated("light.warning.no_blocks_registered", operationId);
                 }
 
-                LoggingUtils.sendAndLog(player, "light.info.completed_operation", operationId);
+                TextHandler.get().sendAndLog(player, "light.info.completed_operation", operationId);
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
             }
@@ -217,7 +217,7 @@ public class LightHandler {
                 BatchProcessor.addBlockToBatch(blockLocation, lightLevel, operationId);
                 return true;
             } catch (ClassCastException e) {
-                LoggingUtils.logTranslated("light.error.setting_level", blockLocation, e.getMessage());
+                TextHandler.get().logTranslated("light.error.setting_level", blockLocation, e.getMessage());
             }
         }
         return false;

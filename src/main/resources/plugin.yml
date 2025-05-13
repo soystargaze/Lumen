@@ -23,9 +23,6 @@ permissions:
   lumen.light:
     description: Allows placing light blocks
     default: op
-  lumen.lang:
-    description: Allows changing language
-    default: op
   lumen.redo:
     description: Allows redoing light operations
     default: op

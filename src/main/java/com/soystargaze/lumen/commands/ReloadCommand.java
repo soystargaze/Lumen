@@ -2,8 +2,10 @@ package com.soystargaze.lumen.commands;
 
 import com.soystargaze.lumen.config.ConfigHandler;
 import com.soystargaze.lumen.lights.ItemLightsHandler;
-import com.soystargaze.lumen.utils.LoggingUtils;
-import com.soystargaze.lumen.utils.TranslationHandler;
+import com.soystargaze.lumen.utils.text.TextHandler;
+import com.soystargaze.lumen.utils.text.legacy.LegacyTranslationHandler;
+import com.soystargaze.lumen.utils.text.modern.ModernTranslationHandler;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,22 +24,22 @@ public class ReloadCommand implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            LoggingUtils.logTranslated("command.only_players");
+            TextHandler.get().logTranslated("command.only_players");
             return true;
         }
 
         if (!sender.hasPermission("lumen.reload")) {
-            LoggingUtils.sendMessage(player,"command.no_permission");
+            TextHandler.get().sendMessage(player,"command.no_permission");
             return true;
         }
 
         try {
             reloadConfig();
             int loadedTranslations = reloadTranslations();
-            LoggingUtils.sendMessage(player,"command.reload.success", loadedTranslations);
+            TextHandler.get().sendMessage(player,"command.reload.success", loadedTranslations);
         } catch (Exception e) {
-            LoggingUtils.sendMessage(player,"command.reload.error");
-            LoggingUtils.logTranslated("command.reload.error", e.getMessage());
+            TextHandler.get().sendMessage(player,"command.reload.error");
+            TextHandler.get().logTranslated("command.reload.error", e.getMessage());
         }
         return true;
     }
@@ -49,8 +51,15 @@ public class ReloadCommand implements CommandExecutor {
     }
 
     private int reloadTranslations() {
-        TranslationHandler.clearTranslations();
-        TranslationHandler.loadTranslations(plugin, plugin.getConfig().getString("language", "es_es"));
-        return TranslationHandler.getLoadedTranslationsCount();
+        String language = plugin.getConfig().getString("language", "en_us");
+        if (Bukkit.getServer().getName().equalsIgnoreCase("Paper")) {
+            ModernTranslationHandler.clearTranslations();
+            ModernTranslationHandler.loadTranslations(plugin, language);
+            return ModernTranslationHandler.getLoadedTranslationsCount();
+        } else {
+            LegacyTranslationHandler.clearTranslations();
+            LegacyTranslationHandler.loadTranslations(plugin, language);
+            return LegacyTranslationHandler.getLoadedTranslationsCount();
+        }
     }
 }

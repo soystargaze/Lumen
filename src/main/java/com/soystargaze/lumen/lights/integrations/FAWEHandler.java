@@ -1,7 +1,6 @@
 package com.soystargaze.lumen.lights.integrations;
 
 import com.soystargaze.lumen.connections.CoreProtectHandler;
-import com.soystargaze.lumen.utils.LoggingUtils;
 import com.fastasyncworldedit.bukkit.FaweBukkitWorld;
 import com.sk89q.worldedit.EditSession;
 import com.sk89q.worldedit.WorldEdit;
@@ -10,6 +9,7 @@ import com.sk89q.worldedit.registry.state.Property;
 import com.sk89q.worldedit.world.block.BlockState;
 import com.sk89q.worldedit.world.block.BlockType;
 import com.sk89q.worldedit.world.block.BlockTypes;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -31,7 +31,7 @@ public class FAWEHandler {
 
     public static void placeLightBlocks(List<Location> locations, int lightLevel, Player player, CoreProtectHandler coreProtectHandler) {
         if (isFAWEAvailable()) {
-            LoggingUtils.logTranslated("light.error.fawe_not_found");
+            TextHandler.get().logTranslated("light.error.fawe_not_found");
             return;
         }
 
@@ -56,7 +56,7 @@ public class FAWEHandler {
 
             BlockType lightType = BlockTypes.LIGHT;
             if (lightType == null) {
-                LoggingUtils.logTranslated("light.error.blocktype_not_supported");
+                TextHandler.get().logTranslated("light.error.blocktype_not_supported");
                 return;
             }
 
@@ -69,18 +69,18 @@ public class FAWEHandler {
             if (coreProtectHandler != null) {
                 try {
                     coreProtectHandler.logLightPlacement(player.getName(), placedLocations, Material.LIGHT);
-                    LoggingUtils.sendAndLog(player, "light.success.fawe", placedLocations.size());
+                    TextHandler.get().sendAndLog(player, "light.success.fawe", placedLocations.size());
                 } catch (Exception ex) {
-                    LoggingUtils.logTranslated("coreprotect.placement.error", ex.getMessage());
+                    TextHandler.get().logTranslated("coreprotect.placement.error", ex.getMessage());
                 }
             } else {
-                LoggingUtils.logTranslated("coreprotect.integration.not_found");
+                TextHandler.get().logTranslated("coreprotect.integration.not_found");
             }
 
             editSession.flushQueue();
 
         } catch (Exception e) {
-            LoggingUtils.logTranslated("light.error.fawe_failed", e.getMessage());
+            TextHandler.get().logTranslated("light.error.fawe_failed", e.getMessage());
         }
     }
 
@@ -94,7 +94,7 @@ public class FAWEHandler {
                 editSession.smartSetBlock(position, customLightState);
                 placedLocations.add(loc);
             } catch (Exception e) {
-                LoggingUtils.logTranslated("light.error.fawe_failed_location", loc, e.getMessage());
+                TextHandler.get().logTranslated("light.error.fawe_failed_location", loc, e.getMessage());
             }
         }
         return placedLocations;

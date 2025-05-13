@@ -8,7 +8,7 @@ import com.soystargaze.lumen.lights.integrations.ItemFAWEHandler;
 import com.soystargaze.lumen.tasks.TaskManager;
 import com.soystargaze.lumen.utils.AsyncExecutor;
 import com.soystargaze.lumen.utils.DisplayUtil;
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Levelled;
@@ -46,14 +46,14 @@ public class ItemLightsHandler {
         World world = center.getWorld();
 
         if (world == null) {
-            LoggingUtils.sendAndLog(player, "light.error.no_world");
+            TextHandler.get().sendAndLog(player, "light.error.no_world");
             return;
         }
 
         CompletableFuture.supplyAsync(() -> calculateLightPositions(center, radius), executor)
                 .thenAcceptAsync(blocksToLight -> {
                     if (blocksToLight.isEmpty()) {
-                        LoggingUtils.sendAndLog(player, "light.error.no_blocks_found");
+                        TextHandler.get().sendAndLog(player, "light.error.no_blocks_found");
                         return;
                     }
 
@@ -63,7 +63,7 @@ public class ItemLightsHandler {
                     processBlocksAsync(player, blocksToLight, lightLevel, lightsPerTick, tickInterval, operationId);
                 }, runnable -> Bukkit.getScheduler().runTask(plugin, runnable))
                 .exceptionally(ex -> {
-                    LoggingUtils.logTranslated("light.error.calculating_positions", ex.getMessage());
+                    TextHandler.get().logTranslated("light.error.calculating_positions", ex.getMessage());
                     return null;
                 });
     }
@@ -84,7 +84,7 @@ public class ItemLightsHandler {
                 }
             }
         }
-        LoggingUtils.logTranslated("light.info.calculated_blocks", positions.size());
+        TextHandler.get().logTranslated("light.info.calculated_blocks", positions.size());
         return positions;
     }
 
@@ -113,27 +113,27 @@ public class ItemLightsHandler {
 
     private void processBlocksAsync(Player player, List<Location> blocks, int lightLevel, int lightsPerTick, int tickInterval, int operationId) {
         if (isFAWEAvailable()) {
-            LoggingUtils.logTranslated("light.info.fawe_found");
+            TextHandler.get().logTranslated("light.info.fawe_found");
             CompletableFuture.runAsync(() -> ItemFAWEHandler.placeLightsWithFAWE(player, blocks, lightLevel, operationId), executor)
                     .thenRun(() -> {
-                        LoggingUtils.sendAndLog(player, "light.success.placed", operationId);
+                        TextHandler.get().sendAndLog(player, "light.success.placed", operationId);
                         DisplayUtil.hideBossBar(player);
                         TaskManager.cancelTask(player.getUniqueId());
                     })
                     .exceptionally(ex -> {
-                        LoggingUtils.sendAndLog(player, "light.error.fawe_failed", ex.getMessage());
+                        TextHandler.get().sendAndLog(player, "light.error.fawe_failed", ex.getMessage());
                         return null;
                     });
             return;
         }
 
-        LoggingUtils.logTranslated("light.info.fawe_not_found");
+        TextHandler.get().logTranslated("light.info.fawe_not_found");
         Queue<Location> blockQueue = new LinkedList<>(blocks);
         final BukkitTask[] taskHolder = new BukkitTask[1];
 
         taskHolder[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             if (!TaskManager.hasActiveTask(player.getUniqueId())) {
-                LoggingUtils.logTranslated("light.info.operation_cancelled", operationId);
+                TextHandler.get().logTranslated("light.info.operation_cancelled", operationId);
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
                 taskHolder[0].cancel();
@@ -165,7 +165,7 @@ public class ItemLightsHandler {
                 if (coreProtectHandler != null && coreProtectHandler.isEnabled()) {
                     coreProtectHandler.logLightPlacement(player.getName(), placedBlocks, Material.LIGHT);
                 }
-                LoggingUtils.sendAndLog(player, "light.success.placed", operationId);
+                TextHandler.get().sendAndLog(player, "light.success.placed", operationId);
                 DisplayUtil.hideBossBar(player);
                 TaskManager.cancelTask(player.getUniqueId());
                 taskHolder[0].cancel();
@@ -193,7 +193,7 @@ public class ItemLightsHandler {
                 LightRegistry.addBlockAsync(location, lightLevel, operationId);
                 return true;
             } catch (ClassCastException e) {
-                LoggingUtils.logTranslated("light.error.setting_level_torch", location, e.getMessage());
+                TextHandler.get().logTranslated("light.error.setting_level_torch", location, e.getMessage());
             }
         }
         return false;
@@ -203,7 +203,7 @@ public class ItemLightsHandler {
         CompletableFuture.supplyAsync(() -> LightRegistry.getBlocksByOperationId(operationId), executor)
                 .thenAcceptAsync(blocksToRemove -> {
                     if (blocksToRemove.isEmpty()) {
-                        LoggingUtils.sendAndLog(player, "light.error.no_lights_to_remove", operationId);
+                        TextHandler.get().sendAndLog(player, "light.error.no_lights_to_remove", operationId);
                         return;
                     }
 
@@ -231,6 +231,6 @@ public class ItemLightsHandler {
         removeLights(player, operationId);
 
         DisplayUtil.hideBossBar(player);
-        LoggingUtils.sendAndLog(player,"light.success.removed", operationId);
+        TextHandler.get().sendAndLog(player,"light.success.removed", operationId);
     }
 }

@@ -2,7 +2,7 @@ package com.soystargaze.lumen.commands;
 
 import com.soystargaze.lumen.Lumen;
 import com.soystargaze.lumen.items.LumenItems;
-import com.soystargaze.lumen.utils.LoggingUtils;
+import com.soystargaze.lumen.utils.text.TextHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -20,17 +20,17 @@ public class GiveCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            LoggingUtils.logTranslated("command.only_players");
+            TextHandler.get().logTranslated("command.only_players");
             return true;
         }
 
         if (!sender.hasPermission("lumen.give")) {
-            LoggingUtils.sendMessage(player,"command.no_permission");
+            TextHandler.get().sendMessage(player,"command.no_permission");
             return true;
         }
 
         if (args.length < 2 || args.length > 3) {
-            LoggingUtils.sendMessage(player,"command.give.usage");
+            TextHandler.get().sendMessage(player,"command.give.usage");
             return true;
         }
 
@@ -45,8 +45,8 @@ public class GiveCommand implements CommandExecutor, TabCompleter {
         ItemStack torch = lumenItems.getLumenItem(torchType.toLowerCase());
 
         if (torch == null) {
-            LoggingUtils.sendMessage(player,"command.give.invalid_torch");
-            LoggingUtils.logTranslated("command.give.invalid_torch");
+            TextHandler.get().sendMessage(player,"command.give.invalid_torch");
+            TextHandler.get().logTranslated("command.give.invalid_torch");
             return true;
         }
 
@@ -55,20 +55,20 @@ public class GiveCommand implements CommandExecutor, TabCompleter {
         if (target.equalsIgnoreCase("all") || target.equalsIgnoreCase("@a")) {
             Bukkit.getOnlinePlayers().forEach(p -> {
                 player.getInventory().addItem(torch.clone());
-                LoggingUtils.sendAndLog(player, "command.give.received", amount, torchType);
+                TextHandler.get().sendAndLog(player, "command.give.received", amount, torchType);
             });
-            LoggingUtils.sendMessage(player,"command.give.success_all", amount, torchType);
-            LoggingUtils.logTranslated("command.give.success_all", amount, torchType);
+            TextHandler.get().sendMessage(player,"command.give.success_all", amount, torchType);
+            TextHandler.get().logTranslated("command.give.success_all", amount, torchType);
         } else {
             Player p = Bukkit.getPlayerExact(target);
             if (p != null && player.isOnline()) {
                 player.getInventory().addItem(torch.clone());
-                LoggingUtils.sendAndLog(player, "command.give.received", amount, torchType);
-                LoggingUtils.sendMessage(player,"command.give.success_one", target, amount, torchType);
-                LoggingUtils.logTranslated("command.give.success_one", target, amount, torchType);
+                TextHandler.get().sendAndLog(player, "command.give.received", amount, torchType);
+                TextHandler.get().sendMessage(player,"command.give.success_one", target, amount, torchType);
+                TextHandler.get().logTranslated("command.give.success_one", target, amount, torchType);
             } else {
-                LoggingUtils.sendMessage(player,"command.give.invalid_player");
-                LoggingUtils.logTranslated("command.give.invalid_player");
+                TextHandler.get().sendMessage(player,"command.give.invalid_player");
+                TextHandler.get().logTranslated("command.give.invalid_player");
             }
         }
 
@@ -77,20 +77,20 @@ public class GiveCommand implements CommandExecutor, TabCompleter {
 
     private int parseAmount(String arg, CommandSender sender) {
         if (!(sender instanceof Player player)) {
-            LoggingUtils.logTranslated("command.only_players");
+            TextHandler.get().logTranslated("command.only_players");
             return -1;
         }
         try {
             int amount = Integer.parseInt(arg);
             if (amount <= 0) {
-                LoggingUtils.sendMessage(player,"command.give.invalid_amount");
-                LoggingUtils.logTranslated("command.give.invalid_amount");
+                TextHandler.get().sendMessage(player,"command.give.invalid_amount");
+                TextHandler.get().logTranslated("command.give.invalid_amount");
                 return -1;
             }
             return amount;
         } catch (NumberFormatException e) {
-            LoggingUtils.sendMessage(player,"command.give.invalid_amount");
-            LoggingUtils.logTranslated("command.give.invalid_amount");
+            TextHandler.get().sendMessage(player,"command.give.invalid_amount");
+            TextHandler.get().logTranslated("command.give.invalid_amount");
             return -1;
         }
     }

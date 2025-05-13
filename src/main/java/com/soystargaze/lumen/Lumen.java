@@ -12,6 +12,10 @@ import com.soystargaze.lumen.listeners.MobListener;
 import com.soystargaze.lumen.listeners.TorchListener;
 import com.soystargaze.lumen.mobs.ItemMobsHandler;
 import com.soystargaze.lumen.utils.*;
+import com.soystargaze.lumen.utils.text.TextHandler;
+import com.soystargaze.lumen.utils.text.legacy.LegacyTranslationHandler;
+import com.soystargaze.lumen.utils.updater.UpdateOnFullLoad;
+import com.soystargaze.lumen.utils.updater.UpdateOnJoinListener;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -36,7 +40,7 @@ public class Lumen extends JavaPlugin implements Listener {
         try {
             initializePlugin();
         } catch (Exception e) {
-            LoggingUtils.logTranslated("plugin.enable_error", e.getMessage());
+            TextHandler.get().logTranslated("plugin.enable_error", e.getMessage());
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
         }
@@ -46,32 +50,21 @@ public class Lumen extends JavaPlugin implements Listener {
     public void onDisable() {
         AsyncExecutor.shutdown();
         DatabaseHandler.close();
-        LoggingUtils.logTranslated("plugin.disabled");
+        TextHandler.get().logTranslated("plugin.disabled");
         instance = null;
     }
 
-    @SuppressWarnings("deprecation")
     private void initializePlugin() {
         LumenConstants.init(this);
         loadConfigurations();
         initializeMetrics();
 
-        ConsoleUtils.displayAsciiArt();
-        LoggingUtils.logTranslated("plugin.separator");
-        LoggingUtils.logTranslated("plugin.name");
-        LoggingUtils.logTranslated("plugin.version", getDescription().getVersion());
-        LoggingUtils.logTranslated("plugin.author", getDescription().getAuthors());
-        LoggingUtils.logTranslated("plugin.separator");
-
         try {
             initializeDatabase();
-            initializeSystems();
             registerEvents();
             registerServerLoadListener();
-
-            ConsoleUtils.displaySuccessMessage();
         } catch (Exception e) {
-            LoggingUtils.logTranslated("plugin.enable_error", e);
+            TextHandler.get().logTranslated("plugin.enable_error", e);
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -90,51 +83,54 @@ public class Lumen extends JavaPlugin implements Listener {
 
     private void loadConfigurations() {
         ConfigHandler.setup(this);
-        AsyncExecutor.initialize();
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+
+        TextHandler.init(this);
         setupTranslations();
-        TranslationHandler.loadTranslations(this, ConfigHandler.getLanguage());
+        ConsoleUtils.displayAsciiArt(this);
+
+        AsyncExecutor.initialize();
+        initializeCommandManager();
+        initializeItems();
+        ConsoleUtils.displaySuccessMessage(this);
     }
 
     private void setupTranslations() {
         File translationsFolder = new File(getDataFolder(), "Translations");
         if (!translationsFolder.exists() && !translationsFolder.mkdirs()) {
-            LoggingUtils.logTranslated("translations.folder_error");
+            TextHandler.get().logTranslated("translations.folder_error");
             return;
         }
 
-        String[] defaultLanguages = {"en_us.yml", "es_es.yml", "fr_fr.yml", "de_de.yml", "it_it.yml", "zh_cn.yml", "pt_br.yml", "es_andaluh.yml"};
-        for (String languageFile : defaultLanguages) {
-            saveDefaultTranslation(languageFile);
-        }
+        String[] defaults = {
+                "en_us.yml","es_es.yml","fr_fr.yml","de_de.yml",
+                "pt_br.yml","zh_cn.yml","it_it.yml","es_andaluh.yml"
+        };
 
-        File[] translationFiles = translationsFolder.listFiles((dir, name) -> name.endsWith(".yml"));
-        if (translationFiles != null) {
-            for (File file : translationFiles) {
-                String language = file.getName().replace(".yml", "");
-                TranslationHandler.loadTranslations(this, language);
-            }
-        }
-
-        String configuredLanguage = ConfigHandler.getLanguage();
-        if (TranslationHandler.isLanguageAvailable(configuredLanguage)) {
-            TranslationHandler.setActiveLanguage(configuredLanguage);
-        } else {
-            final String LICENSE_SUCCESS_KEY = "translations.language_not_found";
-            TranslationHandler.registerTemporaryTranslation(LICENSE_SUCCESS_KEY, "Language not found: {0}");
-            LoggingUtils.logTranslated(LICENSE_SUCCESS_KEY, configuredLanguage);
-        }
-    }
-
-    private void saveDefaultTranslation(String fileName) {
-        File translationFile = new File(getDataFolder(), "Translations/" + fileName);
-        if (!translationFile.exists()) {
+        boolean replace = getConfig().getBoolean("translations.force-update", true);
+        for (String file : defaults) {
             try {
-                saveResource("Translations/" + fileName, false);
+                saveResource("Translations/" + file, replace);
             } catch (Exception e) {
-                final String SAVE_ERROR_KEY = "translations.language_not_found";
-                TranslationHandler.registerTemporaryTranslation(SAVE_ERROR_KEY, "Translations cannot be saved: {0} {1}");
-                LoggingUtils.logTranslated(SAVE_ERROR_KEY, fileName, e.getMessage());
+                TextHandler.get().registerTemporaryTranslation(
+                        "translations.save_error",
+                        "Language cannot be saved: {0}"
+                );
+                TextHandler.get().logTranslated("translations.save_error", file);
             }
+        }
+
+        String lang = ConfigHandler.getLanguage();
+        if (TextHandler.get().isLanguageAvailable(lang)) {
+            TextHandler.get().loadTranslations(this, lang);
+        } else {
+            TextHandler.get().registerTemporaryTranslation(
+                    "translations.language_not_found",
+                    "Language not found: {0}"
+            );
+            TextHandler.get().logTranslated("translations.language_not_found", lang);
+            TextHandler.get().loadTranslations(this, TextHandler.get().getActiveLanguage());
         }
     }
 
@@ -142,14 +138,9 @@ public class Lumen extends JavaPlugin implements Listener {
         try {
             DatabaseHandler.initialize(this);
         } catch (Exception e) {
-            LoggingUtils.logTranslated("database.init_error", e.getMessage());
-            throw new IllegalStateException(TranslationHandler.get("database.init_fatal_error"));
+            TextHandler.get().logTranslated("database.init_error", e.getMessage());
+            throw new IllegalStateException(LegacyTranslationHandler.get("database.init_fatal_error"));
         }
-    }
-
-    private void initializeSystems() {
-        initializeCommandManager();
-        initializeItems();
     }
 
     private void initializeCommandManager() {
@@ -159,7 +150,7 @@ public class Lumen extends JavaPlugin implements Listener {
                 commandManager.registerCommands();
             }
         } catch (Exception e) {
-            LoggingUtils.logTranslated("command.register_error", e.getMessage());
+            TextHandler.get().logTranslated("command.register_error", e.getMessage());
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -171,14 +162,14 @@ public class Lumen extends JavaPlugin implements Listener {
                 lumenItems.registerItems();
             }
         } catch (Exception e) {
-            LoggingUtils.logTranslated("items.init_error", e.getMessage());
+            TextHandler.get().logTranslated("items.init_error", e.getMessage());
         }
     }
 
     private void initializeCoreProtectIntegration() {
         if (!isCoreProtectAvailable()) {
-            LoggingUtils.logTranslated("plugin.separator");
-            LoggingUtils.logTranslated("coreprotect.unavailable");
+            TextHandler.get().logTranslated("plugin.separator");
+            TextHandler.get().logTranslated("coreprotect.unavailable");
             return;
         }
 
@@ -187,22 +178,22 @@ public class Lumen extends JavaPlugin implements Listener {
             if (isFAWEAvailable()) {
                 ItemFAWEHandler.setCoreProtectHandler(coreProtectHandler);
             } else {
-                LoggingUtils.logTranslated("plugin.separator");
-                LoggingUtils.logTranslated("coreprotect.integration.no_fawe");
+                TextHandler.get().logTranslated("plugin.separator");
+                TextHandler.get().logTranslated("coreprotect.integration.no_fawe");
             }
             if (coreProtectHandler.isEnabled()) {
-                LoggingUtils.logTranslated("plugin.separator");
-                LoggingUtils.logTranslated("coreprotect.enabled");
+                TextHandler.get().logTranslated("plugin.separator");
+                TextHandler.get().logTranslated("coreprotect.enabled");
             } else {
-                LoggingUtils.logTranslated("plugin.separator");
-                LoggingUtils.logTranslated("coreprotect.unavailable");
+                TextHandler.get().logTranslated("plugin.separator");
+                TextHandler.get().logTranslated("coreprotect.unavailable");
                 coreProtectHandler = null;
             }
         } catch (Exception e) {
-            LoggingUtils.logTranslated("coreprotect.error_initializing", e.getMessage());
+            TextHandler.get().logTranslated("coreprotect.error_initializing", e.getMessage());
             coreProtectHandler = null;
         }
-        LoggingUtils.logTranslated("plugin.separator");
+        TextHandler.get().logTranslated("plugin.separator");
     }
 
     private boolean isCoreProtectAvailable() {
@@ -233,11 +224,13 @@ public class Lumen extends JavaPlugin implements Listener {
         try {
             ItemLightsHandler lightsHandler = new ItemLightsHandler(this);
             ItemMobsHandler mobsHandler = new ItemMobsHandler(this);
+            getServer().getPluginManager().registerEvents(new UpdateOnFullLoad(), this);
+            getServer().getPluginManager().registerEvents(new UpdateOnJoinListener(), this);
             getServer().getPluginManager().registerEvents(new TorchListener(this, lightsHandler, lumenItems), this);
             getServer().getPluginManager().registerEvents(new MobListener(mobsHandler, lumenItems), this);
             getServer().getPluginManager().registerEvents(new CraftPermissionListener(), this);
         } catch (Exception e) {
-            LoggingUtils.logTranslated("events.register_error", e.getMessage());
+            TextHandler.get().logTranslated("events.register_error", e.getMessage());
         }
     }
 
@@ -250,8 +243,8 @@ public class Lumen extends JavaPlugin implements Listener {
             new Metrics(this, BSTATS_PLUGIN_ID);
         } catch (Exception e) {
             final String BSTATS_ERROR = "bstats.error";
-            TranslationHandler.registerTemporaryTranslation(BSTATS_ERROR, "BStats error: {0}");
-            LoggingUtils.logTranslated(BSTATS_ERROR, e.getMessage());
+            TextHandler.get().registerTemporaryTranslation(BSTATS_ERROR, "BStats error: {0}");
+            TextHandler.get().logTranslated(BSTATS_ERROR, e.getMessage());
         }
     }
 
