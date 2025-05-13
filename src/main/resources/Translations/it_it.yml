@@ -17,10 +17,10 @@ plugin:
   disabled: "Lumen disabilitato correttamente."
   enable_error: "Errore durante l'abilitazione del plugin. Controlla la console per maggiori dettagli."
   language_loaded: "Lingua caricata: {0}.yml ({1} traduzioni)"
-  update_available: "<color:#FFA500>Aggiornamento disponibile:</color> Scarica Lumen {0} su {1}"
-  no_update_available: "<color:#FFA500>Nessun aggiornamento disponibile.</color> Stai usando l'ultima versione."
-  update_check_failed: "<color:#FFA500>Errore durante la verifica degli aggiornamenti:</color> {0}"
-  update_check_error: "<color:#FFA500>Errore durante la verifica degli aggiornamenti:</color> {0}"
+  update_available: "<color:#21FFCE>Aggiornamento disponibile:</color> Scarica Lumen {0} su {1}"
+  no_update_available: "<color:#21FFCE>Nessun aggiornamento disponibile.</color> Stai usando l'ultima versione."
+  update_check_failed: "<red>Errore durante la verifica degli aggiornamenti:</red> {0}"
+  update_check_error: "<red>Errore durante la verifica degli aggiornamenti:</red> {0}"
 
 translations:
   folder_error: "Errore: impossibile creare la cartella delle traduzioni."
