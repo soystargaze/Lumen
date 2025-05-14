@@ -4,7 +4,6 @@ import com.soystargaze.lumen.utils.text.legacy.LegacyLoggingUtils;
 import com.soystargaze.lumen.utils.text.legacy.LegacyTranslationHandler;
 import com.soystargaze.lumen.utils.text.modern.ModernLoggingUtils;
 import com.soystargaze.lumen.utils.text.modern.ModernTranslationHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,9 +23,9 @@ public class TextHandler {
         this.modern = modernDetected;
 
         if (modern) {
-            Bukkit.getLogger().info("[Lumen] Using ModernTranslationHandler (Paper/fork detected)");
+            plugin.getLogger().info("[Lumen] Using ModernTranslationHandler (Paper/fork detected)");
         } else {
-            Bukkit.getLogger().info("[Lumen] Using LegacyTranslationHandler");
+            plugin.getLogger().info("[Lumen] Using LegacyTranslationHandler");
         }
     }
 

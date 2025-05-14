@@ -5,7 +5,9 @@
 - **Lumen Torch** – Automatically lights up the surroundings with custom light level.
 - **Lumen Guard** – Prevents hostile mobs from spawning.
 
-[![Discord](https://img.shields.io/discord/1079917552588816484?label=Discord&logo=discord&logoColor=white&color=31FFA3&style=for-the-badge)](https://erosmari.com/discord) ![](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F%20by%20stargaze-31FFA3?style=for-the-badge) [![CodeFactor](https://img.shields.io/codefactor/grade/github/soystargaze/lumen?style=for-the-badge&logo=codefactor&logoColor=white&color=31FFA3)](https://www.codefactor.io/repository/github/soystargaze/lumen)
+> 💡**Attention:** NO resource pack needed!
+
+[![Discord](https://img.shields.io/discord/1079917552588816484?label=Discord&logo=discord&logoColor=white&color=31FFA3&style=for-the-badge)](https://erosmari.com/discord) ![](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F%20by%20stargaze-31FFA3?style=for-the-badge)
 
 ![Banner Logo](https://cdn.modrinth.com/data/izTZx6gw/images/ed1c78a69e6aba737ccc687acc242140fcce6299.png)
 
@@ -77,7 +79,6 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
 - `/lumen clear confirm` – Clears all registered lights.
 - `/lumen give <player/all> <torch_type> <quantity>` – Gives torches to players.
 - `/lumen reload` – Reloads configuration and translations.
-- `/lumen lang <language>` – Changes the plugin language.
 
 </details>
 
@@ -93,7 +94,6 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
   - `lumen.clear` – Permission to clear all lights.
   - `lumen.give` – Permission to give `Lumen Torch` and `Lumen Guard`.
   - `lumen.reload` – Permission to reload configuration and translations.
-  - `lumen.lang` – Permission to change the language.
 - **PLAYER Permissions:**
   - `lumen.craft.*` – Permission to craft all Lumen items.
     - `lumen.craft.torch` – Permission to craft the `Lumen Torch`.
@@ -128,8 +128,8 @@ Before installing Lumen, make sure your server meets the following requirements:
 - **Minecraft Server:** PaperMC **1.21 or higher** (recommended **1.21.4**, the latest stable version).
 - **Java:** Version **21 or higher**.
 - **Optional Dependencies:**
-    - **CoreProtect (Optional):** Enables tracking and rollback of placed or removed lights. Integration can be verified in the console upon server startup.
-    - **FastAsyncWorldEdit (Optional):** Optimizes performance for placing and removing large amounts of lights.
+  - **CoreProtect (Optional):** Enables tracking and rollback of placed or removed lights. Integration can be verified in the console upon server startup.
+  - **FastAsyncWorldEdit (Optional):** Optimizes performance for placing and removing large amounts of lights.
 
 ---
 
@@ -148,10 +148,10 @@ Download the latest version of **Lumen** from [Modrinth](https://modrinth.com/pl
 ## **Step 3: Initial Configuration**
 1. **Navigate to the configuration folder:** `plugins/Lumen/`
 2. **Edit `config.yml`** to adjust performance settings, such as:
-    - `command_lights_per_tick`: Number of lights added per tick when using commands.
-    - `torch_lights_per_tick`: Number of lights added per tick when using torches.
-    - `torch_tick_interval`: Interval between torch ticks.
-    - `mob_torch_radius`: Protection radius of the anti-mob torch.
+  - `command_lights_per_tick`: Number of lights added per tick when using commands.
+  - `torch_lights_per_tick`: Number of lights added per tick when using torches.
+  - `torch_tick_interval`: Interval between torch ticks.
+  - `mob_torch_radius`: Protection radius of the anti-mob torch.
 3. **If using CoreProtect,** check the server console on startup. If integration is successful, you will see a message indicating that CoreProtect has been detected and is active in Lumen.
 4. **If using FastAsyncWorldEdit,** ensure it is installed and properly configured to optimize the placement and removal of lights.
 
@@ -167,6 +167,4 @@ Download the latest version of **Lumen** from [Modrinth](https://modrinth.com/pl
 
 ## 💬 Support & Contact
 
-If you have any questions or encounter issues, feel free to contact us on [Discord](https://erosmari.com/discord)
-
-![bstats](https://bstats.org/signatures/bukkit/Lumen%20-%20Ultimate%20Lightning.svg)
+If you have any questions or encounter issues, feel free to contact us on [Discord](https://soystargaze.com/discord)
