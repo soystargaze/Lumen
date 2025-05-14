@@ -85,8 +85,8 @@ public class LegacyTranslationHandler {
     }
 
     public static Component getPlayerMessage(String key, Object... args) {
-        String prefix = translations.getOrDefault("plugin.prefix", "<gray>[</gray><gradient:#FFA500:#FFFF00>Vitamin</gradient><color:#FFA500>+</color><gray>]</gray> ");
-        String dynamicColor = translations.getOrDefault("plugin.dynamic_color", "<color:#FFA500>");
+        String prefix = translations.getOrDefault("plugin.prefix", "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> ");
+        String dynamicColor = translations.getOrDefault("plugin.dynamic_color", "<color:#21FFCE>");
         String template = translations.getOrDefault(key, "Translation not found: " + key + "!");
 
         for (int i = 0; i < args.length; i++) {
@@ -108,9 +108,9 @@ public class LegacyTranslationHandler {
     }
 
     public static Component getLogMessage(String key, Object... args) {
-        String prefix = translations.getOrDefault("plugin.prefix", "<gray>[</gray><gradient:#FFA500#FFFF00>Vitamin</gradient><color:#FFA500>+</color><gray>]</gray> ");
+        String prefix = translations.getOrDefault("plugin.prefix", "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> ");
         String template = translations.getOrDefault(key, "Translation not found: " + key + "!");
-        String dynamicColor = translations.getOrDefault("plugin.dynamic_color", "<color:#FFA500>");
+        String dynamicColor = translations.getOrDefault("plugin.dynamic_color", "<color:#21FFCE>");
 
         for (int i = 0; i < args.length; i++) {
             String coloredArg = dynamicColor + args[i].toString() + "</color>";
