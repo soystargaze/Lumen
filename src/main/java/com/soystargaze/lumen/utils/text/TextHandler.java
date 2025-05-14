@@ -24,9 +24,9 @@ public class TextHandler {
         this.modern = modernDetected;
 
         if (modern) {
-            Bukkit.getLogger().info("[Vitamin] Using ModernTranslationHandler (Paper/fork detected)");
+            Bukkit.getLogger().info("[Lumen] Using ModernTranslationHandler (Paper/fork detected)");
         } else {
-            Bukkit.getLogger().info("[Vitamin] Using LegacyTranslationHandler");
+            Bukkit.getLogger().info("[Lumen] Using LegacyTranslationHandler");
         }
     }
 
