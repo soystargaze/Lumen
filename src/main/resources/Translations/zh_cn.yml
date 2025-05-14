@@ -4,8 +4,6 @@
 # | |__| |_| | | | | | |  __/ | | |
 # |_____\__,_|_| |_| |_|\___|_| |_|
 
-# You can use MiniMessage, (&6, &a...) and (§b, §c...) for styles and colors in translations.
-
 plugin:
   prefix: "<color:#d4d4d4>[</color><gradient:#21FFCE:#D3FFAD>Lumen</gradient><color:#d4d4d4>]</color> "
   dynamic_color: "<color:#21FFCE>" # 应用于 {0}、{1} 等的颜色
