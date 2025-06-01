@@ -87,6 +87,10 @@ public class ConfigHandler {
         return config.getInt(path, def);
     }
 
+    public static String getString(String path, String def) {
+        return config.getString(path, def);
+    }
+
     public static boolean isBossBarEnabled() {
         return Lumen.getInstance().getConfig().getBoolean("display.bossbar.enabled", true);
     }

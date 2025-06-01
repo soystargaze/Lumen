@@ -1,5 +1,5 @@
 name: Lumen
-version: '1.1.0'
+version: '1.1.1'
 main: com.soystargaze.lumen.Lumen
 api-version: '1.21'
 load: STARTUP

@@ -117,12 +117,8 @@ items:
   registered: "Objets personnalisés enregistrés avec succès."
   init_error: "Erreur lors de l'initialisation des objets personnalisés."
   torch:
-    name: "<yellow><bold>Torche Lumen</yellow>"
-    lore: "<white>Une torche lumineuse qui éclaire les environs.</white>"
     no-permission: "Vous n'avez pas la permission de fabriquer une Lumen Torch."
   guard:
-    name: "<blue><bold>Gardien Lumen</blue>"
-    lore: "<white>Un gardien lumineux qui protège les environs.</white>"
     no-permission: "Vous n'avez pas la permission de fabriquer un Lumen Guard."
   recipe_registered: "Recette enregistrée : {0}."
 

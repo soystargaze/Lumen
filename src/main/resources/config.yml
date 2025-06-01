@@ -43,3 +43,12 @@ display:
   actionbar:
     enabled: true
     message: "Progress: {progress}% completed"
+
+# Lumen Torch and Guard items
+items:
+  torch:
+    name: "<yellow>Lumen Torch</yellow>"
+    lore: "<white>Place this torch to illuminate the area around it.</white> <gray>(Right-click to change intensity)</gray>"
+  guard:
+    name: "<blue>Lumen Guard</blue>"
+    lore: "<white>Place this guard to protect the area against hostile mobs.</white>"

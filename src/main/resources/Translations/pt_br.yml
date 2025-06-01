@@ -117,12 +117,8 @@ items:
   registered: "Itens personalizados registrados com sucesso."
   init_error: "Erro ao inicializar os itens personalizados."
   torch:
-    name: "<yellow><bold>Lumen Torch</yellow>"
-    lore: "<white>Uma tocha mágica que ilumina a área ao seu redor.</white>"
     no-permission: "Você não tem permissão para fabricar uma Lumen Torch."
   guard:
-    name: "<blue><bold>Lumen Guard</blue>"
-    lore: "<white>Uma tocha mágica que protege uma área contra mobs hostis.</white>"
     no-permission: "Você não tem permissão para fabricar uma Lumen Guard."
   recipe_registered: "Receita registrada: {0}."
 

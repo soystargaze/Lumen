@@ -117,12 +117,8 @@ items:
   registered: "自定义物品注册成功。"
   init_error: "初始化自定义物品时出错。"
   torch:
-    name: "<yellow><bold>Lumen 火把</yellow>"
-    lore: "<white>放置此火把以照亮周围区域。</white>"
     no-permission: "您没有权限制作 Lumen 火把。"
   guard:
-    name: "<blue><bold>Lumen 护卫</blue>"
-    lore: "<white>放置此护卫以防御敌对生物侵袭区域。</white>"
     no-permission: "您没有权限制作 Lumen 护卫。"
   recipe_registered: "配方注册成功：{0}。"
 

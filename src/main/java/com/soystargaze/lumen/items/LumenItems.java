@@ -1,7 +1,7 @@
 package com.soystargaze.lumen.items;
 
+import com.soystargaze.lumen.config.ConfigHandler;
 import com.soystargaze.lumen.utils.LumenConstants;
-import com.soystargaze.lumen.utils.text.legacy.LegacyTranslationHandler;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -40,15 +40,19 @@ public class LumenItems {
     }
 
     public void registerItems() {
+        String torchName = ConfigHandler.getString("items.torch.name", "<yellow>Lumen Torch</yellow>");
+        String torchLore = ConfigHandler.getString("items.torch.lore", "<white>Place this torch to illuminate the area around it.</white> <gray>(Right-click to change intensity)</gray>");
         ItemStack lumenTorch = createLumenTorch(
-                LegacyTranslationHandler.get("items.torch.name"),
-                LegacyTranslationHandler.get("items.torch.lore"),
+                torchName,
+                torchLore,
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzViNTFjYzJlOTlkMDhkZDI4NzlhNzkyZjA2MmUwNzc4MzJhMDE2M2YzZDg1YzI0NGUwYmExYzM5MmFiMDlkZSJ9fX0=",
                 "torch"
         );
+        String guardName = ConfigHandler.getString("items.guard.name", "<blue>Lumen Guard</blue>");
+        String guardLore = ConfigHandler.getString("items.guard.lore", "<white>Place this guard to protect the area against hostile mobs.</white>");
         ItemStack lumenGuard = createLumenTorch(
-                LegacyTranslationHandler.get("items.guard.name"),
-                LegacyTranslationHandler.get("items.guard.lore"),
+                guardName,
+                guardLore,
                 "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzg0NDE3MjViZDQzMDczNmNmNDBkNGNlOTVjYjVhNWUxMDMwNWI3OTVhYzRmZjg0NzRlMDUzNWRmN2FmMWRkNyJ9fX0=",
                 "guard"
         );

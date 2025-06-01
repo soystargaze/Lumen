@@ -124,12 +124,8 @@ items:
   registered: "¡Ea! Loh objeto' personalizáo' están ya bien montao'."
   init_error: "Quillo, algo ha salío torcío con loh objeto'."
   torch:
-    name: "<yellow><bold>Antorcha Lumen muy Luminoza</yellow>"
-    lore: "<white>¡Ilumina máh que un farolillo en feria! ¡Cuidao con loh bicho'!</white>"
     no-permission: "¡Quillo, que no tieneh permiso pa crafteá eso! Pregúntale al jefaso a vé si te deja."
   guard:
-    name: "<blue><bold>Guardia Antibichoh</blue>"
-    lore: "<white>¡No entra ni un gato! ¡Protege tu casa de loh bicho'!</white>"
     no-permission: "¡Ojú! No tieneh permiso pa' crafteá ehto. Pregúntale al jefaso a vé si te deja."
   recipe_registered: "¡Receta lista! Se ha registráo: {0}."
 
