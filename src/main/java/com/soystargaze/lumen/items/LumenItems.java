@@ -75,7 +75,8 @@ public class LumenItems {
         if (meta != null) {
             Component displayName = MiniMessage.miniMessage()
                     .deserialize(name)
-                    .decoration(TextDecoration.ITALIC, false);
+                    .decoration(TextDecoration.ITALIC, false)
+                    .decoration(TextDecoration.BOLD, true);
 
             List<Component> loreComponents = List.of(
                     MiniMessage.miniMessage()
