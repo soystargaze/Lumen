@@ -158,4 +158,12 @@ public class ConfigHandler {
     public static String getActionBarMessage() {
         return Lumen.getInstance().getConfig().getString("display.actionbar.message", "Progreso: {progress}% completado");
     }
+
+    public static boolean isSmartLightingEnabled() {
+        return config.getBoolean("settings.smart_lighting.enabled", true);
+    }
+
+    public static int getSmartLightingSpacingFactor() {
+        return config.getInt("settings.smart_lighting.spacing_factor", 5);
+    }
 }

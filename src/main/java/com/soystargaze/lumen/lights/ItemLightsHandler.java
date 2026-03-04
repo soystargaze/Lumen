@@ -50,7 +50,7 @@ public class ItemLightsHandler {
             return;
         }
 
-        CompletableFuture.supplyAsync(() -> calculateLightPositions(center, radius), executor)
+        CompletableFuture.supplyAsync(() -> calculateLightPositions(center, radius, lightLevel), executor)
                 .thenAcceptAsync(blocksToLight -> {
                     if (blocksToLight.isEmpty()) {
                         TextHandler.get().sendAndLog(player, "light.error.no_blocks_found");
@@ -68,14 +68,24 @@ public class ItemLightsHandler {
                 });
     }
 
-    private List<Location> calculateLightPositions(Location center, int radius) {
+    private List<Location> calculateLightPositions(Location center, int radius, int lightLevel) {
         List<Location> positions = new LinkedList<>();
         World world = center.getWorld();
         if (world == null) return positions;
 
+        int step = 1;
+        if (ConfigHandler.isSmartLightingEnabled()) {
+            int factor = ConfigHandler.getSmartLightingSpacingFactor();
+            step = Math.max(1, lightLevel / factor);
+        }
+
         for (int x = -radius; x <= radius; x++) {
+            if (step > 1 && x % step != 0) continue;
             for (int y = -radius; y <= radius; y++) {
+                if (step > 1 && y % step != 0) continue;
                 for (int z = -radius; z <= radius; z++) {
+                    if (step > 1 && z % step != 0) continue;
+                    
                     Location location = center.clone().add(x, y, z);
 
                     if (isValidLightPosition(location)) {

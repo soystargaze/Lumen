@@ -59,6 +59,15 @@ settings:
       - "SCULK_SENSOR"
       - "CALIBRATED_SCULK_SENSOR"
 
+  # Smart lighting settings
+  smart_lighting:
+    # If enabled, the plugin will skip some blocks based on the light level
+    # to optimize performance and avoid excessive light block placement.
+    enabled: true
+    # The higher the factor, the more blocks are skipped.
+    # A factor of 5 with light level 15 results in a 3x3x3 grid.
+    spacing_factor: 5
+
   # Lumen Mob Torch settings
   mob_torch_radius: 35 # Radius of the mob torch
   mob_torch_search_range: 100 # Range of the mob torch search
