@@ -5,7 +5,7 @@
 - **Lumen Torch** – Automatically lights up the surroundings with custom light level.
 - **Lumen Guard** – Prevents hostile mobs from spawning.
 
-> 💡**Attention:** NO resource pack needed!
+> 💡**Attention:** NO resource pack needed! Built exclusively for **PaperMC**.
 
 [![Discord](https://img.shields.io/discord/1079917552588816484?label=Discord&logo=discord&logoColor=white&color=31FFA3&style=for-the-badge)](https://erosmari.com/discord) ![](https://img.shields.io/badge/Made%20with-%E2%9D%A4%EF%B8%8F%20by%20stargaze-31FFA3?style=for-the-badge)
 
@@ -15,11 +15,13 @@
 
 ## ⚡️ Features
 
+- **Smart Lighting Optimization:** Automatically skips redundant light blocks based on light intensity, reducing block count while maintaining perfect illumination.
+- **Placement Safety:** Intelligently avoids placing lights near sensitive blocks (saplings, redstone mechanisms, etc.) with a configurable safety margin.
 - **Dynamic lighting** using **commands** and **custom crafteable items** (No resource pack needed).
 - **Auto-lighting** torches with custom light level (Lumen Torch).
 - Mob spawn prevention (Lumen Guard).
 - **Integration** with **CoreProtect & FAWE**. (Recommended)
-- **Multilingual Support** – Available translations: **Spanish**, **Chinese**, **English**, **French**, **German**, **Italian** and **Brazilian Portuguese**. Custom languages can be added.
+- **Multilingual Support** – Available translations: **Spanish**, **Chinese**, **English**, **French**, **German**, **Italian** and **Brazilian Portuguese**.
 
 ---
 
@@ -27,7 +29,7 @@
 
 ### For Players
 - The `Lumen Torch` automatically lights up nearby areas.
-  - Players can right-click the air while holding a Lumen Torch and input a light level between 0 and 15.
+  - Players can right-click the air while holding a Lumen Torch and input a light level between 0 and 15 in the chat.
   - The selected light level will be stored in the torch and applied when placed.
 - The `Lumen Guard` prevents mob spawning within its range.
 - Torches can be removed without being lost, and their effects disappear when removed.
@@ -57,11 +59,6 @@ Lumen can leverage other tools to enhance performance and functionality:
 
 - **CoreProtect** – Logs light placements and removals, allowing rollbacks and audits.
 - **FastAsyncWorldEdit (FAWE)** – Optimizes light block placement through commands and the Lumen Torch, improving server performance.
-
-  ![Lumen Torch with FAWE](https://imgur.com/pgmWWE1.gif)
-  ![LightCommandWithFAWE](https://imgur.com/tqJ3gLA.gif)
-
-These integrations are optional but recommended for better control and efficiency.
 
 ---
 
@@ -104,6 +101,8 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
 ---
 
 ### For Administrators
+- **Smart Spacing:** Control the density of light blocks with `spacing_factor`.
+- **Safety Settings:** Customize which blocks to avoid and the safety margin radius.
 - Advanced light management using commands.
 - Safe light removal with `/lumen remove`.
 - Undo and redo light placements with `/lumen undo` and `/lumen redo`.
@@ -111,10 +110,7 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
 - Item distribution using `/lumen give`.
 - Full customization through `config.yml` and translation files in `Translations/`.
 - Integration with CoreProtect and FAWE for enhanced performance and control.
-- Change the plugin language with `/lumen lang`.
 - Reload configuration and translations with `/lumen reload`.
-- Adjust performance settings in `config.yml`: Control the number of lights placed per tick and the interval between torch ticks.
-- Control the permissions of each command and item.
 
 ---
 
@@ -125,43 +121,33 @@ Lumen also provides a variety of aliases for each command `/lumen`, `/lu`, and `
 ## **Prerequisites**
 Before installing Lumen, make sure your server meets the following requirements:
 
-- **Minecraft Server:** PaperMC **1.21 or higher** (recommended **1.21.4**, the latest stable version).
+- **Minecraft Server:** **PaperMC 1.21.1 or higher**.
 - **Java:** Version **21 or higher**.
 - **Optional Dependencies:**
-  - **CoreProtect (Optional):** Enables tracking and rollback of placed or removed lights. Integration can be verified in the console upon server startup.
-  - **FastAsyncWorldEdit (Optional):** Optimizes performance for placing and removing large amounts of lights.
+  - **CoreProtect (Optional):** Enables tracking and rollback of placed or removed lights.
+  - **FastAsyncWorldEdit (Optional):** Optimizes performance for placing large amounts of lights.
 
 ---
 
 ## **Step 1: Download the Plugin**
-Download the latest version of **Lumen** from [Modrinth](https://modrinth.com/plugin/lumen) and ensure you obtain a valid `.jar` file.
+Download the latest version of **Lumen** from [Modrinth](https://modrinth.com/plugin/lumen).
 
 ---
 
 ## **Step 2: Installation**
 1. **Upload the file** `Lumen.jar` to the `plugins/` folder of your PaperMC server.
 2. **Restart the server** to automatically generate the configuration files.
-3. **Verify installation** by checking the console. If the installation was successful, you will see a message indicating that the plugin has been loaded correctly.
 
 ---
 
 ## **Step 3: Initial Configuration**
 1. **Navigate to the configuration folder:** `plugins/Lumen/`
-2. **Edit `config.yml`** to adjust performance settings, such as:
-  - `command_lights_per_tick`: Number of lights added per tick when using commands.
-  - `torch_lights_per_tick`: Number of lights added per tick when using torches.
-  - `torch_tick_interval`: Interval between torch ticks.
-  - `mob_torch_radius`: Protection radius of the anti-mob torch.
-3. **If using CoreProtect,** check the server console on startup. If integration is successful, you will see a message indicating that CoreProtect has been detected and is active in Lumen.
-4. **If using FastAsyncWorldEdit,** ensure it is installed and properly configured to optimize the placement and removal of lights.
-
----
-
-## **Step 4: Troubleshooting**
-- **The plugin does not load:** It is recommended to use **PaperMC 1.21.4**, the latest stable version. Also, ensure you are using Java 21 or higher.
-- **CoreProtect errors:** Check the console when starting the server. If integration does not activate, ensure CoreProtect is correctly installed.
-- **Low performance when placing lights:** Adjust values in `config.yml` and/or install **FastAsyncWorldEdit** to optimize large-scale block processing.
-- Only newly placed `Lumen Torch` and `Lumen Guard` will have effects of changes in config.yml. Previously placed torches will not be affected unless removed and placed again.
+2. **Edit `config.yml`** to adjust performance and safety settings:
+  - `smart_lighting.spacing_factor`: Control how many blocks are skipped during lighting.
+  - `safety.margin`: Radius of blocks to avoid around sensitive materials.
+  - `safety.excluded_blocks`: List of materials to avoid (saplings, redstone, etc.).
+  - `command_lights_per_tick`: Lights per tick when using commands.
+3. **If using CoreProtect/FAWE,** check the server console on startup for successful detection.
 
 </details>
 
