@@ -2,6 +2,7 @@ package com.soystargaze.lumen.config;
 
 import com.soystargaze.lumen.Lumen;
 import net.kyori.adventure.bossbar.BossBar;
+import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -12,12 +13,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class ConfigHandler {
 
     private static FileConfiguration config;
     private static String language;
+    private static Set<Material> excludedBlocks;
+    private static int safetyMargin;
 
     public static void setup(JavaPlugin plugin) {
         File dataFolder = plugin.getDataFolder();
@@ -65,6 +71,20 @@ public class ConfigHandler {
 
         config = mergedConfig;
         language = config.getString("language", "en_us");
+        loadExcludedBlocks();
+        safetyMargin = config.getInt("settings.safety.margin", 1);
+    }
+
+    private static void loadExcludedBlocks() {
+        excludedBlocks = new HashSet<>();
+        List<String> rawList = config.getStringList("settings.safety.excluded_blocks");
+        for (String materialName : rawList) {
+            try {
+                Material material = Material.valueOf(materialName.toUpperCase());
+                excludedBlocks.add(material);
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
     }
 
     @SuppressWarnings("unused")
@@ -76,6 +96,16 @@ public class ConfigHandler {
         JavaPlugin plugin = Lumen.getInstance();
         plugin.reloadConfig();
         config = plugin.getConfig();
+        loadExcludedBlocks();
+        safetyMargin = config.getInt("settings.safety.margin", 1);
+    }
+
+    public static Set<Material> getExcludedBlocks() {
+        return excludedBlocks;
+    }
+
+    public static int getSafetyMargin() {
+        return safetyMargin;
     }
 
     public static String getLanguage() {

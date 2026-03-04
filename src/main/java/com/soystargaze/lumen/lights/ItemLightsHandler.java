@@ -94,7 +94,36 @@ public class ItemLightsHandler {
 
         Block block = location.getBlock();
         if (!block.getType().isAir()) return false;
+
+        if (shouldAvoidPlacement(location)) return false;
+
         return isAdjacentToSolidBlock(location);
+    }
+
+    private boolean shouldAvoidPlacement(Location location) {
+        java.util.Set<Material> excluded = ConfigHandler.getExcludedBlocks();
+        if (excluded.isEmpty()) return false;
+
+        int margin = ConfigHandler.getSafetyMargin();
+        World world = location.getWorld();
+        if (world == null) return false;
+
+        int centerX = location.getBlockX();
+        int centerY = location.getBlockY();
+        int centerZ = location.getBlockZ();
+
+        for (int x = -margin; x <= margin; x++) {
+            for (int y = -margin; y <= margin; y++) {
+                for (int z = -margin; z <= margin; z++) {
+                    Material blockType = world.getBlockAt(centerX + x, centerY + y, centerZ + z).getType();
+                    if (excluded.contains(blockType)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     private boolean isAdjacentToSolidBlock(Location location) {

@@ -29,6 +29,36 @@ settings:
   torch_lights_per_tick: 10 # Quantity of lights added per tick with the torch
   torch_tick_interval: 10 # Interval between torch ticks
 
+  # Safety settings for light placement
+  safety:
+    # Margin (in blocks) to keep around excluded blocks.
+    # 1 means no light will be placed directly adjacent to an excluded block.
+    # 2 means a 2-block buffer will be maintained.
+    margin: 2
+    # Blocks to avoid placing light on or adjacent to (e.g., redstone, saplings)
+    # This prevents breaking redstone mechanisms or blocking sapling growth.
+    excluded_blocks:
+      - "OAK_SAPLING"
+      - "SPRUCE_SAPLING"
+      - "BIRCH_SAPLING"
+      - "JUNGLE_SAPLING"
+      - "ACACIA_SAPLING"
+      - "DARK_OAK_SAPLING"
+      - "CHERRY_SAPLING"
+      - "MANGROVE_PROPAGULE"
+      - "BAMBOO_SAPLING"
+      - "REDSTONE_WIRE"
+      - "REDSTONE_TORCH"
+      - "REDSTONE_WALL_TORCH"
+      - "REPEATER"
+      - "COMPARATOR"
+      - "OBSERVER"
+      - "PISTON"
+      - "STICKY_PISTON"
+      - "DAYLIGHT_DETECTOR"
+      - "SCULK_SENSOR"
+      - "CALIBRATED_SCULK_SENSOR"
+
   # Lumen Mob Torch settings
   mob_torch_radius: 35 # Radius of the mob torch
   mob_torch_search_range: 100 # Range of the mob torch search
