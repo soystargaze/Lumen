@@ -1,8 +1,5 @@
 package com.soystargaze.lumen.utils.updater;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.soystargaze.lumen.Lumen;
 import com.soystargaze.lumen.utils.AsyncExecutor;
 import com.soystargaze.lumen.utils.text.TextHandler;
@@ -18,8 +15,7 @@ public class UpdateChecker {
 
     private static final String API_URL = "https://api.modrinth.com/v2/project/%s/version";
     private static final String PROJECT_ID = "lumen";
-    @SuppressWarnings("deprecation")
-    private static final String CURRENT_VERSION = Lumen.getInstance().getDescription().getVersion();
+    private static final String CURRENT_VERSION = Lumen.getInstance().getPluginMeta().getVersion();
     private static final String DOWNLOAD_URL = "https://modrinth.com/plugin/lumen";
 
     public static void checkForUpdates(Player player) {
@@ -34,48 +30,32 @@ public class UpdateChecker {
 
                 int responseCode = connection.getResponseCode();
                 if (responseCode == 200) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    StringBuilder response = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        response.append(line);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    String inputLine;
+                    StringBuilder content = new StringBuilder();
+                    while ((inputLine = in.readLine()) != null) {
+                        content.append(inputLine);
                     }
-                    reader.close();
+                    in.close();
 
-                    Gson gson = new Gson();
-                    JsonArray versions = gson.fromJson(response.toString(), JsonArray.class);
-                    if (!versions.isEmpty()) {
-                        JsonObject latestVersion = versions.get(0).getAsJsonObject();
-                        String latestVersionNumber = latestVersion.get("version_number").getAsString();
-
-                        if (!CURRENT_VERSION.equals(latestVersionNumber)) {
-                            if (player != null && player.isOnline()) {
-                                TextHandler.get().sendAndLog(player, "plugin.update_available", latestVersionNumber, DOWNLOAD_URL);
-                            } else {
-                                TextHandler.get().logTranslated("plugin.update_available", latestVersionNumber, DOWNLOAD_URL);
-                            }
-                        } else {
-                            if (player != null && player.isOnline()) {
-                                TextHandler.get().sendAndLog(player, "plugin.no_update_available");
-                            } else {
-                                TextHandler.get().logTranslated("plugin.no_update_available");
-                            }
-                        }
-                    }
-                } else {
-                    if (player != null && player.isOnline()) {
-                        TextHandler.get().sendAndLog(player, "plugin.update_check_failed", String.valueOf(responseCode));
-                    } else {
-                        TextHandler.get().logTranslated("plugin.update_check_failed", String.valueOf(responseCode));
+                    String latestVersion = parseLatestVersion(content.toString());
+                    if (latestVersion != null && !latestVersion.equalsIgnoreCase(CURRENT_VERSION)) {
+                        TextHandler.get().sendMessage(player, "updater.update_available", latestVersion, DOWNLOAD_URL);
                     }
                 }
             } catch (Exception e) {
-                if (player != null && player.isOnline()) {
-                    TextHandler.get().sendAndLog(player, "plugin.update_check_error", e.getMessage());
-                } else {
-                    TextHandler.get().logTranslated("plugin.update_check_error", e.getMessage());
-                }
+                TextHandler.get().logTranslated("updater.error_checking", e.getMessage());
             }
         });
+    }
+
+    private static String parseLatestVersion(String jsonResponse) {
+        try {
+            int versionStart = jsonResponse.indexOf("\"version_number\":\"") + 18;
+            int versionEnd = jsonResponse.indexOf("\"", versionStart);
+            return jsonResponse.substring(versionStart, versionEnd);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

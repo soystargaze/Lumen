@@ -20,8 +20,8 @@ public class ConsoleUtils {
         TextHandler.get().logTranslated(LOCAL_TEST_MESSAGE_KEY);
         TextHandler.get().logTranslated("plugin.separator");
         TextHandler.get().logTranslated("plugin.name");
-        TextHandler.get().logTranslated("plugin.version", plugin.getDescription().getVersion());
-        TextHandler.get().logTranslated("plugin.author", plugin.getDescription().getAuthors());
+        TextHandler.get().logTranslated("plugin.version", plugin.getPluginMeta().getVersion());
+        TextHandler.get().logTranslated("plugin.author", plugin.getPluginMeta().getAuthors());
         TextHandler.get().logTranslated("plugin.separator");
     }
 

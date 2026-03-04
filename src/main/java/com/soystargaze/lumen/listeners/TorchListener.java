@@ -7,6 +7,8 @@ import com.soystargaze.lumen.lights.ItemLightsHandler;
 import com.soystargaze.lumen.utils.ItemEffectUtil;
 import com.soystargaze.lumen.utils.LumenConstants;
 import com.soystargaze.lumen.utils.text.TextHandler;
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -18,7 +20,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -149,13 +150,12 @@ public class TorchListener implements Listener {
                 TextHandler.get().sendMessage(player, "torch.light_level_prompt");
 
                 plugin.getServer().getPluginManager().registerEvents(new Listener() {
-                    @SuppressWarnings("deprecation")
                     @EventHandler
-                    public void onChat(AsyncPlayerChatEvent chatEvent) {
+                    public void onChat(AsyncChatEvent chatEvent) {
                         if (!chatEvent.getPlayer().equals(player)) return;
 
                         chatEvent.setCancelled(true);
-                        String message = chatEvent.getMessage();
+                        String message = PlainTextComponentSerializer.plainText().serialize(chatEvent.originalMessage());
 
                         try {
                             int lightLevel = Integer.parseInt(message);
@@ -180,7 +180,7 @@ public class TorchListener implements Listener {
                             TextHandler.get().sendAndLog(player, "torch.error.invalid_light_level");
                         }
 
-                        AsyncPlayerChatEvent.getHandlerList().unregister(this);
+                        AsyncChatEvent.getHandlerList().unregister(this);
                     }
                 }, plugin);
             }

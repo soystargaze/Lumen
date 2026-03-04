@@ -1,7 +1,6 @@
 package com.soystargaze.lumen.database;
 
 import com.soystargaze.lumen.utils.text.TextHandler;
-import com.soystargaze.lumen.utils.text.legacy.LegacyTranslationHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,7 +50,7 @@ public class LightRegistry {
         } catch (SQLException e) {
             TextHandler.get().logTranslated("database.operation.register.error", e.getMessage());
         }
-        throw new IllegalStateException(LegacyTranslationHandler.get("database.operation.register.failed"));
+        throw new IllegalStateException("Failed to register database operation.");
     }
 
     public static void softDeleteBlocksByOperationId(int operationId) {
@@ -285,10 +284,11 @@ public class LightRegistry {
         statement.setString(1, Objects.requireNonNull(center.getWorld()).getName());
         statement.setInt(2, center.getBlockX() - range);
         statement.setInt(3, center.getBlockX() + range);
-        statement.setInt(4, center.getBlockY() - range);
-        statement.setInt(5, center.getBlockY() + range);
-        statement.setInt(6, center.getBlockZ() - range);
-        statement.setInt(7, center.getBlockZ() + range);
+        statement.setInt(4, center.getBlockX() + range);
+        statement.setInt(5, center.getBlockY() - range);
+        statement.setInt(6, center.getBlockY() + range);
+        statement.setInt(7, center.getBlockZ() - range);
+        statement.setInt(8, center.getBlockZ() + range);
     }
 
     public static void addBlocksAsync(List<Location> locations, int lightLevel, int operationId) {

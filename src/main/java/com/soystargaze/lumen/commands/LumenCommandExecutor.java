@@ -38,17 +38,17 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String @NotNull [] args) {
         if (!(sender instanceof Player player)) {
-            TextHandler.get().logTranslated("command.only_players");
+            sender.sendMessage(TextHandler.get().getMessage("command.only_players"));
             return true;
         }
 
-        if (!sender.hasPermission("lumen.use")) {
-            TextHandler.get().sendMessage(player, "command.no_permission");
+        if (!player.hasPermission("lumen.use")) {
+            player.sendMessage(TextHandler.get().getMessage("command.no_permission"));
             return true;
         }
 
         if (args.length == 0) {
-            TextHandler.get().sendMessage(player, "command.usage");
+            player.sendMessage(TextHandler.get().getMessage("command.usage"));
             return true;
         }
 
@@ -56,16 +56,16 @@ public class LumenCommandExecutor implements CommandExecutor, TabCompleter {
         String[] subArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
 
         return switch (subCommand) {
-            case "light" -> lightCommand.onCommand(sender, command, label, subArgs);
-            case "cancel" -> cancelCommand.onCommand(sender, command, label, subArgs);
-            case "undo" -> undoCommand.onCommand(sender, command, label, subArgs);
-            case "redo" -> redoCommand.onCommand(sender, command, label, subArgs);
-            case "clear" -> clearCommand.onCommand(sender, command, label, subArgs);
-            case "remove" -> removeCommand.onCommand(sender, command, label, subArgs);
-            case "give" -> giveCommand.onCommand(sender, command, label, subArgs);
-            case "reload" -> reloadCommand.onCommand(sender, command, label, subArgs);
+            case "light" -> lightCommand.onCommand(player, command, label, subArgs);
+            case "cancel" -> cancelCommand.onCommand(player, command, label, subArgs);
+            case "undo" -> undoCommand.onCommand(player, command, label, subArgs);
+            case "redo" -> redoCommand.onCommand(player, command, label, subArgs);
+            case "clear" -> clearCommand.onCommand(player, command, label, subArgs);
+            case "remove" -> removeCommand.onCommand(player, command, label, subArgs);
+            case "give" -> giveCommand.onCommand(player, command, label, subArgs);
+            case "reload" -> reloadCommand.onCommand(player, command, label, subArgs);
             default -> {
-                TextHandler.get().sendMessage(player, "command.usage");
+                player.sendMessage(TextHandler.get().getMessage("command.usage"));
                 yield true;
             }
         };

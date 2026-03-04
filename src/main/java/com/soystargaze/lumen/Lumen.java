@@ -13,7 +13,6 @@ import com.soystargaze.lumen.listeners.TorchListener;
 import com.soystargaze.lumen.mobs.ItemMobsHandler;
 import com.soystargaze.lumen.utils.*;
 import com.soystargaze.lumen.utils.text.TextHandler;
-import com.soystargaze.lumen.utils.text.legacy.LegacyTranslationHandler;
 import com.soystargaze.lumen.utils.updater.UpdateOnFullLoad;
 import com.soystargaze.lumen.utils.updater.UpdateOnJoinListener;
 import org.bukkit.Bukkit;
@@ -33,14 +32,17 @@ public class Lumen extends JavaPlugin implements Listener {
     private CoreProtectHandler coreProtectHandler;
     private static final int BSTATS_PLUGIN_ID = 24638;
 
-    @SuppressWarnings("CallToPrintStackTrace")
     @Override
     public void onEnable() {
         instance = this;
         try {
             initializePlugin();
         } catch (Exception e) {
-            TextHandler.get().logTranslated("plugin.enable_error", e.getMessage());
+            if (TextHandler.get() != null) {
+                TextHandler.get().logTranslated("plugin.enable_error", e.getMessage());
+            } else {
+                getLogger().severe("Critical error during plugin enable: " + e.getMessage());
+            }
             e.printStackTrace();
             getServer().getPluginManager().disablePlugin(this);
         }
@@ -50,7 +52,9 @@ public class Lumen extends JavaPlugin implements Listener {
     public void onDisable() {
         AsyncExecutor.shutdown();
         DatabaseHandler.close();
-        TextHandler.get().logTranslated("plugin.disabled");
+        if (TextHandler.get() != null) {
+            TextHandler.get().logTranslated("plugin.disabled");
+        }
         instance = null;
     }
 
@@ -64,7 +68,9 @@ public class Lumen extends JavaPlugin implements Listener {
             registerEvents();
             registerServerLoadListener();
         } catch (Exception e) {
-            TextHandler.get().logTranslated("plugin.enable_error", e);
+            if (TextHandler.get() != null) {
+                TextHandler.get().logTranslated("plugin.enable_error", e);
+            }
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -139,7 +145,7 @@ public class Lumen extends JavaPlugin implements Listener {
             DatabaseHandler.initialize(this);
         } catch (Exception e) {
             TextHandler.get().logTranslated("database.init_error", e.getMessage());
-            throw new IllegalStateException(LegacyTranslationHandler.get("database.init_fatal_error"));
+            throw new IllegalStateException("Failed to initialize database: " + e.getMessage());
         }
     }
 

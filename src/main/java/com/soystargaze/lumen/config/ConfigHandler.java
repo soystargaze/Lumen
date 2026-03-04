@@ -1,8 +1,7 @@
 package com.soystargaze.lumen.config;
 
 import com.soystargaze.lumen.Lumen;
-import org.bukkit.boss.BarColor;
-import org.bukkit.boss.BarStyle;
+import net.kyori.adventure.bossbar.BossBar;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -99,21 +98,26 @@ public class ConfigHandler {
         return Lumen.getInstance().getConfig().getString("display.bossbar.message", "Progress: {progress}% completed");
     }
 
-    public static BarColor getBossBarColor() {
+    public static BossBar.Color getBossBarColor() {
         String color = Lumen.getInstance().getConfig().getString("display.bossbar.color", "GREEN");
         try {
-            return BarColor.valueOf(color.toUpperCase());
+            return BossBar.Color.valueOf(color.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return BarColor.GREEN;
+            return BossBar.Color.GREEN;
         }
     }
 
-    public static BarStyle getBossBarStyle() {
-        String style = Lumen.getInstance().getConfig().getString("display.bossbar.style", "SOLID");
+    public static BossBar.Overlay getBossBarStyle() {
+        String style = Lumen.getInstance().getConfig().getString("display.bossbar.style", "PROGRESS");
+        // Adventure uses NOTCHED_6, NOTCHED_10, NOTCHED_12, NOTCHED_20, PROGRESS. 
+        // Bukkit style SOLID maps to PROGRESS.
+        if (style.equalsIgnoreCase("SOLID")) {
+            return BossBar.Overlay.PROGRESS;
+        }
         try {
-            return BarStyle.valueOf(style.toUpperCase());
+            return BossBar.Overlay.valueOf(style.toUpperCase());
         } catch (IllegalArgumentException e) {
-            return BarStyle.SOLID;
+            return BossBar.Overlay.PROGRESS;
         }
     }
 
